@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,10 +12,6 @@ public class PlayerController : MonoBehaviour
 
     private Ray ray;
     private RaycastHit hit;
-    
-    //if one of these is true, the other is false
-    [SerializeField] private bool moveToClickWithNavMesh, followMouseWithNavMesh, followMouseClickWithNavMesh, followMouseClickWithoutNavMesh, followMouseWithoutNavMesh, moveToClickWithoutNavMesh;
-
     private Vector3 goal;
     private void Start()
     {
@@ -24,140 +21,7 @@ public class PlayerController : MonoBehaviour
     
     private void Update()
     {
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (moveToClickWithNavMesh)
-        {
-            agent.enabled = true;
-            if (Input.GetMouseButton(0))
-            {
-                if (Physics.Raycast(ray, out hit))
-                {
-                    agent.SetDestination(hit.point);
-                }
-            }
-            else
-            {
-                agent.SetDestination(transform.position);
-            }
-        }
-        else if (followMouseWithNavMesh)
-        {
-            agent.enabled = true;
-            if (Physics.Raycast(ray, out hit))
-            {
-                agent.SetDestination(hit.point);
-            }
-        }
-        else if (followMouseClickWithNavMesh)
-        {
-            agent.enabled = true;
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (Physics.Raycast(ray, out hit))
-                {
-                    agent.SetDestination(hit.point);
-                }
-            }
-        }
-        else if (followMouseClickWithoutNavMesh)
-        {
-            agent.enabled = false;
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (Physics.Raycast(ray, out hit))
-                {
-                    goal = hit.point;
-                }
-            }
-            else
-            {
-                //stop moving and stop the lerp
-                transform.position = transform.position;
-                hit.point = transform.position;
-            }
-            transform.position = Vector3.Lerp(transform.position, goal, speed * Time.deltaTime);
-        }
-        else if (followMouseWithoutNavMesh)
-        {
-            agent.enabled = false;
-            if (Physics.Raycast(ray, out hit))
-            {
-                transform.position = Vector3.Lerp(transform.position, hit.point, speed * Time.deltaTime);
-            }
-            else
-            {
-                //stop moving and stop the lerp
-                transform.position = transform.position;
-                hit.point = transform.position;
-            }
-        }
-        else if (moveToClickWithoutNavMesh)
-        {
-            agent.enabled = false;
-            if (Input.GetMouseButton(0))
-            {
-                if (Physics.Raycast(ray, out hit))
-                {
-                    transform.position = Vector3.Lerp(transform.position, hit.point, speed * Time.deltaTime);
-                }
-                else
-                {
-                    //stop moving and stop the lerp
-                    transform.position = transform.position;
-                    hit.point = transform.position;
-                }
-            }
-        }
-        if (moveToClickWithNavMesh)
-        {
-            followMouseWithNavMesh = false;
-            followMouseClickWithNavMesh = false;
-            followMouseClickWithoutNavMesh = false;
-            followMouseWithoutNavMesh = false;
-            moveToClickWithoutNavMesh = false;
-        }
-        else if (followMouseWithNavMesh)
-        {
-            followMouseClickWithNavMesh = false;
-            followMouseClickWithoutNavMesh = false;
-            followMouseWithoutNavMesh = false;
-            moveToClickWithoutNavMesh = false;
-            moveToClickWithNavMesh = false;
-        }
-        else if (followMouseClickWithNavMesh)
-        {
-            followMouseClickWithoutNavMesh = false;
-            followMouseWithoutNavMesh = false;
-            moveToClickWithoutNavMesh = false;
-            moveToClickWithNavMesh = false;
-            followMouseWithNavMesh = false;
-        }
-        else if (followMouseClickWithoutNavMesh)
-        {
-            followMouseWithoutNavMesh = false;
-            moveToClickWithoutNavMesh = false;
-            moveToClickWithNavMesh = false;
-            followMouseWithNavMesh = false;
-            followMouseClickWithNavMesh = false;
-        }
-        else if (followMouseWithoutNavMesh)
-        {
-            moveToClickWithoutNavMesh = false;
-            moveToClickWithNavMesh = false;
-            followMouseWithNavMesh = false;
-            followMouseClickWithNavMesh = false;
-            followMouseClickWithoutNavMesh = false;
-        }
-        else if (moveToClickWithoutNavMesh)
-        {
-            moveToClickWithNavMesh = false;
-            followMouseWithNavMesh = false;
-            followMouseClickWithNavMesh = false;
-            followMouseClickWithoutNavMesh = false;
-            followMouseWithoutNavMesh = false;
-        }
-        
+        MovementTypeSwitch();
     }
     
     private void OnDrawGizmos()
@@ -167,5 +31,173 @@ public class PlayerController : MonoBehaviour
     }
     
     
+    private enum MovementType
+    {
+        moveToClickWithNavMesh,
+        followMouseWithNavMesh,
+        followMouseClickWithNavMesh,
+        moveToClickbutKeepDirectionWithNavMesh,
+        followMouseClickWithoutNavMesh,
+        followMouseWithoutNavMesh,
+        moveToClickWithoutNavMesh,
+        moveToClickbutKeepDirectionWithoutNavMesh
+    }
     
+    [SerializeField] private MovementType movementType;
+    
+    //make a switch statement for the movement type to replace the if statements
+    private void MovementTypeSwitch()
+    {
+        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        switch (movementType)
+        {
+            case MovementType.moveToClickWithNavMesh:
+                MoveToClickUsingTheNavMesh();
+                break;
+            case MovementType.followMouseWithNavMesh:
+                FollowTheMouseUsingNavMesh();
+                break;
+            case MovementType.followMouseClickWithNavMesh:
+                FollowTheMouseWhenPressedUsingNavMesh();
+                break;
+            case MovementType.moveToClickbutKeepDirectionWithNavMesh:
+                MoveToClickButKeepDirectionUsingNavMesh();
+                break;
+            case MovementType.followMouseClickWithoutNavMesh:
+                FollowMousePosWhenPressedNoNavMesh();
+                break;
+            case MovementType.followMouseWithoutNavMesh:
+                FollowMousePosNoNavMesh();
+                break;
+            case MovementType.moveToClickWithoutNavMesh:
+                MoveToClickNoNavMesh();
+                break;
+            case MovementType.moveToClickbutKeepDirectionWithoutNavMesh:
+                MoveToClickButKeepDirectionNoNavMesh();
+                break;
+        }
+    }
+
+    private void MoveToClickButKeepDirectionNoNavMesh()
+    {
+        agent.enabled = false;
+        //move to click and when you get there keep moving in the direction you were going
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                goal = hit.point;
+                goal.y = transform.position.y;
+            }
+        }
+        if (Vector3.Distance(transform.position, goal) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, goal, speed * Time.deltaTime);
+            transform.LookAt(goal);
+        }
+        else
+        {
+            goal = transform.position + transform.forward * 10;
+        }
+    }
+
+    private void MoveToClickButKeepDirectionUsingNavMesh()
+    {
+        agent.enabled = true;
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                goal = hit.point;
+                agent.SetDestination(goal);
+            }
+        }
+        if (agent.remainingDistance <= agent.stoppingDistance)
+        {
+            agent.ResetPath();
+            goal = transform.position + transform.forward * 10;
+            agent.SetDestination(goal);
+
+        }
+        
+        for (int i = 0; i < agent.path.corners.Length - 1; i++)
+        {
+            Debug.DrawLine(agent.path.corners[i], agent.path.corners[i + 1], Color.red);
+        }
+        
+    }
+
+
+    private void MoveToClickNoNavMesh()
+    {
+        agent.enabled = false;
+        if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit))
+        {
+            goal = hit.point;
+            goal.y = transform.position.y;
+        }
+        GoToNoNavMesh();
+    }
+
+    
+
+    private void FollowMousePosNoNavMesh()
+    {
+        agent.enabled = false;
+        if (Physics.Raycast(ray, out hit)) 
+        {
+            goal = hit.point;
+            goal.y = transform.position.y;
+        }
+        else
+        {
+            transform.position = transform.position;
+            goal = transform.position;
+        }
+        GoToNoNavMesh();
+    }
+
+    private void FollowMousePosWhenPressedNoNavMesh()
+    {
+        agent.enabled = false;
+        if (Input.GetMouseButton(0) && Physics.Raycast(ray, out hit))
+        {
+            goal = hit.point;
+            goal.y = transform.position.y;
+        }
+        else
+        {
+            transform.position = transform.position;
+            goal = transform.position;
+        }
+        GoToNoNavMesh();
+    }
+
+    private void FollowTheMouseWhenPressedUsingNavMesh()
+    {
+        agent.enabled = true;
+        if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit)) agent.SetDestination(hit.point);
+    }
+
+    private void FollowTheMouseUsingNavMesh()
+    {
+        agent.enabled = true;
+        if (Physics.Raycast(ray, out hit)) agent.SetDestination(hit.point);
+    }
+
+    private void MoveToClickUsingTheNavMesh()
+    {
+        agent.enabled = true;
+        if (Input.GetMouseButton(0) && Physics.Raycast(ray, out hit)) agent.SetDestination(hit.point);
+        else agent.SetDestination(transform.position);
+    }
+    
+    
+    private void GoToNoNavMesh()
+    {
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.position = Vector3.MoveTowards(transform.position, goal, speed * Time.deltaTime);
+        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+        transform.LookAt(goal);
+    }
 }
