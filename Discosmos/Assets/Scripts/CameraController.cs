@@ -12,15 +12,21 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector3 offset;
     [SerializeField] private Vector2 rotationOffset;
     [SerializeField] private float cameraSpeed;
-    [SerializeField] private float cameraZoom;
-
-    [SerializeField] private bool cameraLock = true;
     
-    Vector3 nextPos;
+    [Range(-10,3)] [SerializeField] private float cameraZoom;
+
+    private bool cameraLock = true;
+    private Vector3 nextPos;
+    private Vector3 forward;
+    private Vector3 right;
     
     private void Start()
     {
-        transform.rotation = Quaternion.Euler(rotationOffset);
+        //transform rotation but just the y
+        transform.rotation = Quaternion.Euler(0, rotationOffset.y, 0);
+        forward = transform.forward;
+        right = transform.right;
+        transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, 0);
         transform.position += offset;
     }
     
@@ -53,7 +59,7 @@ public class CameraController : MonoBehaviour
         if (cameraLock)
         {
             nextPos = player.position + offset;
-            transform.position = Vector3.Lerp(transform.position, nextPos, /*tick * */ smoothSpeed);
+            transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
         }
         else
         {
@@ -61,28 +67,29 @@ public class CameraController : MonoBehaviour
 
             if (Input.mousePosition.x >= Screen.width - 1)
             {
-                nextPos += transform.right * cameraSpeed;
+                nextPos += right * cameraSpeed;
             }
 
             if (Input.mousePosition.x <= 0)
             {
-                nextPos -= transform.right * cameraSpeed;
+                nextPos -= right * cameraSpeed;
             }
 
             if (Input.mousePosition.y >= Screen.height - 1)
             {
-                nextPos += transform.up * cameraSpeed;
+                //while ignoring rotation on the x axis move the camera forward
+                nextPos += forward * cameraSpeed;
             }
 
             if (Input.mousePosition.y <= 0)
             {
-                nextPos -= transform.up * cameraSpeed;
+                nextPos -= forward * cameraSpeed;
             }
-
-            transform.position = Vector3.Lerp(transform.position, nextPos, /*tick * */ smoothSpeed);
         }
+
         transform.rotation = Quaternion.Euler(rotationOffset);
         transform.position += transform.forward * cameraZoom;
+        transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
 
         
     }
