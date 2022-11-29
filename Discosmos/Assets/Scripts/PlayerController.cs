@@ -8,8 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     
     private NavMeshAgent agent;
-    [SerializeField] private float speed;
-    [SerializeField] private float range;
+    [SerializeField] public float speed;
 
     private Ray ray;
     private Ray rayCam;
@@ -27,6 +26,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         MovementTypeSwitch();
+        agent.speed = speed;
         Debug.DrawLine(transform.position, agent.destination, Color.yellow);
     }
 
