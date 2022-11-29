@@ -16,23 +16,25 @@ public class Speedpad : MonoBehaviour
     {
         //draw the transform.forward of the speedpad
         Debug.DrawRay(transform.position, transform.forward, Color.blue, 50);
+        Debug.Log("Enter");
         if (other.gameObject.GetComponent<PlayerController>())
         {
-            //if the player is going in the same direction as the speedpad, set the speed to 10
-            if (Vector3.Dot(other.transform.forward, transform.forward) > precision)
+            playerspeed = other.gameObject.GetComponent<PlayerController>().speed;
+            //if the player is approaching the speedpad from the same direction as the speedpad is facing, increase the speed
+            if (Vector3.Dot(other.gameObject.transform.forward, transform.forward) > precision)
             {
-                playerspeed = speed;
+                other.gameObject.GetComponent<PlayerController>().speed = speed;
             }
-            //if the player is going in the opposite direction as the speedpad, set the speed to 2
             else
             {
-                playerspeed = slow;
+                other.gameObject.GetComponent<PlayerController>().speed = slow;
             }
         }
     }
     
     private void OnTriggerExit(Collider other)
     {
+        Debug.Log("Exit");
         if (other.gameObject.GetComponent<PlayerController>())
         {
             other.gameObject.GetComponent<PlayerController>().speed = playerspeed;
