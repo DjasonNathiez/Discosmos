@@ -148,7 +148,7 @@ PrefabInstance:
     - target: {fileID: 373636908336022569, guid: f1a33462b35f7e74db5e1ac86e76e224,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.96
+      value: -0.99
       objectReference: {fileID: 0}
     - target: {fileID: 373636908336022569, guid: f1a33462b35f7e74db5e1ac86e76e224,
         type: 3}
@@ -319,7 +319,7 @@ PrefabInstance:
     - target: {fileID: 373636908336022569, guid: f1a33462b35f7e74db5e1ac86e76e224,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.96
+      value: -0.99
       objectReference: {fileID: 0}
     - target: {fileID: 373636908336022569, guid: f1a33462b35f7e74db5e1ac86e76e224,
         type: 3}
@@ -1230,3 +1230,87 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cce93a8acebe525458268637261684d5, type: 3}
+--- !u!1001 &9216117933340439917
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3198023347728109857, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_Name
+      value: Cube
+      objectReference: {fileID: 0}
+    - target: {fileID: 8614526280869706186, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8614526280869706186, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 26.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 8614526280869706186, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.5649357
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 16.608421
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 12.503723
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8682502208742290834, guid: d1d8d5e877743154abd6fa0a0a494823,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d1d8d5e877743154abd6fa0a0a494823, type: 3}
