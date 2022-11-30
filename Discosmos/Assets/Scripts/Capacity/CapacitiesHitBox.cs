@@ -1,18 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class CapacitiesHitBox : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public byte[] GetTargets()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //TODO do the target detection and send
+        return new byte[2];
     }
 }

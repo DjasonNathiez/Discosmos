@@ -8,5 +8,8 @@ public abstract class ActiveCapacitySO : ScriptableObject
    public float castTime;
    public float cooldownTime;
 
+   [Header("Detection")]
+   public CapacitiesHitBox capacitiesHitBox;
+   
    public abstract void GetActiveCapacity();
 }

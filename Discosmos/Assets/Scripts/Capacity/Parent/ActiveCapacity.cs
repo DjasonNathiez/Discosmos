@@ -1,10 +1,11 @@
 using Photon.Pun;
-using UnityEngine;
 
 public abstract class ActiveCapacity
 {
     public ActiveCapacitySO activeCapacitySo;
 
+    private byte caster;
+    
     private bool onCooldown;
     private double serverTimeBackup;
     private float castTimer;
@@ -46,7 +47,8 @@ public abstract class ActiveCapacity
     {
         if (castTimer >= activeCapacitySo.castTime)
         {
-            ApplyCapacity();
+            //TODO check for index capacity in collection script
+            PhotonNetwork.GetPhotonView(caster).RPC("PerformCapacity", RpcTarget.AllBufferedViaServer, caster, activeCapacitySo.capacitiesHitBox.GetTargets(), activeCapacitySo.index);
             GameAdministrator.OnServerUpdate -= CastTimer;
         }
         else
@@ -54,7 +56,19 @@ public abstract class ActiveCapacity
             castTimer += (float)(PhotonNetwork.Time - serverTimeBackup);
         }
     }
+
+    [PunRPC] public virtual void PerformCapacity(byte caster, byte[] target, byte capacityIndex)
+    {
+        GameAdministrator.OnCapacityPerform += ApplyCapacity;
+        GameAdministrator.OnCapacityPerform?.Invoke(caster, target);
+    }
+
+    public virtual void ApplyCapacity(byte caster, byte[] target) //Launch the spell effect.
+    { 
+        SendFeedback();
+
+        GameAdministrator.OnCapacityPerform -= ApplyCapacity;
+    } 
     
-    public virtual void ApplyCapacity() {} //Launch the spell effect.
     public virtual void SendFeedback() {} //Perform the spell feedback of the capacity.
 }

@@ -13,11 +13,6 @@ public class LaserCapacity : ActiveCapacity
         base.CastCapacity();
     }
 
-    public override void ApplyCapacity()
-    {
-        base.ApplyCapacity();
-    }
-
     public override void SendFeedback()
     {
         base.SendFeedback();
