@@ -8,7 +8,7 @@ public class GameAdministrator : MonoBehaviour
     [Header("Network")] 
     public double tickRate;
     
-    private NetworkDelegate.OnServerUpdate OnServerUpdate;
+    public static NetworkDelegate.OnServerUpdate OnServerUpdate;
     private NetworkDelegate.OnUpdated OnUpdated;
     
     private double timer;
