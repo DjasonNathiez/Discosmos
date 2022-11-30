@@ -10,6 +10,8 @@ public class GameAdministrator : MonoBehaviour
     
     public static NetworkDelegate.OnServerUpdate OnServerUpdate;
     private NetworkDelegate.OnUpdated OnUpdated;
+
+    public static NetworkDelegate.OnCapacityPerform OnCapacityPerform;
     
     private double timer;
     private double lastTickTime;
