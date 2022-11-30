@@ -6,8 +6,6 @@ public class LaserCapacitySO : ActiveCapacitySO
     public short damage;
     public PassiveCapacitySO[] additionalPassiveEffect;
 
-    [Header("Detection")]
-    public CapacitiesHitBox capacitiesHitBox;
 
     [Header("Visual")]
     public GameObject projectile;
