@@ -18,6 +18,7 @@ public class TowerDetection : MonoBehaviour
     [SerializeField] private Vector3 targetPosition;
     [SerializeField] private bool hasEnnemiesInRange;
     [SerializeField] private bool rayCastHit;
+    [SerializeField] private bool rotationLocked = true;
     /*il faudra créer une variable pour savoir la team ici*/
     
     private void Start()
@@ -54,8 +55,13 @@ public class TowerDetection : MonoBehaviour
             if (Physics.Raycast(topOfTower, target.transform.position - topOfTower, out hit))
             {
                 //rotate the tower to face the enemy but to not change the y rotation
-                targetPosition = new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z);
-                transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
+                if (!rotationLocked)
+                {
+                    targetPosition = new Vector3(target.transform.position.x, transform.position.y,
+                        target.transform.position.z);
+                    transform.LookAt(new Vector3(target.transform.position.x, transform.position.y,
+                        target.transform.position.z));
+                }
                 Debug.DrawLine(this.transform.position, target.transform.position, Color.yellow);
                
             }

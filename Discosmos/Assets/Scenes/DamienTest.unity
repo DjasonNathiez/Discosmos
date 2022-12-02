@@ -106,7 +106,7 @@ NavMeshSettings:
   m_BuildSettings:
     serializedVersion: 2
     agentTypeID: 0
-    agentRadius: 0.5
+    agentRadius: 1
     agentHeight: 2
     agentSlope: 45
     agentClimb: 0.4
@@ -114,7 +114,7 @@ NavMeshSettings:
     maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
-    cellSize: 0.16666667
+    cellSize: 0.33333334
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
@@ -1022,6 +1022,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1030985794727737837, guid: cce93a8acebe525458268637261684d5,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1594465839981273227, guid: cce93a8acebe525458268637261684d5,
+        type: 3}
+      propertyPath: rotationLocked
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5303429749651350323, guid: cce93a8acebe525458268637261684d5,
         type: 3}
       propertyPath: m_RootOrder
@@ -1077,10 +1087,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6724518256095121494, guid: cce93a8acebe525458268637261684d5,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7487102524351150653, guid: cce93a8acebe525458268637261684d5,
         type: 3}
       propertyPath: m_Name
       value: Tower
+      objectReference: {fileID: 0}
+    - target: {fileID: 7487102524351150653, guid: cce93a8acebe525458268637261684d5,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cce93a8acebe525458268637261684d5, type: 3}
@@ -1150,6 +1170,36 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7754843790860608221, guid: e07d07e50da77ad4381245063d075978,
+        type: 3}
+      propertyPath: m_Speed
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7754843790860608221, guid: e07d07e50da77ad4381245063d075978,
+        type: 3}
+      propertyPath: m_Acceleration
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 7754843790860608221, guid: e07d07e50da77ad4381245063d075978,
+        type: 3}
+      propertyPath: m_AngularSpeed
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 7754843790860608223, guid: e07d07e50da77ad4381245063d075978,
+        type: 3}
+      propertyPath: speed
+      value: 17.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7754843790860608223, guid: e07d07e50da77ad4381245063d075978,
+        type: 3}
+      propertyPath: movementType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7754843790860608223, guid: e07d07e50da77ad4381245063d075978,
+        type: 3}
+      propertyPath: controlSpeedChange
+      value: 19
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e07d07e50da77ad4381245063d075978, type: 3}

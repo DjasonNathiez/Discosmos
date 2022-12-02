@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     
     private NavMeshAgent agent;
     [Range(0,20)][SerializeField] public float speed;
+    [Range(0,20)][SerializeField] public float controlSpeedChange;
     [SerializeField] private MovementType movementType = MovementType.moveToClickWithNavMesh;
 
     private Ray ray;
@@ -27,7 +28,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         //if the speed is > 10 set the enum MovementType to moveToClickbutKeepDirectionWithoutNavMesh else set it to moveToClickWithNavMesh
-        if (agent.speed > 10)
+        if (speed > controlSpeedChange)
         {
             movementType = MovementType.moveToClickbutKeepDirectionWithoutNavMesh;
         }
@@ -102,8 +103,10 @@ public class PlayerController : MonoBehaviour
         {
             if (Physics.Raycast(ray, out hit))
             {
+                agent.ResetPath();
                 agent.SetDestination(hit.point);
             }
         }
+        //fix for when the agent run into a wall and wants to rotate
     }
 }

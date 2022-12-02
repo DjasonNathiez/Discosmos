@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class CameraController : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector2 rotationOffset;
     [SerializeField] private float cameraSpeed;
     
-    [Range(-10,3)] [SerializeField] private float cameraZoom;
+    [Range(0,4)] [SerializeField] private float cameraZoom;
 
     private bool cameraLock = true;
     private Vector3 nextPos;
@@ -86,9 +87,13 @@ public class CameraController : MonoBehaviour
                 nextPos -= forward * cameraSpeed;
             }
         }
-
-        transform.rotation = Quaternion.Euler(rotationOffset);
-        transform.position += transform.forward * cameraZoom;
+        //if scroll wheel is used zoom in or out
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            cameraZoom -= Input.mouseScrollDelta.y * 0.1f;
+        }
+        //lerp Vector3.one * Mathf.Clamp(cameraZoom,0,4)
+        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * Mathf.Clamp(cameraZoom, 0, 4), 0.125f);
         transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
 
         
