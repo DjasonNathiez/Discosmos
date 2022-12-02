@@ -8,38 +8,35 @@ public class PlayerController : MonoBehaviour
 {
     
     private NavMeshAgent agent;
-    [Range(0,20)][SerializeField] public float speed;
-    [Range(0,20)][SerializeField] public float controlSpeedChange;
     [SerializeField] private MovementType movementType = MovementType.moveToClickWithNavMesh;
+    [Range(0,1)][SerializeField] private float force; //from 0 to 1
+    [Range(0, 20)] [SerializeField] public float baseSpeed;
+    [SerializeField] private AnimationCurve speedCurve;
+    [SerializeField] private AnimationCurve slowDownCurve;
 
     private Ray ray;
     private Ray rayCam;
     private RaycastHit hit;
-    private Vector3 goal;
+    private Vector3 destination;
+    private Vector3 direction;
+    private float currentSpeed;
     
     private bool attacking =false;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = speed;
+        agent.speed = currentSpeed;
     }
     
     private void Update()
     {
-        //if the speed is > 10 set the enum MovementType to moveToClickbutKeepDirectionWithoutNavMesh else set it to moveToClickWithNavMesh
-        if (speed > controlSpeedChange)
-        {
-            movementType = MovementType.moveToClickbutKeepDirectionWithoutNavMesh;
-        }
-        else
-        {
-            movementType = MovementType.moveToClickWithNavMesh;
-        }
+        direction = transform.forward;
+        currentSpeed = (speedCurve.Evaluate(force) - slowDownCurve.Evaluate(force)) + baseSpeed;
         
         
         MovementTypeSwitch();
-        agent.speed = speed;
+        agent.speed = currentSpeed;
         Debug.DrawLine(transform.position, agent.destination, Color.yellow);
     }
 
@@ -53,7 +50,8 @@ public class PlayerController : MonoBehaviour
     private enum MovementType
     {
         moveToClickWithNavMesh,
-        moveToClickbutKeepDirectionWithoutNavMesh
+        KeepDirectionWithoutNavMesh,
+        slide,
     }
     
     
@@ -66,33 +64,25 @@ public class PlayerController : MonoBehaviour
             case MovementType.moveToClickWithNavMesh:
                 MoveToClickUsingTheNavMesh();
                 break;
-            case MovementType.moveToClickbutKeepDirectionWithoutNavMesh:
-                MoveToClickButKeepDirectionNoNavMesh();
+            case MovementType.KeepDirectionWithoutNavMesh:
+                KeepDirectionNoNavMesh();
+                break;
+            case MovementType.slide:
+                Slide();
                 break;
         }
     }
 
-    private void MoveToClickButKeepDirectionNoNavMesh()
+    public void Slide()
     {
-        if (Input.GetMouseButton(1))
-        {
-            if (Physics.Raycast(ray, out hit))
-            {
-                agent.enabled = false;
-                goal = hit.point;
-                goal.y = transform.position.y;
-            }
-        }
-        if (Vector3.Distance(transform.position, goal) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, goal, speed * Time.deltaTime);
-            transform.LookAt(goal);
-        }
-        else
-        {
-            goal = transform.position + transform.forward * 10;
-            transform.LookAt(goal);
-        }
+        //ici fonc slide ^^
+    }
+
+    private void KeepDirectionNoNavMesh()
+    {
+        transform.LookAt(direction);
+        transform.position += direction * (currentSpeed * Time.deltaTime);
+            
     }
 
     
@@ -107,6 +97,10 @@ public class PlayerController : MonoBehaviour
                 agent.SetDestination(hit.point);
             }
         }
-        //fix for when the agent run into a wall and wants to rotate
+    }
+    
+    public float GetForce()
+    {
+        return force;
     }
 }

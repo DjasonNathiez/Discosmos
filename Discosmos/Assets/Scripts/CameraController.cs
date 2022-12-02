@@ -15,6 +15,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float cameraSpeed;
     
     [Range(0,4)] [SerializeField] private float cameraZoom;
+    
+    private PlayerController playerController;
 
     private bool cameraLock = true;
     private Vector3 nextPos;
@@ -29,6 +31,7 @@ public class CameraController : MonoBehaviour
         right = transform.right;
         transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, 0);
         transform.position += offset;
+        playerController = player.GetComponent<PlayerController>();
     }
     
     
@@ -92,10 +95,13 @@ public class CameraController : MonoBehaviour
         {
             cameraZoom -= Input.mouseScrollDelta.y * 0.1f;
         }
-        //lerp Vector3.one * Mathf.Clamp(cameraZoom,0,4)
         transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * Mathf.Clamp(cameraZoom, 0, 4), 0.125f);
+        if(playerController != null)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * (playerController.GetForce() * 1.5f), 0.125f);
+        }
         transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
 
-        
+
     }
 }
