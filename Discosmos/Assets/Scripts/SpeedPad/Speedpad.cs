@@ -19,15 +19,15 @@ public class Speedpad : MonoBehaviour
         Debug.Log("Enter");
         if (other.gameObject.GetComponent<PlayerController>())
         {
-            playerspeed = other.gameObject.GetComponent<PlayerController>().speed;
+            playerspeed = other.gameObject.GetComponent<PlayerController>().baseSpeed;
             //if the player is approaching the speedpad from the same direction as the speedpad is facing, increase the speed
             if (Vector3.Dot(other.gameObject.transform.forward, transform.forward) > precision)
             {
-                other.gameObject.GetComponent<PlayerController>().speed = speed;
+                other.gameObject.GetComponent<PlayerController>().baseSpeed *= speed;
             }
             else
             {
-                other.gameObject.GetComponent<PlayerController>().speed = slow;
+                other.gameObject.GetComponent<PlayerController>().baseSpeed *= 1/slow;
             }
         }
     }
@@ -37,7 +37,7 @@ public class Speedpad : MonoBehaviour
         Debug.Log("Exit");
         if (other.gameObject.GetComponent<PlayerController>())
         {
-            other.gameObject.GetComponent<PlayerController>().speed = playerspeed;
+            other.gameObject.GetComponent<PlayerController>().baseSpeed = playerspeed;
         }
     }
 }

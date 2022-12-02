@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class CameraController : MonoBehaviour
 {
@@ -13,7 +14,9 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector2 rotationOffset;
     [SerializeField] private float cameraSpeed;
     
-    [Range(-10,3)] [SerializeField] private float cameraZoom;
+    [Range(0,4)] [SerializeField] private float cameraZoom;
+    
+    private PlayerController playerController;
 
     private bool cameraLock = true;
     private Vector3 nextPos;
@@ -28,6 +31,7 @@ public class CameraController : MonoBehaviour
         right = transform.right;
         transform.rotation = Quaternion.Euler(rotationOffset.x, rotationOffset.y, 0);
         transform.position += offset;
+        playerController = player.GetComponent<PlayerController>();
     }
     
     
@@ -86,11 +90,18 @@ public class CameraController : MonoBehaviour
                 nextPos -= forward * cameraSpeed;
             }
         }
-
-        transform.rotation = Quaternion.Euler(rotationOffset);
-        transform.position += transform.forward * cameraZoom;
+        //if scroll wheel is used zoom in or out
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            cameraZoom -= Input.mouseScrollDelta.y * 0.1f;
+        }
+        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * Mathf.Clamp(cameraZoom, 0, 4), 0.125f);
+        if(playerController != null)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * (playerController.GetForce() * 1.5f), 0.125f);
+        }
         transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
 
-        
+
     }
 }
