@@ -53,7 +53,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _D_but_Horaire: 0
-    - _Fin_Horaire: 0.075
+    - _Fin_Horaire: 0.324
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors: []
