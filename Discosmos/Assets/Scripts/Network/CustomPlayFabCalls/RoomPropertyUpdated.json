@@ -1,0 +1,67 @@
+﻿{
+  "ActorNr": 1,
+  "AppVersion": "1.2_1.85",
+  "AppId": "bfd5f98b-c6a4-4763-80d9-824d20db842b",
+  "Properties": {
+    "CustomProperty": "It's Value"
+  },
+  "GameId": "8b8322de-096d-4481-a2b2-8db8bb45cfef",
+  "Region": "EU",
+  "State": {
+    "ActorCounter": 1,
+    "ActorList": [
+      {
+        "ActorNr": 1,
+        "UserId": "834D5AA5BAB1DFB6",
+        "Username": "",
+        "IsActive": true,
+        "Binary": "RGIAAAEBRAAAAAFi\/3MAAA==",
+        "DEBUG_BINARY": {
+          "1": {
+            "255": ""
+          }
+        }
+      }
+    ],
+    "Binary": {
+      "18": "RAAAAANi+nkAAHNzAA1QbGF5ZXJJbmRleGVzRGlpAAEAAAABAAAAAHMADkN1c3RvbVByb3BlcnR5cwAKSXQncyBWYWx1ZQ=="
+    },
+    "CheckUserOnJoin": false,
+    "CustomProperties": {
+
+    },
+    "DeleteCacheOnLeave": true,
+    "EmptyRoomTTL": 0,
+    "IsOpen": true,
+    "IsVisible": true,
+    "LobbyType": 0,
+    "LobbyProperties": [
+
+    ],
+    "MaxPlayers": 4,
+    "PlayerTTL": 0,
+    "SuppressRoomEvents": false,
+    "Slice": 0,
+    "DebugInfo": {
+      "DEBUG_PROPERTIES_18": {
+        "250": [
+
+        ],
+        "PlayerIndexes": {
+          "1": 0
+        },
+        "CustomProperty": "It's Value"
+      }
+    },
+    "ExcludedActors": [
+
+    ],
+    "PublishUserId": false,
+    "ExpectedUsers": [
+
+    ]
+  },
+  "Type": "Game",
+  "UserId": "834D5AA5BAB1DFB6",
+  "Username": ""
+}
