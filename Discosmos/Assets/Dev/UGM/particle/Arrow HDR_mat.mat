@@ -40,11 +40,15 @@ Material:
     m_Ints: []
     m_Floats:
     - _4: 8
+    - _D_calage_de_frame: 0
+    - _Nombre_de_colonne: 1
+    - _Nombre_de_frame: 0
     - _Nombre_de_ligne: 4
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Transparent: 1
     m_Colors:
-    - _Color: {r: 4.504694, g: 2.4400425, b: 17.924929, a: 0}
+    - _Color: {r: 1.1261735, g: 0.6100106, b: 4.481232, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &3017723563517958477
 MonoBehaviour:
