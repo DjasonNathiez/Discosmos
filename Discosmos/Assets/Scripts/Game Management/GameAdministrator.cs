@@ -34,6 +34,9 @@ public class GameAdministrator : MonoBehaviour
     [Header("Local Player In Game Informations")]
     public Enums.Teams currentTeam;
 
+    [Header("Local Player")] 
+    public static string username;
+
     private void Awake()
     {
         #region Singleton
