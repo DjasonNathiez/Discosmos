@@ -15,8 +15,25 @@ namespace Toolbox.Variable
     
     public static class Enums
     {
+        public enum Scenes
+        {
+            Login,
+            Hub,
+            Game,
+            EndGame
+        }
+        
+        public enum Teams
+        {
+            None,
+            Green,
+            Yellow,
+            Neutral
+        }
+        
         public enum GameState
         {
+            Login,
             Hub,
             InQueue,
             ChampionSelection,
