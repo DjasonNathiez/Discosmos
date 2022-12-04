@@ -518,7 +518,7 @@ MonoBehaviour:
   player: {fileID: 1846850387}
   smoothSpeed: 0.125
   offset: {x: -3.5, y: 8, z: -7}
-  rotationOffset: {x: 45, y: 22.5}
+  rotationOffset: {x: 60, y: 22.5}
   cameraSpeed: 0.2
   cameraZoom: 0
 --- !u!114 &620923164
