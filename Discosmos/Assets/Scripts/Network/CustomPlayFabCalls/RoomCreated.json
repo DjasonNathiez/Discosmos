@@ -1,0 +1,25 @@
+{
+  "ActorNr": 1,
+  "AppVersion": "1.2_1.85",
+  "AppId": "bfd5f98b-c6a4-4763-80d9-824d20db842b",
+  "CreateOptions": {
+    "MaxPlayers": 4,
+    "LobbyId": null,
+    "LobbyType": 0,
+    "CustomProperties": {
+
+    },
+    "EmptyRoomTTL": 0,
+    "PlayerTTL": 0,
+    "CheckUserOnJoin": false,
+    "DeleteCacheOnLeave": true,
+    "SuppressRoomEvents": false,
+    "PublishUserId": false,
+    "ExpectedUsers": null
+  },
+  "GameId": "8b8322de-096d-4481-a2b2-8db8bb45cfef",
+  "Region": "EU",
+  "Type": "Create",
+  "UserId": "834D5AA5BAB1DFB6",
+  "Username": ""
+}
