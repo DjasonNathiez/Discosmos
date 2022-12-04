@@ -7,17 +7,17 @@ public class GameAdministrator : MonoBehaviour
 {
     [Header("Network")] 
     public double tickRate;
-    
     public static NetworkDelegate.OnServerUpdate OnServerUpdate;
     private NetworkDelegate.OnUpdated OnUpdated;
-
     public static NetworkDelegate.OnCapacityPerform OnCapacityPerform;
-    
     private double timer;
     private double lastTickTime;
 
     [Header("Game State")] 
     public Enums.GameState currentState;
+
+    [Header("Local Player")] 
+    public static string username;
 
     private void Awake()
     {
@@ -26,12 +26,7 @@ public class GameAdministrator : MonoBehaviour
 
     void Update()
     {
-        switch (currentState)
-        {
-            case Enums.GameState.InGame:
-                OnUpdated?.Invoke();
-                break;
-        }
+        OnUpdated?.Invoke();
     }
 
     void UpdateNetwork()
