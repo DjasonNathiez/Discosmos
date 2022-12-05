@@ -15,6 +15,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float cameraSpeed;
     
     [Range(0,4)] [SerializeField] private float cameraZoom;
+    [SerializeField] private AnimationCurve cameraZoomCurve;
     
     private PlayerController playerController;
 
@@ -98,7 +99,7 @@ public class CameraController : MonoBehaviour
         transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * Mathf.Clamp(cameraZoom, 0, 4), 0.125f);
         if(playerController != null)
         {
-            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * (playerController.GetForce() * 1.5f), 0.125f);
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * (cameraZoomCurve.Evaluate(playerController.GetForce()) * 1.5f), 0.125f);
         }
         transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
 

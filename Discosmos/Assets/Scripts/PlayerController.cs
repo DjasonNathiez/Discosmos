@@ -33,8 +33,9 @@ public class PlayerController : MonoBehaviour
     {
         direction = transform.forward;
         currentSpeed = (speedCurve.Evaluate(force) - slowDownCurve.Evaluate(force)) + baseSpeed;
-        
-        
+        ClampSpeed();
+
+
         MovementTypeSwitch();
         agent.speed = currentSpeed;
         Debug.DrawLine(transform.position, agent.destination, Color.yellow);
@@ -102,5 +103,17 @@ public class PlayerController : MonoBehaviour
     public float GetForce()
     {
         return force;
+    }
+    
+    private void ClampSpeed()
+    {
+        if (currentSpeed > 20)
+        {
+            currentSpeed = 20;
+        }
+        else if (currentSpeed < 0)
+        {
+            currentSpeed = 0;
+        }
     }
 }
