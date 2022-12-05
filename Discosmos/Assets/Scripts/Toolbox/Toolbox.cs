@@ -25,6 +25,12 @@ namespace Toolbox.Variable
     
     public static class Enums
     {
+        public enum RoomPrivacy
+        {
+            Open,
+            Close
+        }
+        
         public enum Scenes
         {
             Login,

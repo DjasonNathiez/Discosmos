@@ -10,7 +10,7 @@ public class LoginScreen : MonoBehaviour
 
     private void Start()
     {
-        PlayFabManager.instance.LoginScreen = this;
+        NetworkManager.instance.LoginScreen = this;
     }
 
     public void ActiveConnectPanel(bool state)
@@ -20,11 +20,11 @@ public class LoginScreen : MonoBehaviour
     
     public void RegisterButton()
     {
-        PlayFabManager.instance.RegisterUser(usernameInputField.text, passwordInputField.text);
+        NetworkManager.instance.RegisterUser(usernameInputField.text, passwordInputField.text);
     }
 
     public void ConnectButton()
     {
-        PlayFabManager.instance.ConnectToUser(usernameInputField.text, passwordInputField.text);
+        NetworkManager.instance.ConnectToUser(usernameInputField.text, passwordInputField.text);
     }
 }
