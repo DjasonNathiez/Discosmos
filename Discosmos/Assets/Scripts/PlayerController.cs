@@ -7,10 +7,9 @@ using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {
-    
     private NavMeshAgent agent;
     [SerializeField] private MovementType movementType = MovementType.MoveToClickWithNavMesh;
-    [Range(0,1)][SerializeField] private float force; //from 0 to 1
+    [Range(0, 1)] [SerializeField] private float force; //from 0 to 1
     [Range(0, 20)] [SerializeField] public float baseSpeed;
     [SerializeField] private AnimationCurve speedCurve;
     [SerializeField] private AnimationCurve slowDownCurve;
@@ -21,9 +20,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 destination;
     private Vector3 direction;
     private float currentSpeed;
-    
-    private bool attacking =false;
-    
+
+    private bool attacking = false;
+
     private bool speedPadTriggered = false;
     private Transform speedPad;
     [SerializeField] private float speedUp = 10;
@@ -32,14 +31,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool speedPadPositive = false;
     [SerializeField] private float slowSpeedPadDuration = 0.5f;
     [SerializeField] private float fastSpeedPadDuration = 2;
-    private float speedPadSpeed = 0;
+    private float forcePad = 0;
     private double speedPadTimer = 0;
     private double time;
     [SerializeField] private float speedPadLerp = 1;
-    
+
     [SerializeField] private Canvas canvas;
-    
-    
+
+
     private Camera _camera;
 
     private void Start()
@@ -66,9 +65,10 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         SetTime();
-        
+
         direction = transform.forward;
-        currentSpeed = (speedCurve.Evaluate(force) - slowDownCurve.Evaluate(force)) + baseSpeed + speedPadSpeed;
+        force = forcePad /*+ autre trucs*/;
+        currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
         ClampSpeed();
         agent.speed = currentSpeed;
 
@@ -83,6 +83,7 @@ public class PlayerController : MonoBehaviour
     }
 
     #region SpeedPad
+
     private void SpeedPadFunction()
     {
         if (speedPadTriggered)
@@ -91,18 +92,16 @@ public class PlayerController : MonoBehaviour
             speedPadTimer = 0;
         }
 
-        if (!speedPadTriggered && speedPadSpeed != 0)
+        if (!speedPadTriggered && forcePad != 0)
         {
             speedPadTimer += time;
-            //if the speedPadSpeed is positive, then use the duration of the fast speed pad
-            if (speedPadSpeed > 0)
+            if (forcePad > 0)
             {
                 if (speedPadTimer >= fastSpeedPadDuration)
                 {
                     GoBackToNormalSpeed();
                 }
             }
-            //if the speedPadSpeed is negative, then use the duration of the slow speed pad
             else
             {
                 if (speedPadTimer >= slowSpeedPadDuration)
@@ -115,9 +114,9 @@ public class PlayerController : MonoBehaviour
 
     private void GoBackToNormalSpeed()
     {
-        speedPadSpeed = Mathf.Lerp(speedPadSpeed, 0, speedPadLerp);
+        forcePad = Mathf.Lerp(forcePad, 0, speedPadLerp);
     }
-    
+
     public void SpeedPadTrigger(bool isTriggered, Transform speedPadTransform)
     {
         speedPadTriggered = isTriggered;
@@ -130,7 +129,7 @@ public class PlayerController : MonoBehaviour
             speedPad = null;
         }
     }
-    
+
     //if the speed pad is triggered get the transform of the speed pad
     private void SpeedPadEffect()
     {
@@ -143,27 +142,30 @@ public class PlayerController : MonoBehaviour
         {
             SlowDownPad();
         }
+
         //debug Vector3.Angle(transform.forward, speedPad.forward) in the scene view
         Debug.DrawLine(transform.position, transform.position + transform.forward * 10, Color.red);
         Debug.DrawLine(transform.position, transform.position + speedPad.forward * 10, Color.green);
-        Debug.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(precisionAnglePad, Vector3.up) * transform.forward * 10, Color.blue);
-        
+        Debug.DrawLine(transform.position,
+            transform.position + Quaternion.AngleAxis(precisionAnglePad, Vector3.up) * transform.forward * 10,
+            Color.blue);
     }
 
     private void SlowDownPad()
     {
-        speedPadSpeed = -slowDown;
+        forcePad = Mathf.Lerp(forcePad, 0, speedPadLerp);
+        // speedPadSpeed = -slowDown;
         speedPadPositive = false;
         Debug.Log("slow down");
     }
 
     private void SpeedUpPad()
     {
-        speedPadSpeed = speedUp;
+        forcePad = Mathf.Lerp(forcePad, 1, speedPadLerp);;
         speedPadPositive = true;
         Debug.Log("speed up");
     }
-    
+
     #endregion
 
     private void OnDrawGizmos()
@@ -171,17 +173,16 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(hit.point, 0.1f);
     }
-    
-    
+
+
     private enum MovementType
     {
         MoveToClickWithNavMesh,
         KeepDirectionWithoutNavMesh,
         Slide,
     }
-    
-    
-    
+
+
     private void MovementTypeSwitch()
     {
         if (_camera != null) ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -208,10 +209,9 @@ public class PlayerController : MonoBehaviour
     {
         transform.LookAt(direction);
         transform.position += direction * (currentSpeed * Time.deltaTime);
-            
     }
 
-    
+
     private void MoveToClickUsingTheNavMesh()
     {
         agent.enabled = true;
@@ -224,12 +224,17 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    
+
     public float GetForce()
     {
         return force;
     }
-    
+
+    public float GetSpeed()
+    {
+        return currentSpeed;
+    }
+
     private void ClampSpeed()
     {
         if (currentSpeed > 20)
@@ -242,4 +247,19 @@ public class PlayerController : MonoBehaviour
         }
     }
     
+    private void ClampForce()
+    {
+        if (force > 1)
+        {
+            force = 1;
+        }
+        else if (force < 0)
+        {
+            force = 0;
+        }
+    }
 }
+
+
+//=======================================TO DO==================================================================
+//1. Implement for in the current speed of the player
