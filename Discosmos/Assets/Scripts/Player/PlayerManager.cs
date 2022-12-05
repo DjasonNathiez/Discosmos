@@ -1,3 +1,4 @@
+using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -18,8 +19,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     public float groovySpeed;
     public float speedMultiplier;
 
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    private void Awake()
     {
-        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
+        Debug.Log("Instantiate");
+        GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
+        GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log("Have been destroy");
     }
 }

@@ -4,7 +4,6 @@ using Toolbox.Variable;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(PhotonView))]
 public class GameAdministrator : MonoBehaviour
 {
     public static GameAdministrator instance;
@@ -26,10 +25,13 @@ public class GameAdministrator : MonoBehaviour
     public string hubSceneName;
     public string gameSceneName;
     public string endGameSceneName;
-    
+
     [Header("Local Player")] 
+    public bool localInitialize;
     public string username;
     public int playerLevel;
+    public int localViewID;
+    public PhotonView localPlayerView;
 
     [Header("Local Player In Game Informations")]
     public Enums.Teams currentTeam;
@@ -51,6 +53,25 @@ public class GameAdministrator : MonoBehaviour
         #endregion
         
         OnUpdated += UpdateNetwork;
+
+        string activeSceneName = SceneManager.GetActiveScene().name;
+        
+        if (activeSceneName == loginSceneName)
+        {
+            currentScene = Enums.Scenes.Login;
+        }
+        else if (activeSceneName == hubSceneName)
+        {
+            currentScene = Enums.Scenes.Hub;
+        }
+        else if (activeSceneName == gameSceneName)
+        {
+            currentScene = Enums.Scenes.Game;
+        }
+        else if (activeSceneName == endGameSceneName)
+        {
+            currentScene = Enums.Scenes.EndGame;
+        }
     }
 
     void Update()
@@ -78,8 +99,31 @@ public class GameAdministrator : MonoBehaviour
 
     public void LoadScene(Enums.Scenes scenes)
     {
+        if (currentScene == scenes) return;
+        
         SceneManager.LoadScene(GetSceneName(scenes));
         currentScene = scenes;
+        SetGameState();
+    }
+
+    public void SetGameState()
+    {
+        switch (currentScene)
+        {
+            default:
+                currentState = Enums.GameState.Loading;
+                break;
+            
+            case Enums.Scenes.Hub:
+                currentState = Enums.GameState.Hub;
+                break;
+            case Enums.Scenes.Login:
+                currentState = Enums.GameState.Login;
+                break;
+            case Enums.Scenes.Game:
+                currentState = Enums.GameState.InGame;
+                break;
+        }
     }
 
     public string GetSceneName(Enums.Scenes scenes)

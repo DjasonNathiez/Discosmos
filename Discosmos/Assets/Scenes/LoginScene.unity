@@ -357,7 +357,7 @@ RectTransform:
   m_Children:
   - {fileID: 2116009673}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -704,6 +704,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 378373418}
   m_CullTransparentMesh: 1
+--- !u!1 &389453802
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 389453803}
+  - component: {fileID: 389453804}
+  m_Layer: 0
+  m_Name: GameIntializer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &389453803
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 389453802}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &389453804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 389453802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f897bf27ada8239489682954b3b11138, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &416589591
 GameObject:
   m_ObjectHideFlags: 0
@@ -1595,7 +1639,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1077762938
 GameObject:
@@ -1825,7 +1869,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &1133018753
 MonoBehaviour:
@@ -2191,7 +2235,7 @@ RectTransform:
   m_Children:
   - {fileID: 460626891}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3936,15 +3980,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2976315303333238008, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: sceneViewId
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2976315303333238009, guid: e5929c7f48d5fe3488b53706ac06db92,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2976315303333238009, guid: e5929c7f48d5fe3488b53706ac06db92,
         type: 3}
@@ -3996,50 +4035,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2976315303333238011, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: connectPanel
-      value: 
-      objectReference: {fileID: 2116009672}
-    - target: {fileID: 2976315303333238011, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: passwordInputField
-      value: 
-      objectReference: {fileID: 2129803783}
-    - target: {fileID: 2976315303333238011, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: usernameInputField
-      value: 
-      objectReference: {fileID: 1976046184}
-    - target: {fileID: 2976315303333238011, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: popUpTextMeshProUGUI
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 2976315303333238014, guid: e5929c7f48d5fe3488b53706ac06db92,
         type: 3}
       propertyPath: m_Name
       value: Game Manager
-      objectReference: {fileID: 0}
-    - target: {fileID: 2976315303333238015, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: hubSceneName
-      value: HubScene
-      objectReference: {fileID: 0}
-    - target: {fileID: 2976315303333238015, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: gameSceneName
-      value: GameScene
-      objectReference: {fileID: 0}
-    - target: {fileID: 2976315303333238015, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: loginSceneName
-      value: LoginScene
-      objectReference: {fileID: 0}
-    - target: {fileID: 2976315303333238015, guid: e5929c7f48d5fe3488b53706ac06db92,
-        type: 3}
-      propertyPath: endGameSceneName
-      value: EndGameScene
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e5929c7f48d5fe3488b53706ac06db92, type: 3}
