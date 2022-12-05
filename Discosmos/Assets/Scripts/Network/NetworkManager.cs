@@ -8,7 +8,7 @@ using PlayFab.ClientModels;
 using Toolbox.Variable;
 using UnityEngine;
 
-public class NetworkManager : MonoBehaviourPunCallbacks
+public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
    public static NetworkManager instance;
 
@@ -24,6 +24,22 @@ public class NetworkManager : MonoBehaviourPunCallbacks
    public List<CustomRoom> roomsList;
    public CustomRoom currentPlayerRoom;
    private string currentTargetingRoom;
+
+   private string roomBackup;
+   
+   RoomOptions roomOptions = new RoomOptions
+   {
+      MaxPlayers = 4,
+      IsOpen = true,
+      IsVisible = true
+   };
+
+   private RaiseEventOptions raiseOption = new RaiseEventOptions
+   {
+      Receivers = ReceiverGroup.All,
+   };
+   
+   public static NetworkDelegate.OnRoomUpdated OnRoomUpdated;
    
    private void Awake()
    {
@@ -42,11 +58,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
    {
       base.OnConnectedToMaster();
       _debugNetworkShower.photonStatue = "Connected";
-      
-      if (GameAdministrator.instance.currentScene == Enums.Scenes.Login)
-      {
-         LoginScreen.ActiveConnectPanel(true);
-      }
 
       PhotonNetwork.JoinLobby(typedLobby: new TypedLobby("World", LobbyType.Default));
    }
@@ -55,31 +66,41 @@ public class NetworkManager : MonoBehaviourPunCallbacks
    {
       base.OnJoinedLobby();
       
-      if (!GameAdministrator.instance.localInitialize)
+      _debugNetworkShower.currentLobby = PhotonNetwork.CurrentLobby.Name;
+      
+      if (GameAdministrator.instance.currentScene == Enums.Scenes.Login)
       {
-         PhotonNetwork.JoinRandomOrCreateRoom();
+         GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+      }
+
+      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != String.Empty)
+      {
+         PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
       }
    }
 
    public override void OnCreatedRoom()
    {
       base.OnCreatedRoom();
-      GameAdministrator.instance.localPlayerView.RPC("AddNewRoomToList", RpcTarget.AllBufferedViaServer, currentPlayerRoom.roomName, currentPlayerRoom.roomPassword, currentPlayerRoom.roomPrivacy.ToString());
+      
+      _debugNetworkShower.currentLobby = PhotonNetwork.CurrentLobby.Name;
+      _debugNetworkShower.currentRoom = PhotonNetwork.CurrentRoom.Name;
    }
 
    public override void OnJoinedRoom()
    {
-      if (GameAdministrator.instance.currentScene == Enums.Scenes.Login)
-      {
-         GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
-      }
-      
-      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub)
-      {
-         GameAdministrator.instance.localPlayerView.RPC("UpdateRoomList", RpcTarget.AllBufferedViaServer, currentTargetingRoom, GameAdministrator.instance.username, GameAdministrator.instance.localViewID);
-      }
       _debugNetworkShower.currentLobby = PhotonNetwork.CurrentLobby.Name;
       _debugNetworkShower.currentRoom = PhotonNetwork.CurrentRoom.Name;
+   }
+
+   public override void OnLeftRoom()
+   {
+      base.OnLeftRoom();
+      _debugNetworkShower.currentLobby = PhotonNetwork.CurrentLobby.Name;
+      _debugNetworkShower.currentRoom = "None";
+
+      PhotonNetwork.JoinLobby(typedLobby: new TypedLobby("World", LobbyType.Default));
+      
    }
 
    public override void OnJoinRoomFailed(short returnCode, string message)
@@ -224,14 +245,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
    public void CreateRoom(string roomName, string roomPassword, Enums.RoomPrivacy roomPrivacy)
    {
-      RoomOptions roomOptions = new RoomOptions
-      {
-         CustomRoomProperties = new Hashtable()
-         {
-            {"Password", roomPassword}
-         },
-         MaxPlayers = 4
-      };
+      
       
       foreach (var room in roomsList)
       {
@@ -269,8 +283,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
       
       currentPlayerRoom = newRoom;
       
-      PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
+      //PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
+      
+      Hashtable options = new Hashtable
+      {
+         {"RoomName", currentPlayerRoom.roomName},
+         {"RoomPassword", currentPlayerRoom.roomPassword},
+         {"RoomPrivacy", currentPlayerRoom.roomPrivacy.ToString()}
+      };
+
+      PhotonNetwork.RaiseEvent(1, options, raiseOption, SendOptions.SendReliable);
+      
+      SwitchRoom(roomName);
    }
+
    public void JoinRoom(string roomName, string roomPassword)
    {
       foreach (var room in roomsList)
@@ -302,13 +328,24 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             
                currentPlayerRoom = room;
 
-               PhotonNetwork.JoinRoom(roomName);
+               //PhotonNetwork.JoinRoom(roomName);
             }
          }
       }
+      
+      Hashtable options = new Hashtable
+      {
+         {"RoomName", currentTargetingRoom},
+         {"Username", GameAdministrator.instance.username},
+         {"PhotonID", GameAdministrator.instance.localViewID}
+      };
+
+      PhotonNetwork.RaiseEvent(2, options, raiseOption, SendOptions.SendReliable);
+      
+      SwitchRoom(roomName);
    }
    
-   [PunRPC] public void AddNewRoomToList(string roomName, string roomPassword, string roomPrivacy)
+   public void AddNewRoomToList(string roomName, string roomPassword, string roomPrivacy)
    {
       CustomRoom newRoom = new CustomRoom
       {
@@ -336,14 +373,16 @@ public class NetworkManager : MonoBehaviourPunCallbacks
       
       roomsList.Add(newRoom);
       
-      FindObjectOfType<HubManager>().UpdateRoomList();
+      Debug.Log("Room List Add");
+      
+      OnRoomUpdated?.Invoke();
    }
-   [PunRPC] public void UpdateRoomList(string roomName, string playerUsername, int playerPhotonViewID)
+   public void UpdateRoomList(string roomName, string playerUsername, int playerPhotonViewID)
    {
       var player = new CustomPlayer
       {
-         username = GameAdministrator.instance.username,
-         photonViewID = GameAdministrator.instance.localViewID
+         username = playerUsername,
+         photonViewID = playerPhotonViewID
       };
       
       foreach (var room in roomsList)
@@ -356,11 +395,33 @@ public class NetworkManager : MonoBehaviourPunCallbacks
          }
       }
       
-      FindObjectOfType<HubManager>().UpdateRoomList();
+      Debug.Log("Room List Updated");
       
+      OnRoomUpdated?.Invoke();
    }
 
    #endregion
+
+   public void OnEvent(EventData photonEvent)
+   {
+      Hashtable options = (Hashtable)photonEvent.CustomData;
+      
+      if (photonEvent.Code == 1)
+      {
+         AddNewRoomToList((string)options["RoomName"], (string)options["RoomPassword"], (string)options["RoomPrivacy"]);
+      }
+
+      if (photonEvent.Code == 2)
+      {
+         UpdateRoomList((string)options["RoomName"], (string)options["Username"], (int)options["PhotonID"]);
+      }
+   }
+
+   public void SwitchRoom(string roomName)
+   {
+      PhotonNetwork.LeaveRoom();
+      roomBackup = roomName;
+   }
 }
 
 [Serializable] public class CustomRoom

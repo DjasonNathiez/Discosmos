@@ -33,18 +33,12 @@ public class HubManager : MonoBehaviour
 
    private void Awake()
    {
-      if (!GameAdministrator.instance.localInitialize)
-      {
-         var newPlay = PhotonNetwork.Instantiate(NetworkManager.instance.player.name, Vector3.zero, Quaternion.identity);
-         Debug.Log("Player instantiate");
-         
-         //PhotonNetwork.LeaveRoom();
-         
-         GameAdministrator.instance.localInitialize = true;
-      }
+      PhotonNetwork.JoinRoom("Hub");
       
       SetRoomPrivacy();
       InitializeRoomList();
+
+      NetworkManager.OnRoomUpdated += UpdateRoomList;
    }
 
    public void CreateRoomButton()

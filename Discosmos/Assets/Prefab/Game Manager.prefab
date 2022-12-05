@@ -483,8 +483,7 @@ GameObject:
   - component: {fileID: 2976315303333238009}
   - component: {fileID: 2976315303333238015}
   - component: {fileID: 5318078956135858034}
-  - component: {fileID: 105960397}
-  - component: {fileID: 105960396}
+  - component: {fileID: 2976315302279833926}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -527,9 +526,11 @@ MonoBehaviour:
   hubSceneName: HubScene
   gameSceneName: GameScene
   endGameSceneName: EndGameScene
+  localInitialize: 0
   username: 
   playerLevel: 0
   localViewID: 0
+  localPlayerView: {fileID: 0}
   currentTeam: 0
 --- !u!114 &5318078956135858034
 MonoBehaviour:
@@ -558,7 +559,7 @@ MonoBehaviour:
     players:
     - username: 
       photonViewID: 0
---- !u!114 &105960397
+--- !u!114 &2976315302279833926
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -567,41 +568,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 2976315303333238014}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d06466c03d263624786afa88b52928b6, type: 3}
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statsWindowOn: 1
-  statsOn: 1
-  healthStatsVisible: 0
-  trafficStatsOn: 0
-  buttonsOn: 0
-  statsRect:
-    serializedVersion: 2
-    x: 0
-    y: 100
-    width: 200
-    height: 50
-  WindowId: 100
---- !u!114 &105960396
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2976315303333238014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5867a53c8db0e6745818285bb6b6e1b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WindowRect:
-    serializedVersion: 2
-    x: 0
-    y: 100
-    width: 120
-    height: 100
-  WindowId: 101
-  Visible: 1
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &6437256163600405380
 GameObject:
   m_ObjectHideFlags: 0
