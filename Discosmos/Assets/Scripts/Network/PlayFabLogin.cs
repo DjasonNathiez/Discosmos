@@ -73,7 +73,7 @@ public class PlayFabLogin : MonoBehaviourPunCallbacks
    private void OnLoginSuccess(LoginResult result)
    {
       SetPopUpMessage("You've been connected", Color.white);
-      GameAdministrator.username = usernameInputField.text;
+      GameAdministrator.instance.username = usernameInputField.text;
       connectPanel.SetActive(false);
    }
    private void OnLoginFailure(PlayFabError error)
