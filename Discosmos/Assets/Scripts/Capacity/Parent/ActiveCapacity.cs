@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Toolbox.Variable;
+using UnityEngine;
 
 public abstract class ActiveCapacity
 {

@@ -12,6 +12,16 @@ namespace Toolbox.Variable
 
         #endregion
     }
+
+    public static class Detection
+    {
+        public static byte[] GetTargetInZone()
+        {
+            byte[] targets = new byte[3];
+
+            return targets;
+        }
+    }
     
     public static class Enums
     {
