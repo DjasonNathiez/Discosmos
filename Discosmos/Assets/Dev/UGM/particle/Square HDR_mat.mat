@@ -46,6 +46,7 @@ Material:
     - _Nombre_de_ligne: 1
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Transparent: 1
     m_Colors:
     - _Color: {r: 54.998573, g: 1.4397533, b: 41.464893, a: 0}
   m_BuildTextureStacks: []
