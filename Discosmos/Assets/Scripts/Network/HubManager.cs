@@ -3,19 +3,13 @@ using Photon.Pun;
 using TMPro;
 using Toolbox.Variable;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 public class HubManager : MonoBehaviour
 {
-   //Friend List
-   
-   //Room List
-
    [Header("Room List")] 
    [SerializeField] private GameObject roomListPrefab;
    [SerializeField] private ScrollRect roomScrollRect;
-
    
    private List<GameObject> roomListObjects;
    
@@ -24,7 +18,6 @@ public class HubManager : MonoBehaviour
    [SerializeField] private TMP_InputField joinRoomPassword;
    public GameObject roomConnectPanel;
    
-   //Room Creation
    [Header("Creation Room")] 
    [SerializeField] private TMP_InputField createRoomName;
    [SerializeField] private TMP_InputField createRoomPassword;
@@ -110,6 +103,15 @@ public class HubManager : MonoBehaviour
          roomUiItem.roomSizeTxt.text = room.players.Count + "/" + room.roomSize;
       }
    }
+
+   #region DEBUG //TODO Delete it when it's done
+
+   public void DEBUG_ConnectToTestRoom()
+   {
+      NetworkManager.instance.SwitchRoom("Test");
+   }
    
-   //Room Inside
+
+   #endregion
+   
 }

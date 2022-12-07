@@ -1,11 +1,14 @@
-using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 {
+    [SerializeField] 
+    public PlayerController PlayerController;
+    public GameObject hud;
+    public GameObject camera;
+    
     public ChampionDataSO championDataSo;
 
     [Header("State")]
@@ -21,9 +24,30 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 
     private void Awake()
     {
-        Debug.Log("Instantiate");
+        DontDestroyOnLoad(gameObject);
         GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
         GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();
+    }
+
+    public void Initialize()
+    {
+        if (photonView.IsMine)
+        {
+            camera.SetActive(true);
+            hud.SetActive(true);
+            PlayerController.enabled = true;
+            
+            GameAdministrator.instance.localPlayer = this;
+        }
+        
+        //PLAYER CUSTOM PROPERTIES
+        Hashtable customPropertiesBase = new Hashtable
+        {
+            {"CurrentHealth", currentHealth },
+            {"MaxHealth", maxHealth },
+            {"CurrentShield", currentShield},
+            {"CurrentSpeed", currentSpeed}
+        };
     }
 
     private void OnDestroy()
