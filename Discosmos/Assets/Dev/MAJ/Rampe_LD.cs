@@ -9,9 +9,9 @@ public class Rampe_LD : MonoBehaviour
     [Header("Curve")]
     [SerializeField] private List<RailPoint> railPoints;
     [SerializeField] private  float nbPoints;
-    [SerializeField] private  float distBetweenNodes;
+    public  float distBetweenNodes;
     private List<Vector3> pointsOnCurve =new List<Vector3>(0);
-    private List<Vector3> distancedNodes = new List<Vector3>(0);
+    public List<Vector3> distancedNodes = new List<Vector3>(0);
     [SerializeField] private bool loop;
     [SerializeField] private List<Transform> forms;
 
@@ -20,6 +20,8 @@ public class Rampe_LD : MonoBehaviour
     public MeshFilter meshFilter;
     public int nbRails;
     public float space;
+    public Mesh endPointsMesh;
+    public float endPointMeshSize = 1;
 
     [Header("Tool")] 
     [SerializeField] private bool generateRail;
@@ -29,47 +31,109 @@ public class Rampe_LD : MonoBehaviour
 
     [Header("Gameplay")] 
     [SerializeField] private bool playerOnRamp;
-    [SerializeField] private AnimationCurve speedBoost;
+    public AnimationCurve speedBoost;
     private float _progressOnRamp;
-    [SerializeField] private float downTimer;
+    private bool down;
+    private float downTimer;
     [SerializeField] private float downDelay;
+    [SerializeField] private float entryZoneLenght;
+    [SerializeField] private PlayerController player;
+    public float heightOnRamp;
+    private bool transition;
+    private float transitionTimer;
+    [SerializeField] private float transitionDelay;
 
     [Header("Graphics")] 
     [SerializeField] private Material material;
+
     [SerializeField] private MeshRenderer meshRenderer;
 
     private void Start()
     {
-        DrawRailPoints();
-        CreateDistancedNodes();
-        meshFilter.mesh = GenerateRail();
         material = new Material(meshRenderer.material);
+        material.name = gameObject.name + " Material";
         meshRenderer.material = material;
     }
 
-
-    void OnEnterRamp(PlayerController playerController)
+    public void OnExitRamp()
     {
-        
-    }
-    
-    void OnExitRamp(PlayerController playerController)
-    {
+        downTimer = downDelay;
+        down = true;
+        playerOnRamp = false;
         // Quand le joueur sort de la rampe, on passe en mode downTime
         // On set le slider du material a 1 automatiquement
     }
     
     void OnRampUp()
     {
-        // quand la rampe est de nouveau prenable par le joueur
-        // On remet les propriétés du material de base
+        down = false;
+        transitionTimer = transitionDelay;
+        transition = true;
     }
 
     private void Update()
     {
-        if (playerOnRamp)
+        if (!playerOnRamp)
         {
-            
+            if (down && downTimer <= 0)
+            {
+                OnRampUp();
+            }
+            else if (down)
+            {
+                downTimer -= Time.deltaTime;
+                material.SetFloat("_Slider",Mathf.Lerp(material.GetFloat("_Slider"),1.2f,Time.deltaTime*2));
+            }
+            else
+            {
+                if (transition)
+                {
+                    if (transitionTimer > 0)
+                    {
+                        transitionTimer -= Time.deltaTime;
+                        material.SetFloat("_NextColorRevive",1- (transitionTimer / transitionDelay));
+                    }
+                    else
+                    {
+                        material.SetFloat("_NextColorRevive",0);
+                        material.SetFloat("_Slider",-0.2f);
+                        transition = false;
+                    }
+                }
+                else
+                {
+                    if(Vector3.SqrMagnitude(new Vector3(player.transform.position.x,0,player.transform.position.z) - new Vector3(distancedNodes[0].x,0,distancedNodes[0].z)) <= entryZoneLenght * entryZoneLenght)
+                    {
+                        player.OnEnterRamp(this,true,0);
+                        material.SetFloat("_Reverse",1);
+                        material.SetFloat("_Slider",-0.2f);
+                        playerOnRamp = true;
+                    }
+                    else if (Vector3.SqrMagnitude(new Vector3(player.transform.position.x, 0, player.transform.position.z) - new Vector3(distancedNodes[distancedNodes.Count - 1].x, 0, distancedNodes[distancedNodes.Count - 1].z)) <= entryZoneLenght * entryZoneLenght)
+                    {
+                        player.OnEnterRamp(this,false,distancedNodes.Count - 1);
+                        material.SetFloat("_Reverse",0);
+                        material.SetFloat("_Slider",-0.2f);
+                        playerOnRamp = true;
+                    }   
+                }
+            }
+        }
+        else
+        {
+            if (playerOnRamp)
+            {
+                float progress;
+                if (player.forwardOnRamp)
+                {
+                    progress = Mathf.Lerp(-0.1f,0.85f,(player.rampIndex + player.rampProgress) / (distancedNodes.Count-1));   
+                }
+                else
+                {
+                    progress = Mathf.Lerp(-0.03f,0.88f,(((distancedNodes.Count-1) - player.rampIndex) + player.rampProgress) / (distancedNodes.Count-1));   
+                }
+                material.SetFloat("_Slider",progress);   
+            }
         }
     }
 
@@ -182,6 +246,32 @@ public class Rampe_LD : MonoBehaviour
             }
 
             nbPt = vertices.Count;
+        }
+
+        int verticeCount = vertices.Count;
+        
+        for (int i = 0; i < endPointsMesh.vertexCount; i++)
+        {
+            vertices.Add(distancedNodes[0] + endPointsMesh.vertices[i] * endPointMeshSize);
+            colors.Add(Color.black);
+        }
+        
+        for (int i = 0; i < endPointsMesh.triangles.Length; i++)
+        {
+            triangles.Add(endPointsMesh.triangles[i] + verticeCount);
+        }
+        
+        verticeCount = vertices.Count;
+        
+        for (int i = 0; i < endPointsMesh.vertexCount; i++)
+        {
+            vertices.Add(distancedNodes[distancedNodes.Count-1] + endPointsMesh.vertices[i] * endPointMeshSize);
+            colors.Add(Color.white);
+        }
+        
+        for (int i = 0; i < endPointsMesh.triangles.Length; i++)
+        {
+            triangles.Add(endPointsMesh.triangles[i] + verticeCount);
         }
 
         mesh.vertices = vertices.ToArray();
