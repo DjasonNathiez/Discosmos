@@ -4,7 +4,8 @@ namespace Toolbox.Variable
     {
         public delegate void OnServerUpdate();
         public delegate void OnUpdated();
-
+        public delegate void OnRoomUpdated();
+        
         #region Capacities
 
         public delegate void OnCapacityPerform(byte caster, byte[] target);
@@ -25,6 +26,12 @@ namespace Toolbox.Variable
     
     public static class Enums
     {
+        public enum RoomPrivacy
+        {
+            Open,
+            Close
+        }
+        
         public enum Scenes
         {
             Login,
