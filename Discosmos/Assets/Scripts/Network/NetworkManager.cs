@@ -246,7 +246,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    public void CreateRoom(string roomName, string roomPassword, Enums.RoomPrivacy roomPrivacy)
    {
       
-      
       foreach (var room in roomsList)
       {
          if (room.roomName == roomName)
@@ -256,7 +255,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          }
       }
 
-       
+      
       CustomRoom newRoom = new CustomRoom
       {
          roomName =  roomName,
