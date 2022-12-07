@@ -27,6 +27,7 @@ public class GameAdministrator : MonoBehaviour
     public string endGameSceneName;
 
     [Header("Local Player")] 
+    public PlayerManager localPlayer;
     public bool localInitialize;
     public string username;
     public int playerLevel;

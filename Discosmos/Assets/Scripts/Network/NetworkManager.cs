@@ -6,6 +6,7 @@ using Photon.Realtime;
 using PlayFab;
 using PlayFab.ClientModels;
 using Toolbox.Variable;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
@@ -73,7 +74,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
       }
 
-      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != String.Empty)
+      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
       {
          PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
       }
@@ -91,6 +92,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    {
       _debugNetworkShower.currentLobby = PhotonNetwork.CurrentLobby.Name;
       _debugNetworkShower.currentRoom = PhotonNetwork.CurrentRoom.Name;
+
+      if (roomBackup == "Test")
+      {
+         GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
+         playerTest.GetComponent<PlayerManager>().Initialize();
+         
+         PhotonNetwork.LoadLevel("Test");
+      }
    }
 
    public override void OnLeftRoom()

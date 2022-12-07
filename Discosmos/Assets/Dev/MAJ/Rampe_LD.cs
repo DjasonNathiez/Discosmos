@@ -53,6 +53,8 @@ public class Rampe_LD : MonoBehaviour
         material = new Material(meshRenderer.material);
         material.name = gameObject.name + " Material";
         meshRenderer.material = material;
+
+        player = GameAdministrator.instance.localPlayer.PlayerController;
     }
 
     public void OnExitRamp()
