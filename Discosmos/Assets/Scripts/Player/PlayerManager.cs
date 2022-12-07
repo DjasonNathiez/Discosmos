@@ -6,6 +6,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 {
     [SerializeField] 
     public PlayerController PlayerController;
+    public GameObject hud;
+    public GameObject camera;
     
     public ChampionDataSO championDataSo;
 
@@ -31,7 +33,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     {
         if (photonView.IsMine)
         {
+            camera.SetActive(true);
+            hud.SetActive(true);
             PlayerController.enabled = true;
+            
             GameAdministrator.instance.localPlayer = this;
         }
         

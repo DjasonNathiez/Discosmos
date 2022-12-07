@@ -6,7 +6,7 @@ public class LevelManager : MonoBehaviour
     
     void Start()
     {
-        FindObjectOfType<PlayerManager>().transform.position = spawnPoint.position;
+        FindObjectOfType<PlayerController>().transform.position = spawnPoint.position;
         FindObjectOfType<PlayerController>()._camera = Camera.main;
     }
 }
