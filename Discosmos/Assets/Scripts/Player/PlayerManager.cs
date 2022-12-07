@@ -1,24 +1,33 @@
+using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
 
 public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 {
     public ChampionDataSO championDataSo;
 
-    //State
-    public int currentHealth => championDataSo.baseMaxHealth;
-    public int maxHealth => championDataSo.baseMaxHealth;
-    public int currentShield => championDataSo.baseShield;
+    [Header("State")]
+    public int currentHealth;
+    public int maxHealth;
+    public int currentShield;
     
-    //Movement
-    public float currentSpeed => championDataSo.baseSpeed;
-    public float normalSpeed => championDataSo.baseSpeed;
-    public float groovySpeed => championDataSo.baseGroovySpeed;
-    public float speedMultiplier => championDataSo.baseSpeedMultiplier;
+    [Header("Movement")]
+    public float currentSpeed;
+    public float normalSpeed;
+    public float groovySpeed;
+    public float speedMultiplier;
 
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    private void Awake()
     {
-        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
+        Debug.Log("Instantiate");
+        GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
+        GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log("Have been destroy");
     }
 }
