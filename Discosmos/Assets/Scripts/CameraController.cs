@@ -14,12 +14,11 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Vector2 rotationOffset;
     [SerializeField] private float cameraSpeed;
     
-    [Range(0,4)] [SerializeField] private float cameraZoom;
     [SerializeField] private AnimationCurve cameraZoomCurve;
     
     private PlayerController playerController;
 
-    private bool cameraLock = true;
+    public bool cameraLock = true;
     private Vector3 nextPos;
     private Vector3 forward;
     private Vector3 right;
@@ -49,7 +48,6 @@ public class CameraController : MonoBehaviour
         {
             cameraLock = !cameraLock;
         }
-        
     }
 
     private void LateUpdate()
@@ -63,8 +61,7 @@ public class CameraController : MonoBehaviour
 
         if (cameraLock)
         {
-            nextPos = player.position + offset;
-            transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
+            transform.position = Vector3.Lerp(transform.position, player.position, Time.deltaTime * 5);
         }
         else
         {
@@ -91,17 +88,10 @@ public class CameraController : MonoBehaviour
                 nextPos -= forward * cameraSpeed;
             }
         }
-        //if scroll wheel is used zoom in or out
-        if (Input.mouseScrollDelta.y != 0)
-        {
-            cameraZoom -= Input.mouseScrollDelta.y * 0.1f;
-        }
-        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * Mathf.Clamp(cameraZoom, 0, 4), 0.125f);
         if(playerController != null)
         {
-            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * (cameraZoomCurve.Evaluate(playerController.GetForce()) * 1.5f), 0.125f);
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * cameraZoomCurve.Evaluate(playerController.force), Time.deltaTime * 5);
         }
-        transform.position = Vector3.Lerp(transform.position, nextPos, smoothSpeed);
 
 
     }

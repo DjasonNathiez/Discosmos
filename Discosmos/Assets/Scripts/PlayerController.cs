@@ -4,31 +4,44 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
     private NavMeshAgent agent;
+    
+    [Header("Movement")]
+    
     [SerializeField] private MovementType movementType = MovementType.MoveToClickWithNavMesh;
-    [Range(0, 1)] [SerializeField] private float force; //from 0 to 1
+    [Range(0, 1)] public float force; //from 0 to 1
     [Range(0, 20)] [SerializeField] public float baseSpeed;
     [SerializeField] private AnimationCurve speedCurve;
     [SerializeField] private AnimationCurve slowDownCurve;
+    [SerializeField] private float currentSpeed;
+    [SerializeField] private bool moving;
 
+    [Header("Ramps")] 
+    
+    [SerializeField] public bool onRamp;
+    [SerializeField] public int rampIndex;
+    [SerializeField] private Rampe_LD ramp;
+    [SerializeField] public float rampProgress;
+    [SerializeField] public bool forwardOnRamp;
+    
+    
     private Ray ray;
-    private Ray rayCam;
     private RaycastHit hit;
     private Vector3 destination;
     private Vector3 direction;
-    private float currentSpeed;
 
     private bool attacking = false;
 
     private bool speedPadTriggered = false;
     private Transform speedPad;
-    [SerializeField] private float speedUp = 10;
-    [SerializeField] private float slowDown = 2;
+    
+    [Header("SpeedPads")]
+    
     [SerializeField] private float precisionAnglePad;
-    [SerializeField] private bool speedPadPositive = false;
     [SerializeField] private float slowSpeedPadDuration = 0.5f;
     [SerializeField] private float fastSpeedPadDuration = 2;
     private float forcePad = 0;
@@ -36,10 +49,13 @@ public class PlayerController : MonoBehaviour
     private double time;
     [SerializeField] private float speedPadLerp = 1;
 
-    [SerializeField] private Canvas canvas;
+    [SerializeField] private Camera _camera;
 
+    [Header("Animation")] 
+    [SerializeField] private Animator animator;
 
-    private Camera _camera;
+    [Header("UI")] 
+    [SerializeField] private Image speedJauge;
 
     private void Start()
     {
@@ -67,19 +83,15 @@ public class PlayerController : MonoBehaviour
         SetTime();
 
         direction = transform.forward;
-        force = forcePad /*+ autre trucs*/;
-        currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
-        ClampSpeed();
-        agent.speed = currentSpeed;
-
-
+        
         MovementTypeSwitch();
+        speedJauge.fillAmount = force;
+        currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
+        agent.speed = currentSpeed;
+        
         Debug.DrawLine(transform.position, agent.destination, Color.yellow);
 
         SpeedPadFunction();
-
-        //on the canvas, create a chart that shows the speed of the player 
-        canvas.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(currentSpeed * 10, 10);
     }
 
     #region SpeedPad
@@ -142,37 +154,19 @@ public class PlayerController : MonoBehaviour
         {
             SlowDownPad();
         }
-
-        //debug Vector3.Angle(transform.forward, speedPad.forward) in the scene view
-        Debug.DrawLine(transform.position, transform.position + transform.forward * 10, Color.red);
-        Debug.DrawLine(transform.position, transform.position + speedPad.forward * 10, Color.green);
-        Debug.DrawLine(transform.position,
-            transform.position + Quaternion.AngleAxis(precisionAnglePad, Vector3.up) * transform.forward * 10,
-            Color.blue);
     }
 
     private void SlowDownPad()
     {
         forcePad = Mathf.Lerp(forcePad, 0, speedPadLerp);
-        // speedPadSpeed = -slowDown;
-        speedPadPositive = false;
-        Debug.Log("slow down");
     }
 
     private void SpeedUpPad()
     {
         forcePad = Mathf.Lerp(forcePad, 1, speedPadLerp);;
-        speedPadPositive = true;
-        Debug.Log("speed up");
     }
 
     #endregion
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(hit.point, 0.1f);
-    }
 
 
     private enum MovementType
@@ -200,62 +194,118 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnEnterRamp(Rampe_LD rampeLd,bool forward,int startIndex)
+    {
+        onRamp = true;
+        forwardOnRamp = forward;
+        rampIndex = startIndex;
+        rampProgress = 0;
+        ramp = rampeLd;
+        movementType = MovementType.Slide;
+        agent.ResetPath();
+        animator.Play("Slide");
+    }
+
     public void Slide()
     {
-        //ici fonc slide ^^
+        if (rampProgress < 1)
+        {
+            rampProgress += (Time.deltaTime * currentSpeed) / ramp.distBetweenNodes;
+        }
+        else
+        {
+            if (forwardOnRamp)
+            {
+                rampIndex++;
+                if (rampIndex == ramp.distancedNodes.Count - 1)
+                {
+                    direction = (ramp.distancedNodes[rampIndex] -
+                                 ramp.distancedNodes[rampIndex - 1]).normalized;
+                    OnExitRamp();
+                    return;
+                }
+            }
+            else
+            {
+                rampIndex--;
+                if (rampIndex == 0)
+                {
+                    direction = (ramp.distancedNodes[0] -
+                                 ramp.distancedNodes[1]).normalized;
+                    OnExitRamp();
+                    return;
+                }
+            }
+            rampProgress = 0;
+        }
+
+        if (onRamp)
+        {
+            transform.position = Vector3.Lerp(ramp.distancedNodes[rampIndex], ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1], rampProgress) + Vector3.up * ramp.heightOnRamp;
+            transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1] - ramp.distancedNodes[rampIndex]),Time.deltaTime*8);
+            force += ramp.speedBoost.Evaluate(force) * Time.deltaTime;
+        }
+    }
+
+    void OnExitRamp()
+    {
+        animator.Play("Roller");
+        onRamp = false;
+        movementType = MovementType.KeepDirectionWithoutNavMesh;
+        ramp.OnExitRamp();
     }
 
     private void KeepDirectionNoNavMesh()
     {
-        transform.LookAt(direction);
         transform.position += direction * (currentSpeed * Time.deltaTime);
-    }
-
-
-    private void MoveToClickUsingTheNavMesh()
-    {
-        agent.enabled = true;
+        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
+        force = Mathf.Clamp01(force);
+        if (force <= 0)
+        {
+            agent.ResetPath();
+            movementType = MovementType.MoveToClickWithNavMesh;
+            animator.Play("Idle");
+        }
         if (Input.GetMouseButton(1))
         {
             if (Physics.Raycast(ray, out hit))
             {
                 agent.ResetPath();
                 agent.SetDestination(hit.point);
+                movementType = MovementType.MoveToClickWithNavMesh;
             }
         }
     }
 
-    public float GetForce()
-    {
-        return force;
-    }
 
-    public float GetSpeed()
+    private void MoveToClickUsingTheNavMesh()
     {
-        return currentSpeed;
-    }
-
-    private void ClampSpeed()
-    {
-        if (currentSpeed > 20)
+        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
+        force = Mathf.Clamp01(force);
+        agent.enabled = true;
+        if (moving && agent.remainingDistance == 0)
         {
-            currentSpeed = 20;
+            moving = false;
+            animator.Play("Idle");
         }
-        else if (currentSpeed < 0)
+        
+        
+        if (Input.GetMouseButton(1))
         {
-            currentSpeed = 0;
-        }
-    }
-    
-    private void ClampForce()
-    {
-        if (force > 1)
-        {
-            force = 1;
-        }
-        else if (force < 0)
-        {
-            force = 0;
+            if (Physics.Raycast(ray, out hit))
+            {
+                agent.ResetPath();
+                agent.SetDestination(hit.point);
+                moving = true;
+                if (force <= 0)
+                {
+                    animator.Play("Run");
+                }
+                else
+                {
+                    animator.Play("Roller");
+                }
+            }
         }
     }
 }
