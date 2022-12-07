@@ -893,6 +893,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5310095215756010864}
+  - component: {fileID: 8252326848771060988}
   - component: {fileID: 5969948849991234455}
   - component: {fileID: 5083620713990154835}
   - component: {fileID: 6639617643184513177}
@@ -924,6 +925,30 @@ Transform:
   m_Father: {fileID: 3242392941343150299}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8252326848771060988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2962512626795819812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 5969948849991234455}
+  - {fileID: 5083620713990154835}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!114 &5969948849991234455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -981,6 +1006,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d40d14d79c52bd449b58993e7431e33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clientPlayer: 0
+  healthBar: {fileID: 0}
+  healthText: {fileID: 0}
+  uiStatsTransform: {fileID: 0}
+  heightUI: 0
+  healthMax: 0
+  currentHealth: 0
+  shield: 0
+  baseDamages: 0
+  maxSpeedBonusDamages: 0
+  range: 0
+  cible: {fileID: 0}
+  isAttacking: 0
   movementType: 0
   force: 0
   baseSpeed: 3
@@ -1045,6 +1083,7 @@ MonoBehaviour:
   speedPadLerp: 0.1
   _camera: {fileID: 0}
   animator: {fileID: 4649460313323453560}
+  sparkles: {fileID: 0}
   speedJauge: {fileID: 3942735983270357122}
 --- !u!65 &4385791426291121596
 BoxCollider:
