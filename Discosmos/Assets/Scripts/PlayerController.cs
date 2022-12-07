@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
     private double time;
     [SerializeField] private float speedPadLerp = 1;
 
-    [SerializeField] private Camera _camera;
+    [SerializeField] public Camera _camera;
 
     [Header("Animation")] 
     [SerializeField] private Animator animator;
@@ -59,7 +59,6 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        _camera = Camera.main;
         agent = GetComponent<NavMeshAgent>();
         agent.speed = currentSpeed;
         //if photon is on, then we are in multiplayer

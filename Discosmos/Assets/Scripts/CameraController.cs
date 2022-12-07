@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 public class CameraController : MonoBehaviour
 {
-    
     [SerializeField] private Transform player;
     [SerializeField] private float smoothSpeed = 0.125f;
     [SerializeField] private Vector3 offset;
@@ -22,7 +18,12 @@ public class CameraController : MonoBehaviour
     private Vector3 nextPos;
     private Vector3 forward;
     private Vector3 right;
-    
+
+    private void Awake()
+    {
+        player = FindObjectOfType<PlayerManager>().PlayerController.transform;
+    }
+
     private void Start()
     {
         //transform rotation but just the y
