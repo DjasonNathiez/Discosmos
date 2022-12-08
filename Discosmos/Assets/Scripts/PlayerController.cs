@@ -11,18 +11,8 @@ public class PlayerController : MonoBehaviour
 {
     private NavMeshAgent agent;
     public bool clientPlayer;
+    public PlayerManager playerManager;
 
-    [Header("Stats and UI")] 
-    
-    [SerializeField] private Image healthBar;
-    [SerializeField] private TextMeshProUGUI healthText;
-    [SerializeField] private Transform uiStatsTransform;
-    [SerializeField] private float heightUI;
-
-    public int healthMax;
-    public int currentHealth;
-    public int shield;
-    
     [Header("Auto Attack")] 
     
     public int baseDamages;
@@ -69,8 +59,6 @@ public class PlayerController : MonoBehaviour
     private double speedPadTimer = 0;
     private double time;
     [SerializeField] private float speedPadLerp = 1;
-
-    [SerializeField] public Camera _camera;
 
     [Header("Animation")] 
     [SerializeField] private Animator animator;
@@ -201,22 +189,10 @@ public class PlayerController : MonoBehaviour
         Slide,
     }
 
-    private void LateUpdate()
-    {
-        SetUI();
-    }
-
-    void SetUI()
-    {
-        uiStatsTransform.position = _camera.WorldToScreenPoint(transform.position + Vector3.up) + Vector3.up * heightUI;
-        healthBar.fillAmount = currentHealth / (float) healthMax;
-        healthText.text = currentHealth + " / " + healthMax;
-    }
-
 
     private void MovementTypeSwitch()
     {
-        if (_camera != null) ray = _camera.ScreenPointToRay(Input.mousePosition);
+        if (playerManager._camera != null) ray = playerManager._camera.ScreenPointToRay(Input.mousePosition);
         switch (movementType)
         {
             case MovementType.MoveToClickWithNavMesh:
