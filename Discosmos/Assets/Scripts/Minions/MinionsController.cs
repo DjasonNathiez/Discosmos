@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,16 +22,48 @@ public class MinionsController : MonoBehaviour
     private Vector3 targetPosition;
     
     private Collider[] colliders;
+    private GameObject waypoints;
+    
+    [SerializeField] private bool loopMode;
+    
+    private enum FollowType
+    {
+        NearToFar,
+        OrderedList
+    }
+    
+    [SerializeField] private FollowType followType;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         team = GetComponent<Team>();
         //Find the gameObject named "WaypointsTeam" + team.teamID and add the transforms of its children to the waypoints array
-        GameObject waypoints = GameObject.Find("WaypointsTeam" + team.TeamID);
-        _waypoints = waypoints.GetComponentsInChildren<Transform>(); 
+        waypoints = GameObject.Find("WaypointsTeam" + team.TeamID);
+        _waypoints = waypoints.GetComponentsInChildren<Transform>();
         _waypoints = _waypoints[1..];
-        System.Array.Sort(_waypoints, (x, y) => Vector3.Distance(transform.position, x.position).CompareTo(Vector3.Distance(transform.position, y.position)));
+        ChooseTypeOfFollow();
+        
+    }
+
+    private void FollowFromNearestToFarthest()
+    {
+        
+        System.Array.Sort(_waypoints,
+            (x, y) => Vector3.Distance(transform.position, x.position)
+                .CompareTo(Vector3.Distance(transform.position, y.position)));
+    }
+
+    private void ChooseTypeOfFollow()
+    {
+        switch (followType)
+        {
+            case FollowType.NearToFar:
+                FollowFromNearestToFarthest();
+                break;
+            case FollowType.OrderedList:
+                break;
+        }
     }
 
     private void Update()
@@ -39,6 +72,18 @@ public class MinionsController : MonoBehaviour
         if (entitiesInRange.Count == 0 && currentWaypoint < _waypoints.Length)
         {
             MoveToWaypoint();
+        }
+        else if (entitiesInRange.Count == 0 && currentWaypoint == _waypoints.Length)
+        {
+            if (loopMode)
+            {
+                currentWaypoint = 0;
+                MoveToWaypoint();
+            }
+            else
+            {
+                agent.isStopped = true;
+            }
         }
         else
         {
