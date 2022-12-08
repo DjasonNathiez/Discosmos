@@ -22,9 +22,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private bool overwriteOnline;
     
     [SerializeField] private Image healthBar;
+    [SerializeField] public Image speedBar;
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private Transform uiStatsTransform;
+    [SerializeField] private Transform target;
     [SerializeField] private float heightUI;
     [SerializeField] public Camera _camera;
     [SerializeField] private GameObject healthBarObj;
@@ -40,6 +42,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public float normalSpeed;
     public float groovySpeed;
     public float speedMultiplier;
+    
+    [Header("FX")]
+    public ParticleSystem attackFx;
 
     private void Awake()
     {
@@ -53,14 +58,36 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
         uiStatsTransform = healthBarObject.transform;
         healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
-        healthText = uiStatsTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
-        nameText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        speedBar = uiStatsTransform.GetChild(1).GetComponent<Image>();
+        healthText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        nameText = uiStatsTransform.GetChild(3).GetComponent<TextMeshProUGUI>();
+        target = uiStatsTransform.GetChild(4);
     }
 
     private void Start()
     {
         username = photonView.Controller.NickName;
         nameText.text = username;
+    }
+
+    public void ShowTarget()
+    {
+        target.gameObject.SetActive(true);
+    }
+    
+    public void HideTarget()
+    {
+        target.gameObject.SetActive(false);
+    }
+
+    public void CallFX(VisualEffects effect)
+    {
+        switch (effect)
+        {
+            case VisualEffects.MimiAutoAttack:
+                attackFx.Play();
+                break;
+        }
     }
 
     public void Initialize()
@@ -174,4 +201,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         currentHealth = maxHealth;
         PlayerController.transform.position = FindObjectOfType<LevelManager>().spawnPoint.position;
     }
+}
+
+public enum VisualEffects
+{
+    MimiAutoAttack,
+    MimiLaser
 }

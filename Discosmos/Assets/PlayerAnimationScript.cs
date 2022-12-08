@@ -10,4 +10,9 @@ public class PlayerAnimationScript : MonoBehaviour
     {
         playerController.OnAttack();
     }
+    
+    public void CallAttackFX()
+    {
+        playerController.playerManager.CallFX(VisualEffects.MimiAutoAttack);
+    }
 }

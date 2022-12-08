@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public float range;
     public PlayerManager cible;
     public bool isAttacking;
-    
+
     [Header("Movement")]
     
     [SerializeField] private MovementType movementType = MovementType.MoveToClickWithNavMesh;
@@ -98,7 +98,7 @@ public class PlayerController : MonoBehaviour
 
             AttackCheck();
             MovementTypeSwitch();
-            speedJauge.fillAmount = force;
+            playerManager.speedBar.fillAmount = force;
             currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
             agent.speed = currentSpeed;
 
@@ -224,16 +224,15 @@ public class PlayerController : MonoBehaviour
             {
                 if (hit.transform.CompareTag("Player"))
                 {
+                    if(cible) cible.HideTarget();
                     cible = hit.transform.GetComponent<PlayerController>().playerManager;
+                    cible.ShowTarget();
+                    if (onRamp)
+                    {
+                        OnExitRamp();
+                    }
                     movementType = MovementType.FollowCible;
-                    if (force <= 0)
-                    {
-                        animator.Play("Run");
-                    }
-                    else
-                    {
-                        animator.Play("Roller");
-                    }
+                    ChangeAnimation(force <= 0 ? 1 : 2);
                 }
             }
         }
@@ -254,7 +253,7 @@ public class PlayerController : MonoBehaviour
         if (moving && agent.remainingDistance == 0)
         {
             moving = false;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
 
         if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) <= range * range)
@@ -269,27 +268,32 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 agent.ResetPath();
+                ResetTarget();
                 agent.SetDestination(hit.point);
                 movementType = MovementType.MoveToClickWithNavMesh;
                 moving = true;
-                cible = null;
-                if (force <= 0)
-                {
-                    animator.Play("Run");
-                }
-                else
-                {
-                    animator.Play("Roller");
-                }
+                ChangeAnimation(force <= 0 ? 1 : 2);
             }
         }
+    }
+
+    public void ChangeAnimation(int index)
+    {
+        Debug.Log(index);
+        animator.SetInteger("Animation",index);
+    }
+
+    public void ResetTarget()
+    {
+        if(cible) cible.HideTarget();
+        cible = null;
     }
 
     public void Attack()
     {
         if (!isAttacking)
         {
-            animator.Play("Attack");
+            ChangeAnimation(4);
             isAttacking = true;
         }
         else
@@ -300,32 +304,20 @@ public class PlayerController : MonoBehaviour
             {
                 isAttacking = false;
                 movementType = MovementType.FollowCible;
-                if (force <= 0)
-                {
-                    animator.Play("Run");
-                }
-                else
-                {
-                    animator.Play("Roller");
-                }
+                ChangeAnimation(force <= 0 ? 1 : 2);
             }
             
             if (Input.GetMouseButton(1))
             {
                 if (Physics.Raycast(ray, out hit))
                 {
+                    ResetTarget();
                     isAttacking = false;
+                    movementType = MovementType.MoveToClickWithNavMesh;
                     agent.ResetPath();
                     agent.SetDestination(hit.point);
                     moving = true;
-                    if (force <= 0)
-                    {
-                        animator.Play("Run");
-                    }
-                    else
-                    {
-                        animator.Play("Roller");
-                    }
+                    ChangeAnimation(force <= 0 ? 1 : 2);
                 }
             }
         }
@@ -333,6 +325,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnEnterRamp(Rampe_LD rampeLd,bool forward,int startIndex)
     {
+        ResetTarget();
         onRamp = true;
         forwardOnRamp = forward;
         rampIndex = startIndex;
@@ -340,7 +333,7 @@ public class PlayerController : MonoBehaviour
         ramp = rampeLd;
         movementType = MovementType.Slide;
         agent.ResetPath();
-        animator.Play("Slide");
+        ChangeAnimation(3);
         sparkles.SetActive(true);
     }
 
@@ -385,7 +378,7 @@ public class PlayerController : MonoBehaviour
 
     void OnExitRamp()
     {
-        animator.Play("Roller");
+        ChangeAnimation(force <= 0 ? 1 : 2);
         onRamp = false;
         movementType = MovementType.KeepDirectionWithoutNavMesh;
         ramp.OnExitRamp();
@@ -401,7 +394,7 @@ public class PlayerController : MonoBehaviour
         {
             agent.ResetPath();
             movementType = MovementType.MoveToClickWithNavMesh;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
         if (Input.GetMouseButton(1))
         {
@@ -423,7 +416,7 @@ public class PlayerController : MonoBehaviour
         if (moving && agent.remainingDistance == 0)
         {
             moving = false;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
         
         
@@ -434,14 +427,7 @@ public class PlayerController : MonoBehaviour
                 agent.ResetPath();
                 agent.SetDestination(hit.point);
                 moving = true;
-                if (force <= 0)
-                {
-                    animator.Play("Run");
-                }
-                else
-                {
-                    animator.Play("Roller");
-                }
+                ChangeAnimation(force <= 0 ? 1 : 2);
             }
         }
     }
