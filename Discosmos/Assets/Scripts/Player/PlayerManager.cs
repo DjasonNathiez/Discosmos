@@ -1,13 +1,31 @@
-using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Realtime;
+using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 {
+    [SerializeField] 
+    public PlayerController PlayerController;
+    public GameObject hud;
+    public GameObject cam;
+    
     public ChampionDataSO championDataSo;
 
+    [Header("Stats and UI")] 
+    
+    [SerializeField] private bool overwriteOnline;
+    
+    [SerializeField] private Image healthBar;
+    [SerializeField] private TextMeshProUGUI healthText;
+    [SerializeField] private Transform uiStatsTransform;
+    [SerializeField] private float heightUI;
+    [SerializeField] public Camera _camera;
+    [SerializeField] private GameObject healthBarObj;
+    [SerializeField] private Transform canvas;
+    
     [Header("State")]
     public int currentHealth;
     public int maxHealth;
@@ -21,9 +39,50 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 
     private void Awake()
     {
-        Debug.Log("Instantiate");
-        GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
-        GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();
+        DontDestroyOnLoad(gameObject);
+        if (!overwriteOnline)
+        {
+            GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
+            GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
+        }
+
+        GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
+        uiStatsTransform = healthBarObject.transform;
+        healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
+        healthText = uiStatsTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
+    }
+
+    public void Initialize()
+    {
+        if (photonView.IsMine)
+        {
+            PlayerController.enabled = true;
+            hud.SetActive(true);
+            cam.SetActive(true);
+            
+            GameAdministrator.instance.localPlayer = this;
+        }
+        
+        //PLAYER CUSTOM PROPERTIES
+        Hashtable customPropertiesBase = new Hashtable
+        {
+            {"CurrentHealth", currentHealth },
+            {"MaxHealth", maxHealth },
+            {"CurrentShield", currentShield},
+            {"CurrentSpeed", currentSpeed}
+        };
+    }
+
+    private void LateUpdate()
+    {
+        SetUI();
+    }
+
+    void SetUI()
+    {
+        uiStatsTransform.position = GameAdministrator.instance.localPlayer._camera.WorldToScreenPoint(PlayerController.transform.position + Vector3.up) + Vector3.up * heightUI;
+        healthBar.fillAmount = currentHealth / (float) maxHealth;
+        healthText.text = currentHealth + " / " + maxHealth;
     }
 
     private void OnDestroy()

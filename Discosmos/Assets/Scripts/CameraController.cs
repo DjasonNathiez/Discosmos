@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 public class CameraController : MonoBehaviour
 {
-    
     [SerializeField] private Transform player;
     [SerializeField] private float smoothSpeed = 0.125f;
     [SerializeField] private Vector3 offset;
@@ -15,6 +11,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float cameraSpeed;
     
     [SerializeField] private AnimationCurve cameraZoomCurve;
+    [SerializeField] private AnimationCurve speedLinesCurve;
+    [SerializeField] private Transform speedLines;
     
     private PlayerController playerController;
 
@@ -22,7 +20,12 @@ public class CameraController : MonoBehaviour
     private Vector3 nextPos;
     private Vector3 forward;
     private Vector3 right;
-    
+
+    private void Awake()
+    {
+        if(!player) player = FindObjectOfType<PlayerManager>().PlayerController.transform;
+    }
+
     private void Start()
     {
         //transform rotation but just the y
@@ -62,9 +65,11 @@ public class CameraController : MonoBehaviour
         if (cameraLock)
         {
             transform.position = Vector3.Lerp(transform.position, player.position, Time.deltaTime * 5);
+            speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(playerController.force)), Time.deltaTime * 5);
         }
         else
         {
+            speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(0)), Time.deltaTime * 5);
             nextPos = transform.position;
 
             if (Input.mousePosition.x >= Screen.width - 1)

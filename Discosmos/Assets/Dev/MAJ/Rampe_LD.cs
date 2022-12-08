@@ -28,6 +28,7 @@ public class Rampe_LD : MonoBehaviour
     public bool addNewPoint;
     public bool removeLastPoint;
     [SerializeField] private GameObject railPoint;
+    [SerializeField] private bool visualizeExitDirections;
 
     [Header("Gameplay")] 
     [SerializeField] private bool playerOnRamp;
@@ -42,6 +43,8 @@ public class Rampe_LD : MonoBehaviour
     private bool transition;
     private float transitionTimer;
     [SerializeField] private float transitionDelay;
+    [SerializeField] public Vector3 exitDirectionFirstNode = Vector3.right;
+    [SerializeField] public Vector3 exitDirectionLastNode = Vector3.left;
 
     [Header("Graphics")] 
     [SerializeField] private Material material;
@@ -53,6 +56,8 @@ public class Rampe_LD : MonoBehaviour
         material = new Material(meshRenderer.material);
         material.name = gameObject.name + " Material";
         meshRenderer.material = material;
+
+        if(!player) player = GameAdministrator.instance.localPlayer.PlayerController;
     }
 
     public void OnExitRamp()
@@ -160,6 +165,12 @@ public class Rampe_LD : MonoBehaviour
         {
             RemoveLastPoint();
             removeLastPoint = false;
+        }
+
+        if (visualizeExitDirections)
+        {
+            Gizmos.DrawLine(distancedNodes[0],distancedNodes[0]+exitDirectionFirstNode);
+            Gizmos.DrawLine(distancedNodes[distancedNodes.Count-1],distancedNodes[distancedNodes.Count-1]+exitDirectionLastNode);
         }
     }
 

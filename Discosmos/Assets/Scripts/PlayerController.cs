@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -9,6 +10,16 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     private NavMeshAgent agent;
+    public bool clientPlayer;
+    public PlayerManager playerManager;
+
+    [Header("Auto Attack")] 
+    
+    public int baseDamages;
+    public int maxSpeedBonusDamages;
+    public float range;
+    public PlayerController cible;
+    public bool isAttacking;
     
     [Header("Movement")]
     
@@ -49,21 +60,22 @@ public class PlayerController : MonoBehaviour
     private double time;
     [SerializeField] private float speedPadLerp = 1;
 
-    [SerializeField] private Camera _camera;
-
     [Header("Animation")] 
     [SerializeField] private Animator animator;
+    [SerializeField] private GameObject sparkles;
 
     [Header("UI")] 
     [SerializeField] private Image speedJauge;
 
     private void Start()
     {
-        _camera = Camera.main;
-        agent = GetComponent<NavMeshAgent>();
-        agent.speed = currentSpeed;
-        //if photon is on, then we are in multiplayer
-        SetTime();
+        if (clientPlayer)
+        {
+            agent = GetComponent<NavMeshAgent>();
+            agent.speed = currentSpeed;
+            //if photon is on, then we are in multiplayer
+            SetTime();   
+        }
     }
 
     private void SetTime()
@@ -80,18 +92,19 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        SetTime();
+        if (clientPlayer)
+        {
+            SetTime();
 
-        direction = transform.forward;
-        
-        MovementTypeSwitch();
-        speedJauge.fillAmount = force;
-        currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
-        agent.speed = currentSpeed;
-        
-        Debug.DrawLine(transform.position, agent.destination, Color.yellow);
+            MovementTypeSwitch();
+            speedJauge.fillAmount = force;
+            currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
+            agent.speed = currentSpeed;
 
-        SpeedPadFunction();
+            Debug.DrawLine(transform.position, agent.destination, Color.yellow);
+
+            SpeedPadFunction();   
+        }
     }
 
     #region SpeedPad
@@ -179,7 +192,7 @@ public class PlayerController : MonoBehaviour
 
     private void MovementTypeSwitch()
     {
-        if (_camera != null) ray = _camera.ScreenPointToRay(Input.mousePosition);
+        if (playerManager._camera != null) ray = playerManager._camera.ScreenPointToRay(Input.mousePosition);
         switch (movementType)
         {
             case MovementType.MoveToClickWithNavMesh:
@@ -204,6 +217,7 @@ public class PlayerController : MonoBehaviour
         movementType = MovementType.Slide;
         agent.ResetPath();
         animator.Play("Slide");
+        sparkles.SetActive(true);
     }
 
     public void Slide()
@@ -219,8 +233,7 @@ public class PlayerController : MonoBehaviour
                 rampIndex++;
                 if (rampIndex == ramp.distancedNodes.Count - 1)
                 {
-                    direction = (ramp.distancedNodes[rampIndex] -
-                                 ramp.distancedNodes[rampIndex - 1]).normalized;
+                    direction = ramp.exitDirectionLastNode.normalized;
                     OnExitRamp();
                     return;
                 }
@@ -230,8 +243,7 @@ public class PlayerController : MonoBehaviour
                 rampIndex--;
                 if (rampIndex == 0)
                 {
-                    direction = (ramp.distancedNodes[0] -
-                                 ramp.distancedNodes[1]).normalized;
+                    direction = ramp.exitDirectionFirstNode.normalized;
                     OnExitRamp();
                     return;
                 }
@@ -253,6 +265,7 @@ public class PlayerController : MonoBehaviour
         onRamp = false;
         movementType = MovementType.KeepDirectionWithoutNavMesh;
         ramp.OnExitRamp();
+        sparkles.SetActive(false);
     }
 
     private void KeepDirectionNoNavMesh()
@@ -309,7 +322,3 @@ public class PlayerController : MonoBehaviour
         }
     }
 }
-
-
-//=======================================TO DO==================================================================
-//1. Implement for in the current speed of the player
