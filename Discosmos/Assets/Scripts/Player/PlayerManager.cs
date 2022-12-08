@@ -9,6 +9,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 {
     [SerializeField] 
     public PlayerController PlayerController;
+    public GameObject hud;
+    public GameObject cam;
     
     public ChampionDataSO championDataSo;
 
@@ -22,6 +24,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     [SerializeField] private float heightUI;
     [SerializeField] public Camera _camera;
     [SerializeField] private GameObject healthBarObj;
+    [SerializeField] private Transform canvas;
     
     [Header("State")]
     public int currentHealth;
@@ -43,8 +46,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
             GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
         }
 
-        Transform canvas = FindObjectOfType<Canvas>().transform;
-        GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity,canvas);
+        GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
         uiStatsTransform = healthBarObject.transform;
         healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
         healthText = uiStatsTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
@@ -55,6 +57,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
         if (photonView.IsMine)
         {
             PlayerController.enabled = true;
+            hud.SetActive(true);
+            cam.SetActive(true);
+            
             GameAdministrator.instance.localPlayer = this;
         }
         
@@ -75,7 +80,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
 
     void SetUI()
     {
-        uiStatsTransform.position = _camera.WorldToScreenPoint(transform.position + Vector3.up) + Vector3.up * heightUI;
+        uiStatsTransform.position = GameAdministrator.instance.localPlayer._camera.WorldToScreenPoint(PlayerController.transform.position + Vector3.up) + Vector3.up * heightUI;
         healthBar.fillAmount = currentHealth / (float) maxHealth;
         healthText.text = currentHealth + " / " + maxHealth;
     }
