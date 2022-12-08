@@ -412,15 +412,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void OnEvent(EventData photonEvent)
    {
-      Hashtable options = (Hashtable)photonEvent.CustomData;
-      
       if (photonEvent.Code == 1)
       {
+         Hashtable options = (Hashtable)photonEvent.CustomData;
+
          AddNewRoomToList((string)options["RoomName"], (string)options["RoomPassword"], (string)options["RoomPrivacy"]);
       }
 
       if (photonEvent.Code == 2)
       {
+         Hashtable options = (Hashtable)photonEvent.CustomData;
+
          UpdateRoomList((string)options["RoomName"], (string)options["Username"], (int)options["PhotonID"]);
       }
    }
