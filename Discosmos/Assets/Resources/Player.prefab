@@ -8021,7 +8021,7 @@ MonoBehaviour:
   playerManager: {fileID: 3242392941343150298}
   baseDamages: 10
   maxSpeedBonusDamages: 0
-  range: 4
+  range: 5
   cible: {fileID: 0}
   isAttacking: 0
   movementType: 0

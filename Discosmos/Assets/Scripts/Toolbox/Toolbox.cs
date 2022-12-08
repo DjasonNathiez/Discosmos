@@ -1,5 +1,14 @@
+using Photon.Realtime;
+
 namespace Toolbox.Variable
 {
+    public static class PlayerRaiseEvent
+    {
+        //BEGIN AT 100
+        public static byte DamageTarget = 100;
+        public static byte HealTarget = 101;
+    }
+    
     public static class NetworkDelegate
     {
         public delegate void OnServerUpdate();

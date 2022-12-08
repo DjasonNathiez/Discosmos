@@ -241,7 +241,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack()
     {
-        cible.iplayer.DecreaseCurrentHealth(cible.photonView.ViewID ,baseDamages);
+       playerManager.DealDamage(new []{cible.GetComponent<PhotonView>().ViewID}, baseDamages);
     }
 
     void FollowCible()
@@ -257,7 +257,7 @@ public class PlayerController : MonoBehaviour
             animator.Play("Idle");
         }
 
-        if (Vector3.SqrMagnitude(cible.transform.position - transform.position) <= range * range)
+        if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) <= range * range)
         {
             agent.ResetPath();
             movementType = MovementType.Attack;
@@ -294,7 +294,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (Vector3.SqrMagnitude(cible.transform.position - transform.position) > range * range)
+            if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) > range * range)
             {
                 isAttacking = false;
                 movementType = MovementType.FollowCible;
