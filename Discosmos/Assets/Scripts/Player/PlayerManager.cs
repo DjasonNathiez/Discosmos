@@ -2,11 +2,12 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using Toolbox.Variable;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
+public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     [SerializeField] 
     public PlayerController PlayerController;
@@ -15,7 +16,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     public IPlayer iplayer;
     public ChampionDataSO championDataSo;
 
-    [Header("Stats and UI")] 
+    [Header("Stats and UI")]
     
     [SerializeField] private bool overwriteOnline;
     
@@ -31,7 +32,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     public int currentHealth;
     public int maxHealth;
     public int currentShield;
-    
+
     [Header("Movement")]
     public float currentSpeed;
     public float normalSpeed;
@@ -91,15 +92,57 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
         Debug.Log("Have been destroy");
     }
 
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    public void DealDamage(int[] targetsID, int damageAmount)
     {
-        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
-        
-        if (targetPlayer.IsLocal)
+        Hashtable data = new Hashtable
         {
-            currentHealth = (int) changedProps["CurrentHealth"];
-            currentShield = (int) changedProps["CurrentShield"];
-            currentSpeed = (float) changedProps["CurrentSpeed"];
+            {"TargetsID", targetsID},
+            {"Amount", damageAmount}
+        };
+
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };
+
+        PhotonNetwork.RaiseEvent(PlayerRaiseEvent.DamageTarget, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
+    public void OnEvent(EventData photonEvent)
+    {
+        if (photonEvent.Code == PlayerRaiseEvent.DamageTarget)
+        {
+            Debug.Log("Damage event reiceveid");
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
+
+            foreach (var id in targets)
+            {
+                if (photonView.ViewID == id)
+                {
+                    TakeDamage(data);
+                }
+            }
         }
+    }
+
+    public void TakeDamage(Hashtable data)
+    {
+        int amount = (int)data["Amount"];
+        
+        if (currentShield > 0)
+        {
+            int holdingDamage = amount - currentShield;
+
+            currentShield -= amount;
+
+            if (holdingDamage > 0)
+            {
+                currentHealth -= amount;
+            }
+        }
+        else
+        {
+            currentHealth -= amount;
+        }
+        
+        Debug.Log("Take Damage");
     }
 }
