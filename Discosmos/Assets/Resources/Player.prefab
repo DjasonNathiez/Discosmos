@@ -8642,6 +8642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8199b3ac0d642b47a47d2c8aef0f569, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  username: 
   PlayerController: {fileID: 2011121328774887626}
   hud: {fileID: 337513683121942551}
   cam: {fileID: 1542195262}
