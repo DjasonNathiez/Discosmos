@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     public int baseDamages;
     public int maxSpeedBonusDamages;
     public float range;
-    public PlayerController cible;
+    public PlayerManager cible;
     public bool isAttacking;
     
     [Header("Movement")]
@@ -96,6 +96,7 @@ public class PlayerController : MonoBehaviour
         {
             SetTime();
 
+            AttackCheck();
             MovementTypeSwitch();
             speedJauge.fillAmount = force;
             currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
@@ -187,6 +188,8 @@ public class PlayerController : MonoBehaviour
         MoveToClickWithNavMesh,
         KeepDirectionWithoutNavMesh,
         Slide,
+        FollowCible,
+        Attack
     }
 
 
@@ -204,6 +207,106 @@ public class PlayerController : MonoBehaviour
             case MovementType.Slide:
                 Slide();
                 break;
+            case MovementType.FollowCible:
+                FollowCible();
+                break;
+            case MovementType.Attack:
+                Attack();
+                break;
+        }
+    }
+
+    void AttackCheck()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.transform.CompareTag("Player"))
+                {
+                    cible = hit.transform.GetComponent<PlayerController>().playerManager;
+                    movementType = MovementType.FollowCible;
+                    if (force <= 0)
+                    {
+                        animator.Play("Run");
+                    }
+                    else
+                    {
+                        animator.Play("Roller");
+                    }
+                }
+            }
+        }
+    }
+
+    public void OnAttack()
+    {
+        cible.iplayer.DecreaseCurrentHealth(cible.photonView.ViewID ,baseDamages);
+    }
+
+    void FollowCible()
+    {
+        agent.ResetPath();
+        agent.SetDestination(cible.PlayerController.transform.position);
+        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
+        force = Mathf.Clamp01(force);
+        agent.enabled = true;
+        if (moving && agent.remainingDistance == 0)
+        {
+            moving = false;
+            animator.Play("Idle");
+        }
+
+        if (Vector3.SqrMagnitude(cible.transform.position - transform.position) <= range * range)
+        {
+            agent.ResetPath();
+            movementType = MovementType.Attack;
+        }
+        
+
+        if (Input.GetMouseButton(1))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                agent.ResetPath();
+                agent.SetDestination(hit.point);
+                movementType = MovementType.MoveToClickWithNavMesh;
+                moving = true;
+                cible = null;
+                if (force <= 0)
+                {
+                    animator.Play("Run");
+                }
+                else
+                {
+                    animator.Play("Roller");
+                }
+            }
+        }
+    }
+
+    public void Attack()
+    {
+        if (!isAttacking)
+        {
+            animator.Play("Attack");
+            isAttacking = true;
+        }
+        else
+        {
+            if (Vector3.SqrMagnitude(cible.transform.position - transform.position) > range * range)
+            {
+                isAttacking = false;
+                movementType = MovementType.FollowCible;
+                if (force <= 0)
+                {
+                    animator.Play("Run");
+                }
+                else
+                {
+                    animator.Play("Roller");
+                }
+            }
         }
     }
 
