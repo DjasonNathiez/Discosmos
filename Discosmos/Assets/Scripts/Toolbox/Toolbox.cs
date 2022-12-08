@@ -1,5 +1,3 @@
-using Photon.Realtime;
-
 namespace Toolbox.Variable
 {
     public static class PlayerRaiseEvent

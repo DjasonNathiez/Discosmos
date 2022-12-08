@@ -8649,6 +8649,7 @@ MonoBehaviour:
   overwriteOnline: 1
   healthBar: {fileID: 0}
   healthText: {fileID: 0}
+  nameText: {fileID: 0}
   uiStatsTransform: {fileID: 0}
   heightUI: 40
   _camera: {fileID: 620923166}

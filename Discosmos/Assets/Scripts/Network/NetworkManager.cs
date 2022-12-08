@@ -96,7 +96,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       if (roomBackup == "Test")
       {
          GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
+         
          playerTest.GetComponent<PlayerManager>().Initialize();
+         
+         playerTest.GetPhotonView().Controller.NickName = GameAdministrator.instance.username;
          
          PhotonNetwork.LoadLevel("Test");
       }
