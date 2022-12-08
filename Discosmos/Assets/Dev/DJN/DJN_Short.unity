@@ -8133,13 +8133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clientPlayer: 0
-  healthBar: {fileID: 661695090}
-  healthText: {fileID: 1679559228}
-  uiStatsTransform: {fileID: 372691207}
-  heightUI: 40
-  healthMax: 200
-  currentHealth: 200
-  shield: 0
+  playerManager: {fileID: 0}
   baseDamages: 0
   maxSpeedBonusDamages: 0
   range: 0
@@ -8207,7 +8201,6 @@ MonoBehaviour:
   slowSpeedPadDuration: 0.5
   fastSpeedPadDuration: 2
   speedPadLerp: 0.1
-  _camera: {fileID: 620923166}
   animator: {fileID: 1406229026}
   sparkles: {fileID: 1465745979}
   speedJauge: {fileID: 1314116731}
@@ -18437,13 +18430,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clientPlayer: 1
-  healthBar: {fileID: 1497442906}
-  healthText: {fileID: 1784612642}
-  uiStatsTransform: {fileID: 1098817503}
-  heightUI: 40
-  healthMax: 200
-  currentHealth: 200
-  shield: 0
+  playerManager: {fileID: 0}
   baseDamages: 0
   maxSpeedBonusDamages: 0
   range: 0
@@ -18511,7 +18498,6 @@ MonoBehaviour:
   slowSpeedPadDuration: 0.5
   fastSpeedPadDuration: 2
   speedPadLerp: 0.1
-  _camera: {fileID: 620923166}
   animator: {fileID: 1521700081}
   sparkles: {fileID: 65064021}
   speedJauge: {fileID: 1314116731}
