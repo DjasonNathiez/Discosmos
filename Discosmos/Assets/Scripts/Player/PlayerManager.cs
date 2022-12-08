@@ -1,5 +1,6 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     public PlayerController PlayerController;
     public GameObject hud;
     public GameObject cam;
-    
+    public IPlayer iplayer;
     public ChampionDataSO championDataSo;
 
     [Header("Stats and UI")] 
@@ -45,7 +46,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
             GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
             GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
         }
-
+        iplayer = GetComponent<IPlayer>();
         GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
         uiStatsTransform = healthBarObject.transform;
         healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
@@ -88,5 +89,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
     private void OnDestroy()
     {
         Debug.Log("Have been destroy");
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
+        
+        if (targetPlayer.IsLocal)
+        {
+            currentHealth = (int) changedProps["CurrentHealth"];
+            currentShield = (int) changedProps["CurrentShield"];
+            currentSpeed = (float) changedProps["CurrentSpeed"];
+        }
     }
 }
