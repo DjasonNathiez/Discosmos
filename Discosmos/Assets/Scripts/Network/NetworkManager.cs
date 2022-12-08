@@ -30,7 +30,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    
    RoomOptions roomOptions = new RoomOptions
    {
-      MaxPlayers = 4,
       IsOpen = true,
       IsVisible = true
    };
@@ -74,6 +73,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
       }
 
+      JoinRoom();
+   }
+
+   public void JoinRoom()
+   {
       if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
       {
          PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
@@ -193,7 +197,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    {
       SetPlayerData(result.Username);
       
-      GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+      _debugNetworkShower.photonStatue = "Connecting...";
+      _debugNetworkShower.playFabStatue = "Connected";
+      PhotonNetwork.ConnectUsingSettings();
    }
    
    private void OnRegisterFailed(PlayFabError error)
@@ -432,7 +438,25 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void SwitchRoom(string roomName)
    {
-      PhotonNetwork.LeaveRoom();
+      if (PhotonNetwork.InRoom)
+      {
+         PhotonNetwork.LeaveRoom();
+      }
+      else
+      {
+         if (PhotonNetwork.InLobby)
+         {
+            if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
+            {
+               PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
+            }
+         }
+         else
+         {
+            PhotonNetwork.JoinLobby(typedLobby: new TypedLobby("World", LobbyType.Default));
+         }
+      }
+      
       roomBackup = roomName;
    }
 }
