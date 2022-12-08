@@ -1,3 +1,4 @@
+using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -48,14 +49,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
             GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
         }
-        
-        username = photonView.Controller.NickName;
-        
+
         GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
         uiStatsTransform = healthBarObject.transform;
         healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
         healthText = uiStatsTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
         nameText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
+    }
+
+    private void Start()
+    {
+        username = photonView.Controller.NickName;
         nameText.text = username;
     }
 
@@ -69,15 +73,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             
             GameAdministrator.instance.localPlayer = this;
         }
-        
-        //PLAYER CUSTOM PROPERTIES
-        Hashtable customPropertiesBase = new Hashtable
-        {
-            {"CurrentHealth", currentHealth },
-            {"MaxHealth", maxHealth },
-            {"CurrentShield", currentShield},
-            {"CurrentSpeed", currentSpeed}
-        };
     }
 
     private void LateUpdate()
