@@ -5,6 +5,7 @@ namespace Toolbox.Variable
         //BEGIN AT 100
         public static byte DamageTarget = 100;
         public static byte HealTarget = 101;
+        public static byte Death = 102;
     }
     
     public static class NetworkDelegate

@@ -121,6 +121,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 }
             }
         }
+
+        if (photonEvent.Code == PlayerRaiseEvent.Death)
+        {
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            
+            if (photonView.ViewID == (int)data["ID"])
+            {
+                Death();
+            }
+        }
     }
 
     public void TakeDamage(Hashtable data)
@@ -144,5 +154,24 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         
         Debug.Log("Take Damage");
+        
+        if(currentHealth <= 0)
+        {
+            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };
+            PhotonNetwork.RaiseEvent(PlayerRaiseEvent.Death, new Hashtable{{"ID", photonView.ViewID}}, raiseEventOptions, SendOptions.SendReliable);
+        }
+        
+    }
+
+    void Death()
+    {
+        //TODO ALL LOGIC BRO WTF
+        Respawn();
+    }
+
+    public void Respawn()
+    {
+        currentHealth = maxHealth;
+        PlayerController.transform.position = FindObjectOfType<LevelManager>().spawnPoint.position;
     }
 }
