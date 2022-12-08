@@ -113,7 +113,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             Hashtable data = (Hashtable)photonEvent.CustomData;
             int[] targets = (int[])data["TargetsID"];
 
-            foreach (var id in targets)
+            foreach (int id in targets)
             {
                 if (photonView.ViewID == id)
                 {
