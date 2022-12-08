@@ -72,7 +72,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPlayer
             {"CurrentSpeed", currentSpeed}
         };
     }
-    
+
     private void LateUpdate()
     {
         SetUI();
