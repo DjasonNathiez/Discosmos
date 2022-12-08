@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
-    [SerializeField] 
+    [SerializeField] public string username;
     public PlayerController PlayerController;
     public GameObject hud;
     public GameObject cam;
@@ -48,13 +48,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             GameAdministrator.instance.localViewID = GetComponent<PhotonView>().ViewID; 
             GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
         }
-        iplayer = GetComponent<IPlayer>();
+        
+        username = photonView.Controller.NickName;
+        
         GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
         uiStatsTransform = healthBarObject.transform;
         healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
         healthText = uiStatsTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
         nameText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        nameText.text = GameAdministrator.instance.username;
+        nameText.text = username;
     }
 
     public void Initialize()
