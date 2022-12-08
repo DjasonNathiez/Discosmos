@@ -294,6 +294,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            transform.rotation = Quaternion.LookRotation(cible.PlayerController.transform.position - transform.position);
+            
             if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) > range * range)
             {
                 isAttacking = false;
@@ -305,6 +307,25 @@ public class PlayerController : MonoBehaviour
                 else
                 {
                     animator.Play("Roller");
+                }
+            }
+            
+            if (Input.GetMouseButton(1))
+            {
+                if (Physics.Raycast(ray, out hit))
+                {
+                    isAttacking = false;
+                    agent.ResetPath();
+                    agent.SetDestination(hit.point);
+                    moving = true;
+                    if (force <= 0)
+                    {
+                        animator.Play("Run");
+                    }
+                    else
+                    {
+                        animator.Play("Roller");
+                    }
                 }
             }
         }

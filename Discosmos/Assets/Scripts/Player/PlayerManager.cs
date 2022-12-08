@@ -22,6 +22,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     
     [SerializeField] private Image healthBar;
     [SerializeField] private TextMeshProUGUI healthText;
+    [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private Transform uiStatsTransform;
     [SerializeField] private float heightUI;
     [SerializeField] public Camera _camera;
@@ -52,6 +53,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         uiStatsTransform = healthBarObject.transform;
         healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
         healthText = uiStatsTransform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        nameText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        nameText.text = GameAdministrator.instance.username;
     }
 
     public void Initialize()
