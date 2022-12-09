@@ -84,7 +84,6 @@ public class CameraController : MonoBehaviour
 
             if (Input.mousePosition.y >= Screen.height - 1)
             {
-                //while ignoring rotation on the x axis move the camera forward
                 nextPos += forward * cameraSpeed;
             }
 
@@ -92,6 +91,7 @@ public class CameraController : MonoBehaviour
             {
                 nextPos -= forward * cameraSpeed;
             }
+            transform.position = Vector3.Lerp(transform.position, nextPos, Time.deltaTime * 5);
         }
         if(playerController != null)
         {

@@ -31,27 +31,38 @@ public class Wall : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        playerController = other.GetComponent<PlayerController>();
-        teamScript = other.GetComponent<Team>();
+        playerController = other.GetComponentInChildren<PlayerController>();
+        // teamScript = other.GetComponent<Team>();
         
-        if (playerController != null && teamScript != null)
+        if (playerController != null /*&& teamScript != null*/)
         {
-            if (teamScript.TeamID == team)
-            {
+            Debug.Log("Player is not null");
+            /*if ( team )
+            {*/
                 if (numberOfTowersAlive == 2)
                 {
+                    Debug.Log("Both towers are alive");
                     //if the cooldown is over, boost the player
                     if (cooldownTimer <= 0)
                     {
+                        Debug.Log("Boosting player");
                         ForceBoost();
                     }
                 }
-            }
+            //}
             else
             {
                 //block the player from going through the wall
                 playerController.BlockPlayer();
             }
+        }
+    }
+
+    private void Update()
+    {
+        if (cooldownTimer > 0)
+        {
+            cooldownTimer -= Time.deltaTime;
         }
     }
 
