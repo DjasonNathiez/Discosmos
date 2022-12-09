@@ -42,8 +42,8 @@ public class MobsUIManager : MonoBehaviour
         for (int i = 0; i < healthBars.Count; i++)
         {
             healthBars[i].transform.position = camPlayer.WorldToScreenPoint(mobs[i].transform.position + Vector3.up) + Vector3.up * heightUI;
-            healthBars[i].healthFill.fillAmount = mobs[i].health / (float) mobs[i].maxHealth;
-            healthBars[i].healthText.text = mobs[i].health + " / " + mobs[i].maxHealth;
+            healthBars[i].healthFill.fillAmount = mobs[i].currentHealth / (float) mobs[i].maxHealth;
+            healthBars[i].healthText.text = mobs[i].currentHealth + " / " + mobs[i].maxHealth;
         }
     }
 }

@@ -135,14 +135,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             {"Amount", damageAmount}
         };
 
-        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
 
-        PhotonNetwork.RaiseEvent(PlayerRaiseEvent.DamageTarget, data, raiseEventOptions, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(RaiseEvent.DamageTarget, data, raiseEventOptions, SendOptions.SendReliable);
     }
 
     public void OnEvent(EventData photonEvent)
     {
-        if (photonEvent.Code == PlayerRaiseEvent.DamageTarget)
+        if (photonEvent.Code == RaiseEvent.DamageTarget)
         {
             Debug.Log("Damage event reiceveid");
             Hashtable data = (Hashtable)photonEvent.CustomData;
@@ -157,7 +157,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             }
         }
 
-        if (photonEvent.Code == PlayerRaiseEvent.Death)
+        if (photonEvent.Code == RaiseEvent.Death)
         {
             Hashtable data = (Hashtable)photonEvent.CustomData;
             
@@ -193,7 +193,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if(currentHealth <= 0)
         {
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };
-            PhotonNetwork.RaiseEvent(PlayerRaiseEvent.Death, new Hashtable{{"ID", photonView.ViewID}}, raiseEventOptions, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(RaiseEvent.Death, new Hashtable{{"ID", photonView.ViewID}}, raiseEventOptions, SendOptions.SendReliable);
         }
         
     }
