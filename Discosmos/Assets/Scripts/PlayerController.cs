@@ -335,12 +335,12 @@ public class PlayerController : MonoBehaviour
         {
             case Capacities.MIMI_Laser:
                 Debug.Log("Perform the mimi laser at " + PhotonNetwork.Time);
-                OnCapacityPerformed(Capacities.MIMI_Laser);
+                ChangeAnimation(6);
                 break;
         }
     }
     
-    public void OnCapacityPerformed(Capacities capacity)
+    /*public void OnCapacityPerformed(Capacities capacity)
     {
         switch (capacity)
         {
@@ -349,7 +349,7 @@ public class PlayerController : MonoBehaviour
                 playerManager.DealDamage(ActiveCapacity1.GetTargets(transform.forward), damages);
                 break;
         }
-    }
+    }*/
 
     public void OnAttack()
     {

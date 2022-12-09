@@ -45,6 +45,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     
     [Header("FX")]
     public ParticleSystem attackFx;
+    public ParticleSystem laserFX;
     
 
     private void Awake()
@@ -87,6 +88,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             case VisualEffects.MimiAutoAttack:
                 attackFx.Play();
+                break;
+            case VisualEffects.MimiLaser:
+                laserFX.Play();
                 break;
         }
     }
