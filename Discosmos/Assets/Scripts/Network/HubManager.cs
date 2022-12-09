@@ -26,12 +26,11 @@ public class HubManager : MonoBehaviour
 
    private void Awake()
    {
-      PhotonNetwork.JoinRoom("Hub");
-      
       SetRoomPrivacy();
       InitializeRoomList();
 
       NetworkManager.OnRoomUpdated += UpdateRoomList;
+      //NetworkManager.instance.SwitchRoom("Hub");
    }
 
    public void CreateRoomButton()
