@@ -15,15 +15,28 @@ public class LaserCapacity : ActiveCapacity
 
     public override void Cast()
     {
+        cooldownTimer = 0;
+        
         if(onCooldown)
         {
             Debug.Log("Capacity on cooldown");
             return;
         }
+        onCooldown = true;
+        
 
+        owner.FreezePlayer();
+        
         serverTimeBackup = PhotonNetwork.Time;
-        GameAdministrator.OnServerUpdate += CastRoutine;
-        Debug.Log("Start cast the mimi laser at " + PhotonNetwork.Time);
+
+        if (laserSO.castTime != 0)
+        {
+            GameAdministrator.OnServerUpdate += CastRoutine;
+        }
+        else
+        {
+            Active();
+        }
     }
 
     public override void CastRoutine()
@@ -43,7 +56,7 @@ public class LaserCapacity : ActiveCapacity
     public override void Active()
     {
         owner.OnCastEnd?.Invoke(Capacities.MIMI_Laser);
-        onCooldown = true;
+        
         GameAdministrator.OnServerUpdate += Cooldown;
     }
 
@@ -84,7 +97,6 @@ public class LaserCapacity : ActiveCapacity
             Debug.Log("Capacity is no longer on cooldown");
             onCooldown = false;
             GameAdministrator.OnServerUpdate -= Cooldown;
-            cooldownTimer = 0;
         }
         else
         {

@@ -179,7 +179,6 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (photonEvent.Code == RaiseEvent.DamageTarget)
         {
-            Debug.Log("Damage event reiceveid");
             Hashtable data = (Hashtable)photonEvent.CustomData;
             int[] targets = (int[])data["TargetsID"];
 
@@ -227,9 +226,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             currentHealth -= amount;
         }
-        
-        Debug.Log("Take Damage");
-        
+
         if(currentHealth <= 0)
         {
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };

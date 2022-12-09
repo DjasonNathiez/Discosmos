@@ -100,10 +100,9 @@ public class GameAdministrator : MonoBehaviour
 
     public void LoadScene(string sceneName)
     {
-        //if (currentScene == scenes) return;
-        
+        if (currentScene == GetSceneByName(sceneName)) return;
         SceneManager.LoadScene(sceneName);
-      //  currentScene = scenes;
+        currentScene = GetSceneByName(sceneName);
         SetGameState();
     }
 
@@ -145,5 +144,23 @@ public class GameAdministrator : MonoBehaviour
         }
         
         return String.Empty;
+    }
+
+    public Enums.Scenes GetSceneByName(string sceneName)
+    {
+        switch (sceneName)
+        {
+            default:
+                return Enums.Scenes.Login;
+            
+            case "LoginScene":
+                return Enums.Scenes.Login;
+            
+            case "HubScene" :
+                return Enums.Scenes.Hub;
+
+            case "Test":
+                return Enums.Scenes.Game;
+        }
     }
 }
