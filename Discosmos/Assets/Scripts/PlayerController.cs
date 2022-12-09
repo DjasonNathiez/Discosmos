@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [Header("Auto Attack")] 
     
     public int baseDamages;
-    public AnimationCurve damageMultiplier;
+    public int maxSpeedBonusDamages;
     public float range;
     public PlayerManager cible;
     public bool isAttacking;
@@ -240,9 +240,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack()
     {
-        int damages = Mathf.RoundToInt(baseDamages * damageMultiplier.Evaluate(force));
-        force = 0;
-        playerManager.DealDamage(new []{cible.GetComponent<PhotonView>().ViewID}, damages);
+       playerManager.DealDamage(new []{cible.GetComponent<PhotonView>().ViewID}, baseDamages);
     }
 
     void FollowCible()
@@ -300,7 +298,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
             transform.rotation = Quaternion.LookRotation(cible.PlayerController.transform.position - transform.position);
             
             if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) > range * range)

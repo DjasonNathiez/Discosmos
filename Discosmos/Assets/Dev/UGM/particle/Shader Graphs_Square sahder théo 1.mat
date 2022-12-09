@@ -49,8 +49,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _Nombre_de_carr_horizontal: 10
-    - _Nombre_de_carr_vertical: 8.53
-    - _Opacity: 0
+    - _Nombre_de_carr_vertical: -1.93
+    - _Opacity: 15
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Speed: 5
