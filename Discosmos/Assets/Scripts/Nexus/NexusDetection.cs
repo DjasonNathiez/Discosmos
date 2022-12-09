@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TowerDetection : MonoBehaviour
+public class NexusDetection : MonoBehaviour
 {
     public float detectionRadius = 5f;
     private Collider[] collidersDetection;
@@ -19,6 +20,11 @@ public class TowerDetection : MonoBehaviour
     
     [SerializeField] private float cooldown = 0.5f;
     [SerializeField] private float timer = 0f;
+    
+    [SerializeField] private float radius;
+    private Collider[] collidersAoe;
+    [SerializeField] private float cooldown2 = 0.5f;
+    [SerializeField] private float timer2 = 0f;
 
     private void Start()
     {
@@ -73,18 +79,43 @@ public class TowerDetection : MonoBehaviour
                 timer = 0;
                 Shoot();
             }
+            
+            timer2 += Time.deltaTime;
+            if (timer2 >= cooldown2)
+            {
+                timer2 = 0;
+                AoeAttack();
+            }
+        }
+    }
+
+    private void AoeAttack()
+    {
+        collidersAoe = Physics.OverlapSphere(transform.position, radius);
+        foreach (Collider collider in collidersAoe)
+        {
+            if (collider.name.Contains("Player") /* && si la team du gameObject = variable team*/)
+            {
+                //draw aoe
+                Debug.DrawLine(this.transform.position, collider.transform.position, Color.red);
+                Debug.Log("Aoe Nexus");
+            }
         }
     }
 
     private void Shoot()
     {
-        Debug.Log("Tower shoot");
+        Debug.Log("Nexus shoot");
     }
-    
-    private void OnDrawGizmosSelected()
+
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
-        
+        Gizmos.color = Color.blue;
+        if (target != null)
+        {
+            Gizmos.DrawWireSphere(target.transform.position, radius);
+        }
     }
 }
