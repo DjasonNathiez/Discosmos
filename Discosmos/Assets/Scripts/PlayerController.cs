@@ -189,7 +189,8 @@ public class PlayerController : MonoBehaviour
         KeepDirectionWithoutNavMesh,
         Slide,
         FollowCible,
-        Attack
+        Attack,
+        Block
     }
 
 
@@ -212,6 +213,9 @@ public class PlayerController : MonoBehaviour
                 break;
             case MovementType.Attack:
                 Attack();
+                break;
+            case MovementType.Block:
+                BlockPlayer();
                 break;
         }
     }
@@ -433,5 +437,46 @@ public class PlayerController : MonoBehaviour
                 ChangeAnimation(force <= 0 ? 1 : 2);
             }
         }
+    }
+    
+    public float GetForce()
+    {
+        return force;
+    }
+    
+    public void SetForce(float force)
+    {
+        this.force = force;
+    }
+
+    public void BlockPlayer()
+    {
+        if (movementType == MovementType.MoveToClickWithNavMesh)
+        {
+            agent.ResetPath();
+            moving = false;
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.FollowCible)
+        {
+            agent.ResetPath();
+            moving = false;
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.Attack)
+        {
+            isAttacking = false;
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.KeepDirectionWithoutNavMesh)
+        {
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.Slide)
+        {
+            OnExitRamp();
+        }
+        movementType = MovementType.Block;
+        
     }
 }
