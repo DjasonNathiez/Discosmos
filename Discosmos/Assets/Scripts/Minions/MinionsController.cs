@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,9 +10,14 @@ public class MinionsController : MonoBehaviour
     [SerializeField] private Transform[] _waypoints;
     [SerializeField] private float range;
     [SerializeField] private float speed;
+    [SerializeField] private bool master;
+    [SerializeField] public int id;
+
+    public int health;
+    public int maxHealth;
 
     private NavMeshAgent agent;
-    private int currentWaypoint = 0;
+    public int currentWaypoint = 0;
     private bool isMoving = false;
     private bool isAttacking = false;
 
@@ -26,6 +32,7 @@ public class MinionsController : MonoBehaviour
     
     [SerializeField] private bool loopMode;
     
+    
     private enum FollowType
     {
         NearToFar,
@@ -36,14 +43,24 @@ public class MinionsController : MonoBehaviour
 
     private void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        team = GetComponent<Team>();
-        //Find the gameObject named "WaypointsTeam" + team.teamID and add the transforms of its children to the waypoints array
-        waypoints = GameObject.Find("WaypointsTeam" + team.TeamID);
-        _waypoints = waypoints.GetComponentsInChildren<Transform>();
-        _waypoints = _waypoints[1..];
-        ChooseTypeOfFollow();
-        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            agent = GetComponent<NavMeshAgent>();
+            team = GetComponent<Team>();
+            //Find the gameObject named "WaypointsTeam" + team.teamID and add the transforms of its children to the waypoints array
+            waypoints = GameObject.Find("WaypointsTeam" + team.TeamID);
+            _waypoints = waypoints.GetComponentsInChildren<Transform>();
+            _waypoints = _waypoints[1..];
+            ChooseTypeOfFollow();
+            master = true;
+        }
+        else
+        {
+            agent = agent = GetComponent<NavMeshAgent>();
+            agent.enabled = false;
+        }
+
+        MobsUIManager.instance.MinionSpawned(this);
     }
 
     private void FollowFromNearestToFarthest()
@@ -68,33 +85,36 @@ public class MinionsController : MonoBehaviour
 
     private void Update()
     {
-        //while there are no GameObjects with the team != this.team in the entitiesInRange list and the currentWaypoint is not the last waypoint move to the next waypoint else move In Range and attack
-        if (entitiesInRange.Count == 0 && currentWaypoint < _waypoints.Length)
+        if (master)
         {
-            MoveToWaypoint();
-        }
-        else if (entitiesInRange.Count == 0 && currentWaypoint == _waypoints.Length)
-        {
-            if (loopMode)
+            //while there are no GameObjects with the team != this.team in the entitiesInRange list and the currentWaypoint is not the last waypoint move to the next waypoint else move In Range and attack
+            if (entitiesInRange.Count == 0 && currentWaypoint < _waypoints.Length)
             {
-                currentWaypoint = 0;
                 MoveToWaypoint();
+            }
+            else if (entitiesInRange.Count == 0 && currentWaypoint == _waypoints.Length)
+            {
+                if (loopMode)
+                {
+                    currentWaypoint = 0;
+                    MoveToWaypoint();
+                }
+                else
+                {
+                    agent.isStopped = true;
+                }
             }
             else
             {
-                agent.isStopped = true;
-            }
-        }
-        else
-        {
-            MoveInRange();
+                MoveInRange();
+            }   
         }
     }
 
     private void MoveToWaypoint()
     {
         agent.SetDestination(_waypoints[currentWaypoint].position);
-        if (Vector3.Distance(transform.position, _waypoints[currentWaypoint].position) < 1f)
+        if (Vector3.SqrMagnitude(new Vector3(transform.position.x,0,transform.position.z) - new Vector3(_waypoints[currentWaypoint].position.x,0,_waypoints[currentWaypoint].position.z)) < 1f)
         {
             currentWaypoint++;
         }
