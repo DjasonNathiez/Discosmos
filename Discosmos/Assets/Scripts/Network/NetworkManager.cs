@@ -23,13 +23,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    [Header("Connection")]
    [HideInInspector] public LoginScreen LoginScreen;
    private string _playFabPlayerIdCache;
+   private bool isSwitchingRoom;
 
    [Header("Room List")] 
    public List<CustomRoom> roomsList;
    public CustomRoom currentPlayerRoom;
    private string currentTargetingRoom;
 
-   private string roomBackup;
+   private string roomBackup = "Hub";
    
    RoomOptions roomOptions = new RoomOptions
    {
@@ -76,15 +77,25 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameAdministrator.instance.LoadScene(GameAdministrator.instance.hubSceneName);
       }
 
-      JoinRoom();
+      if (!PhotonNetwork.InRoom && !isSwitchingRoom)
+      {
+         SwitchRoom("Hub");
+      }
+      else
+      {
+         JoinRoom();
+      }
+      
    }
 
    public void JoinRoom()
    {
-      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
+      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != String.Empty)
       {
          PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
       }
+
+      isSwitchingRoom = false;
    }
 
    public override void OnCreatedRoom()
@@ -442,6 +453,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    public void SwitchRoom(string roomName)
    {
       roomBackup = roomName;
+      isSwitchingRoom = true;
       
       if (PhotonNetwork.InRoom)
       {
@@ -451,10 +463,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       {
          if (PhotonNetwork.InLobby)
          {
-            if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
-            {
-               PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
-            }
+            JoinRoom();
          }
          else
          {
