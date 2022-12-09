@@ -46,8 +46,9 @@ GameObject:
   - component: {fileID: 7163186596019850226}
   - component: {fileID: 3713908752286993755}
   - component: {fileID: 6991952059630908754}
+  - component: {fileID: 2832784669525409259}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -126,11 +127,28 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8767499056046574859}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2832784669525409259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8767499056046574859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fb5ec2a6283dc3449d58c37d699ddf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower1: {fileID: 2099116418321363020}
+  tower2: {fileID: 560718227691898378}
+  team: 5
+  forceBoost: 0.2
+  cooldown: 2
 --- !u!1001 &6930928028596370487
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -220,6 +238,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9488362607f8c4d49acd9324d6bfb9a8, type: 3}
+--- !u!1 &560718227691898378 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7487102524351150653, guid: 9488362607f8c4d49acd9324d6bfb9a8,
+    type: 3}
+  m_PrefabInstance: {fileID: 6930928028596370487}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3005601965393436420 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5303429749651350323, guid: 9488362607f8c4d49acd9324d6bfb9a8,
@@ -315,6 +339,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9488362607f8c4d49acd9324d6bfb9a8, type: 3}
+--- !u!1 &2099116418321363020 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7487102524351150653, guid: 9488362607f8c4d49acd9324d6bfb9a8,
+    type: 3}
+  m_PrefabInstance: {fileID: 8846766562772601457}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3701842428142577986 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5303429749651350323, guid: 9488362607f8c4d49acd9324d6bfb9a8,
