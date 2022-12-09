@@ -9,7 +9,7 @@ public interface IPlayer
     /// </summary>
     /// <param name="id">PhotonViewID as byte variable.</param>
     /// <returns></returns>
-    private Player GetPlayerByID(byte id)
+    private Player GetPlayerByID(int id)
     {
         return PhotonNetwork.GetPhotonView(id).Controller;
     }
@@ -19,7 +19,7 @@ public interface IPlayer
     /// </summary>
     /// <param name="id">PhotonViewID as byte variable.</param>
     /// <returns></returns>
-    private Hashtable GetPlayerHashtableByID(byte id)
+    private Hashtable GetPlayerHashtableByID(int id)
     {
         return PhotonNetwork.GetPhotonView(id).Controller.CustomProperties;
     }
@@ -29,7 +29,7 @@ public interface IPlayer
     /// </summary>
     /// <param name="id">PhotonViewID as byte variable.</param>
     /// <param name="amount">Amount of increase to add in Player current health.</param>
-    public virtual void IncreaseCurrentHealth(byte id, int amount)
+    public virtual void IncreaseCurrentHealth(int id, int amount)
     {
         Player player = GetPlayerByID(id);
         Hashtable hash = GetPlayerHashtableByID(id);
@@ -52,12 +52,12 @@ public interface IPlayer
     /// </summary>
     /// <param name="id">PhotonViewID as byte variable.</param>
     /// <param name="amount">Amount of decrease to add in Player current health.</param>
-    public virtual void DecreaseCurrentHealth(byte id, int amount)
+    public virtual void DecreaseCurrentHealth(int id, int amount)
     {
         Player player = GetPlayerByID(id);
         Hashtable hash = GetPlayerHashtableByID(id);
        
-       int currentLife = (int)hash["CurrentLife"];
+       int currentLife = (int)hash["CurrentHealth"];
        int currentShield = (int)hash["CurrentShield"];
        
        if (currentShield > 0)
@@ -71,13 +71,13 @@ public interface IPlayer
                currentLife -= amount;
            }
            
-           hash["CurrentLife"] = currentLife;
+           hash["CurrentHealth"] = currentLife;
            hash["CurrentShield"] = currentShield;
        }
        else
        {
            currentLife -= amount;
-           hash["CurrentLife"] = currentLife;
+           hash["CurrentHealth"] = currentLife;
        }
 
        player.SetCustomProperties(hash);
@@ -89,7 +89,7 @@ public interface IPlayer
     /// </summary>
     /// <param name="id">PhotonViewID as byte variable.</param>
     /// <param name="amount">Amount of decrease to add in Player current health.</param>
-    public virtual void IncreaseCurrentMoveSpeed(byte id, float amount)
+    public virtual void IncreaseCurrentMoveSpeed(int id, float amount)
     {
         Player player = GetPlayerByID(id);
         Hashtable hash = GetPlayerHashtableByID(id);

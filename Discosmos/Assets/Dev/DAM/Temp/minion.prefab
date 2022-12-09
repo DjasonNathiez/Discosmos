@@ -152,6 +152,9 @@ MonoBehaviour:
   _waypoints: []
   range: 0
   speed: 0
+  target: {fileID: 0}
+  loopMode: 1
+  followType: 1
 --- !u!1 &7493823493609663564
 GameObject:
   m_ObjectHideFlags: 0

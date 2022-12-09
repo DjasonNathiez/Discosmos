@@ -30,7 +30,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    
    RoomOptions roomOptions = new RoomOptions
    {
-      MaxPlayers = 4,
       IsOpen = true,
       IsVisible = true
    };
@@ -74,6 +73,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
       }
 
+      JoinRoom();
+   }
+
+   public void JoinRoom()
+   {
       if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
       {
          PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
@@ -96,6 +100,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       if (roomBackup == "Test")
       {
          GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
+         
+         playerTest.GetPhotonView().Controller.NickName = GameAdministrator.instance.username;
+         
          playerTest.GetComponent<PlayerManager>().Initialize();
          
          PhotonNetwork.LoadLevel("Test");
@@ -190,7 +197,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    {
       SetPlayerData(result.Username);
       
-      GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+      _debugNetworkShower.photonStatue = "Connecting...";
+      _debugNetworkShower.playFabStatue = "Connected";
+      PhotonNetwork.ConnectUsingSettings();
    }
    
    private void OnRegisterFailed(PlayFabError error)
@@ -412,22 +421,42 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void OnEvent(EventData photonEvent)
    {
-      Hashtable options = (Hashtable)photonEvent.CustomData;
-      
       if (photonEvent.Code == 1)
       {
+         Hashtable options = (Hashtable)photonEvent.CustomData;
+
          AddNewRoomToList((string)options["RoomName"], (string)options["RoomPassword"], (string)options["RoomPrivacy"]);
       }
 
       if (photonEvent.Code == 2)
       {
+         Hashtable options = (Hashtable)photonEvent.CustomData;
+
          UpdateRoomList((string)options["RoomName"], (string)options["Username"], (int)options["PhotonID"]);
       }
    }
 
    public void SwitchRoom(string roomName)
    {
-      PhotonNetwork.LeaveRoom();
+      if (PhotonNetwork.InRoom)
+      {
+         PhotonNetwork.LeaveRoom();
+      }
+      else
+      {
+         if (PhotonNetwork.InLobby)
+         {
+            if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
+            {
+               PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
+            }
+         }
+         else
+         {
+            PhotonNetwork.JoinLobby(typedLobby: new TypedLobby("World", LobbyType.Default));
+         }
+      }
+      
       roomBackup = roomName;
    }
 }

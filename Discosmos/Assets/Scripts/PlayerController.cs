@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -9,7 +10,17 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     private NavMeshAgent agent;
+    public bool clientPlayer;
+    public PlayerManager playerManager;
+
+    [Header("Auto Attack")] 
     
+    public int baseDamages;
+    public int maxSpeedBonusDamages;
+    public float range;
+    public PlayerManager cible;
+    public bool isAttacking;
+
     [Header("Movement")]
     
     [SerializeField] private MovementType movementType = MovementType.MoveToClickWithNavMesh;
@@ -49,20 +60,22 @@ public class PlayerController : MonoBehaviour
     private double time;
     [SerializeField] private float speedPadLerp = 1;
 
-    [SerializeField] public Camera _camera;
-
     [Header("Animation")] 
     [SerializeField] private Animator animator;
+    [SerializeField] private GameObject sparkles;
 
     [Header("UI")] 
     [SerializeField] private Image speedJauge;
 
     private void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        agent.speed = currentSpeed;
-        //if photon is on, then we are in multiplayer
-        SetTime();
+        if (clientPlayer)
+        {
+            agent = GetComponent<NavMeshAgent>();
+            agent.speed = currentSpeed;
+            //if photon is on, then we are in multiplayer
+            SetTime();   
+        }
     }
 
     private void SetTime()
@@ -79,18 +92,20 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        SetTime();
+        if (clientPlayer)
+        {
+            SetTime();
 
-        direction = transform.forward;
-        
-        MovementTypeSwitch();
-        speedJauge.fillAmount = force;
-        currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
-        agent.speed = currentSpeed;
-        
-        Debug.DrawLine(transform.position, agent.destination, Color.yellow);
+            AttackCheck();
+            MovementTypeSwitch();
+            playerManager.speedBar.fillAmount = force;
+            currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
+            agent.speed = currentSpeed;
 
-        SpeedPadFunction();
+            Debug.DrawLine(transform.position, agent.destination, Color.yellow);
+
+            SpeedPadFunction();   
+        }
     }
 
     #region SpeedPad
@@ -173,12 +188,14 @@ public class PlayerController : MonoBehaviour
         MoveToClickWithNavMesh,
         KeepDirectionWithoutNavMesh,
         Slide,
+        FollowCible,
+        Attack
     }
 
 
     private void MovementTypeSwitch()
     {
-        if (_camera != null) ray = _camera.ScreenPointToRay(Input.mousePosition);
+        if (playerManager._camera != null) ray = playerManager._camera.ScreenPointToRay(Input.mousePosition);
         switch (movementType)
         {
             case MovementType.MoveToClickWithNavMesh:
@@ -190,11 +207,125 @@ public class PlayerController : MonoBehaviour
             case MovementType.Slide:
                 Slide();
                 break;
+            case MovementType.FollowCible:
+                FollowCible();
+                break;
+            case MovementType.Attack:
+                Attack();
+                break;
+        }
+    }
+
+    void AttackCheck()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.transform.CompareTag("Player"))
+                {
+                    if(cible) cible.HideTarget();
+                    cible = hit.transform.GetComponent<PlayerController>().playerManager;
+                    cible.ShowTarget();
+                    if (onRamp)
+                    {
+                        OnExitRamp();
+                    }
+                    movementType = MovementType.FollowCible;
+                    ChangeAnimation(force <= 0 ? 1 : 2);
+                }
+            }
+        }
+    }
+
+    public void OnAttack()
+    {
+       playerManager.DealDamage(new []{cible.GetComponent<PhotonView>().ViewID}, baseDamages);
+    }
+
+    void FollowCible()
+    {
+        agent.ResetPath();
+        agent.SetDestination(cible.PlayerController.transform.position);
+        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
+        force = Mathf.Clamp01(force);
+        agent.enabled = true;
+        if (moving && agent.remainingDistance == 0)
+        {
+            moving = false;
+            ChangeAnimation(0);
+        }
+
+        if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) <= range * range)
+        {
+            agent.ResetPath();
+            movementType = MovementType.Attack;
+        }
+        
+
+        if (Input.GetMouseButton(1))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                agent.ResetPath();
+                ResetTarget();
+                agent.SetDestination(hit.point);
+                movementType = MovementType.MoveToClickWithNavMesh;
+                moving = true;
+                ChangeAnimation(force <= 0 ? 1 : 2);
+            }
+        }
+    }
+
+    public void ChangeAnimation(int index)
+    {
+        Debug.Log(index);
+        animator.SetInteger("Animation",index);
+    }
+
+    public void ResetTarget()
+    {
+        if(cible) cible.HideTarget();
+        cible = null;
+    }
+
+    public void Attack()
+    {
+        if (!isAttacking)
+        {
+            ChangeAnimation(4);
+            isAttacking = true;
+        }
+        else
+        {
+            transform.rotation = Quaternion.LookRotation(cible.PlayerController.transform.position - transform.position);
+            
+            if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) > range * range)
+            {
+                isAttacking = false;
+                movementType = MovementType.FollowCible;
+                ChangeAnimation(force <= 0 ? 1 : 2);
+            }
+            
+            if (Input.GetMouseButton(1))
+            {
+                if (Physics.Raycast(ray, out hit))
+                {
+                    ResetTarget();
+                    isAttacking = false;
+                    movementType = MovementType.MoveToClickWithNavMesh;
+                    agent.ResetPath();
+                    agent.SetDestination(hit.point);
+                    moving = true;
+                    ChangeAnimation(force <= 0 ? 1 : 2);
+                }
+            }
         }
     }
 
     public void OnEnterRamp(Rampe_LD rampeLd,bool forward,int startIndex)
     {
+        ResetTarget();
         onRamp = true;
         forwardOnRamp = forward;
         rampIndex = startIndex;
@@ -202,7 +333,8 @@ public class PlayerController : MonoBehaviour
         ramp = rampeLd;
         movementType = MovementType.Slide;
         agent.ResetPath();
-        animator.Play("Slide");
+        ChangeAnimation(3);
+        sparkles.SetActive(true);
     }
 
     public void Slide()
@@ -218,8 +350,7 @@ public class PlayerController : MonoBehaviour
                 rampIndex++;
                 if (rampIndex == ramp.distancedNodes.Count - 1)
                 {
-                    direction = (ramp.distancedNodes[rampIndex] -
-                                 ramp.distancedNodes[rampIndex - 1]).normalized;
+                    direction = ramp.exitDirectionLastNode.normalized;
                     OnExitRamp();
                     return;
                 }
@@ -229,8 +360,7 @@ public class PlayerController : MonoBehaviour
                 rampIndex--;
                 if (rampIndex == 0)
                 {
-                    direction = (ramp.distancedNodes[0] -
-                                 ramp.distancedNodes[1]).normalized;
+                    direction = ramp.exitDirectionFirstNode.normalized;
                     OnExitRamp();
                     return;
                 }
@@ -248,10 +378,11 @@ public class PlayerController : MonoBehaviour
 
     void OnExitRamp()
     {
-        animator.Play("Roller");
+        ChangeAnimation(force <= 0 ? 1 : 2);
         onRamp = false;
         movementType = MovementType.KeepDirectionWithoutNavMesh;
         ramp.OnExitRamp();
+        sparkles.SetActive(false);
     }
 
     private void KeepDirectionNoNavMesh()
@@ -263,7 +394,7 @@ public class PlayerController : MonoBehaviour
         {
             agent.ResetPath();
             movementType = MovementType.MoveToClickWithNavMesh;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
         if (Input.GetMouseButton(1))
         {
@@ -285,7 +416,7 @@ public class PlayerController : MonoBehaviour
         if (moving && agent.remainingDistance == 0)
         {
             moving = false;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
         
         
@@ -296,19 +427,8 @@ public class PlayerController : MonoBehaviour
                 agent.ResetPath();
                 agent.SetDestination(hit.point);
                 moving = true;
-                if (force <= 0)
-                {
-                    animator.Play("Run");
-                }
-                else
-                {
-                    animator.Play("Roller");
-                }
+                ChangeAnimation(force <= 0 ? 1 : 2);
             }
         }
     }
 }
-
-
-//=======================================TO DO==================================================================
-//1. Implement for in the current speed of the player
