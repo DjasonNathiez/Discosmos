@@ -1,11 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
+using Toolbox.Variable;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class MinionsController : MonoBehaviour
+public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     [SerializeField] private Transform[] _waypoints;
     [SerializeField] private float range;
@@ -13,7 +15,8 @@ public class MinionsController : MonoBehaviour
     [SerializeField] private bool master;
     [SerializeField] public int id;
 
-    public int health;
+    public int currentHealth;
+    public int currentShield;
     public int maxHealth;
 
     private NavMeshAgent agent;
@@ -43,6 +46,8 @@ public class MinionsController : MonoBehaviour
 
     private void Start()
     {
+        currentHealth = maxHealth;
+        
         if (PhotonNetwork.IsMasterClient)
         {
             agent = GetComponent<NavMeshAgent>();
@@ -145,5 +150,80 @@ public class MinionsController : MonoBehaviour
     private void Attack()
     {
         Debug.Log("Attack");
+    }
+
+    public void DealDamage(int[] targetsID, int damageAmount)
+    {
+        Hashtable data = new Hashtable
+        {
+            {"TargetsID", targetsID},
+            {"Amount", damageAmount}
+        };
+
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal };
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.DamageTarget, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
+    public void OnEvent(EventData photonEvent)
+    {
+        if (photonEvent.Code == RaiseEvent.DamageTarget)
+        {
+            Debug.Log("Damage event reiceveid");
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
+
+            foreach (int id in targets)
+            {
+                if (photonView.ViewID == id)
+                {
+                    TakeDamage(data);
+                }
+            }
+        }
+
+        if (photonEvent.Code == RaiseEvent.Death)
+        {
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            
+            if (photonView.ViewID == (int)data["ID"])
+            {
+                Death();
+            }
+        }
+    }
+
+    private void Death()
+    {
+        //gameObject.SetActive(false);
+    }
+
+    private void TakeDamage(Hashtable data)
+    {
+        int amount = (int)data["Amount"];
+        
+        if (currentShield > 0)
+        {
+            int holdingDamage = amount - currentShield;
+
+            currentShield -= amount;
+
+            if (holdingDamage > 0)
+            {
+                currentHealth -= amount;
+            }
+        }
+        else
+        {
+            currentHealth -= amount;
+        }
+        
+        Debug.Log("Take Damage");
+        
+        if(currentHealth <= 0)
+        {
+            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };
+            PhotonNetwork.RaiseEvent(RaiseEvent.Death, new Hashtable{{"ID", photonView.ViewID}}, raiseEventOptions, SendOptions.SendReliable);
+        }
     }
 }

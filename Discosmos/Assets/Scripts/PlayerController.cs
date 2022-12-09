@@ -35,7 +35,9 @@ public class PlayerController : MonoBehaviour
     public int baseDamages;
     public AnimationCurve damageMultiplier;
     public float range;
-    public PlayerManager cible;
+    public GameObject cible;
+    PlayerManager player;
+    MinionsController minion;
     public bool isAttacking;
 
     [Header("Movement")]
@@ -275,11 +277,29 @@ public class PlayerController : MonoBehaviour
         {
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.transform.CompareTag("Player"))
+                if (hit.transform.CompareTag("Targetable"))
                 {
-                    if(cible) cible.HideTarget();
-                    cible = hit.transform.GetComponent<PlayerController>().playerManager;
-                    cible.ShowTarget();
+                    if (player)
+                    {
+                        player.HideTarget();
+                    }
+                    
+                    cible = hit.transform.gameObject;
+
+                    minion = cible.GetComponent<MinionsController>();
+                    player = cible.GetComponentInParent<PlayerManager>();
+
+                    if (player)
+                    {
+                        minion = null;
+                        player.ShowTarget();
+                    }
+
+                    if (minion)
+                    {
+                        player = null;
+                    }
+                    
                     if (onRamp)
                     {
                         OnExitRamp();
@@ -341,7 +361,17 @@ public class PlayerController : MonoBehaviour
     void FollowCible()
     {
         agent.ResetPath();
-        agent.SetDestination(cible.PlayerController.transform.position);
+        
+        if (player)
+        {       
+            agent.SetDestination(player.PlayerController.transform.position);
+        }
+
+        if (minion)
+        {
+            agent.SetDestination(minion.transform.position);
+        }
+        
         force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
         force = Mathf.Clamp01(force);
         agent.enabled = true;
@@ -351,13 +381,25 @@ public class PlayerController : MonoBehaviour
             ChangeAnimation(0);
         }
 
-        if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) <= range * range)
+        if (player)
         {
-            agent.ResetPath();
-            movementType = MovementType.Attack;
+            if (Vector3.SqrMagnitude(player.PlayerController.transform.position - transform.position) <= range * range)
+            {
+                agent.ResetPath();
+                movementType = MovementType.Attack;
+            }
+        }
+
+        if (minion)
+        {
+            if (Vector3.SqrMagnitude(minion.transform.position - transform.position) <= range * range)
+            {
+                agent.ResetPath();
+                movementType = MovementType.Attack;
+            }
         }
         
-
+        
         if (Input.GetMouseButton(1))
         {
             if (Physics.Raycast(ray, out hit))
@@ -380,8 +422,14 @@ public class PlayerController : MonoBehaviour
 
     public void ResetTarget()
     {
-        if(cible) cible.HideTarget();
+        if (player)
+        {
+            player.HideTarget();
+        }
+        
         cible = null;
+        player = null;
+        minion = null;
     }
 
     public void Attack()
@@ -394,28 +442,60 @@ public class PlayerController : MonoBehaviour
         else
         {
             force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
-            transform.rotation = Quaternion.LookRotation(cible.PlayerController.transform.position - transform.position);
-            
-            if (Vector3.SqrMagnitude(cible.PlayerController.transform.position - transform.position) > range * range)
+
+            if (player)
             {
-                isAttacking = false;
-                movementType = MovementType.FollowCible;
-                ChangeAnimation(force <= 0 ? 1 : 2);
-            }
-            
-            if (Input.GetMouseButton(1))
-            {
-                if (Physics.Raycast(ray, out hit))
+                transform.rotation = Quaternion.LookRotation(player.PlayerController.transform.position - transform.position);
+
+                if (Vector3.SqrMagnitude(player.PlayerController.transform.position - transform.position) > range * range)
                 {
-                    ResetTarget();
                     isAttacking = false;
-                    movementType = MovementType.MoveToClickWithNavMesh;
-                    agent.ResetPath();
-                    agent.SetDestination(hit.point);
-                    moving = true;
+                    movementType = MovementType.FollowCible;
                     ChangeAnimation(force <= 0 ? 1 : 2);
                 }
+            
+                if (Input.GetMouseButton(1))
+                {
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        ResetTarget();
+                        isAttacking = false;
+                        movementType = MovementType.MoveToClickWithNavMesh;
+                        agent.ResetPath();
+                        agent.SetDestination(hit.point);
+                        moving = true;
+                        ChangeAnimation(force <= 0 ? 1 : 2);
+                    }
+                }
             }
+
+            if (minion)
+            {
+                transform.rotation = Quaternion.LookRotation(minion.transform.position - transform.position);
+
+                if (Vector3.SqrMagnitude(minion.transform.position - transform.position) > range * range)
+                {
+                    isAttacking = false;
+                    movementType = MovementType.FollowCible;
+                    ChangeAnimation(force <= 0 ? 1 : 2);
+                }
+            
+                if (Input.GetMouseButton(1))
+                {
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        ResetTarget();
+                        isAttacking = false;
+                        movementType = MovementType.MoveToClickWithNavMesh;
+                        agent.ResetPath();
+                        agent.SetDestination(hit.point);
+                        moving = true;
+                        ChangeAnimation(force <= 0 ? 1 : 2);
+                    }
+                }
+            }
+            
+            
         }
     }
 

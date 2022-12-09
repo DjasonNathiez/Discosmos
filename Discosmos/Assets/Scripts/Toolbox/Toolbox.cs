@@ -1,6 +1,6 @@
 namespace Toolbox.Variable
 {
-    public static class PlayerRaiseEvent
+    public static class RaiseEvent
     {
         //BEGIN AT 100
         public static byte DamageTarget = 100;

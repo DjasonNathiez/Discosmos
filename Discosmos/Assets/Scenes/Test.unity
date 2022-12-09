@@ -756,7 +756,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firstWaypointPosition: {fileID: 913794390}
   prefab: {fileID: 2149152815251019513, guid: 8d0cd69a50ad4204585a83270440d59e, type: 3}
-  spawnRate: 8
+  spawnRate: 4
   waveRate: 5
   numberPerWave: 5
   poolSize: 5
