@@ -25,8 +25,7 @@ public class TowerDetection : MonoBehaviour
 
     private void Start()
     {
-        //set the top of the tower to the position of the child of the tower detection object named "TowerShoot"
-        topOfTower = transform.GetChild(0).position;
+        topOfTower = transform.parent.position;
     }
 
     void Update()
@@ -78,10 +77,4 @@ public class TowerDetection : MonoBehaviour
         }
     }
 
-    //draw the detection radius in the scene view
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-    }
 }
