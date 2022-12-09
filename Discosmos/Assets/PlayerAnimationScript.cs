@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAnimationScript : MonoBehaviour
@@ -11,8 +9,13 @@ public class PlayerAnimationScript : MonoBehaviour
         playerController.OnAttack();
     }
     
-    public void CallAttackFX()
+    public void CallMimiAttackFX()
     {
         playerController.playerManager.CallFX(VisualEffects.MimiAutoAttack);
+    }
+
+    public void CallMimiLaserVFX()
+    {
+        playerController.playerManager.CallFX(VisualEffects.MimiLaser);
     }
 }
