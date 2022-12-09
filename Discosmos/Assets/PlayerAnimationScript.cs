@@ -3,6 +3,8 @@ using UnityEngine;
 public class PlayerAnimationScript : MonoBehaviour
 {
     [SerializeField] private PlayerController playerController;
+    [Header("Mimi Hit Box")]
+    public CapacitiesHitBox laserHitBox;
 
     public void CallAttack()
     {
@@ -11,7 +13,7 @@ public class PlayerAnimationScript : MonoBehaviour
 
     public void CallMimiLaser()
     {
-        //playerController.OnCapacityPerfom(MimiLaser);
+        playerController.OnCapacityPerformed(Capacities.MIMI_Laser, laserHitBox.idOnIt.ToArray());
     }
     
     public void CallMimiAttackFX()

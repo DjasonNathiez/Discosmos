@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    private NavMeshAgent agent;
+    [HideInInspector] public NavMeshAgent agent;
     public bool clientPlayer;
     public PlayerManager playerManager;
 
@@ -247,6 +247,8 @@ public class PlayerController : MonoBehaviour
 
     private void MovementTypeSwitch()
     {
+        if(!playerManager.canMove) return;
+
         if (playerManager._camera != null) ray = playerManager._camera.ScreenPointToRay(Input.mousePosition);
         switch (movementType)
         {
@@ -311,11 +313,31 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void FreezePlayer()
+    {
+        playerManager.canMove = false;
+        agent.ResetPath();
+    }
+
+    public void UnfreezePlayer()
+    {
+        playerManager.canMove = true;
+        playerManager.isCasting = false;
+    }
+    
     void CapacitiesInputCheck()
     {
-        if (Input.GetKeyUp(activeCapacity1))
+        if(playerManager.isCasting) return;
+        
+        if (Input.GetKeyUp(activeCapacity1) && !ActiveCapacity1.onCooldown)
         {
+            if (Physics.Raycast(ray, out hit))
+            {
+                transform.rotation = Quaternion.LookRotation(hit.point - transform.position);
+            }
+            
             ActiveCapacity1.Cast();
+            playerManager.isCasting = true;
         }
 
         if (Input.GetKeyUp(activeCapacity2))
@@ -340,16 +362,19 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    /*public void OnCapacityPerformed(Capacities capacity)
+    public void OnCapacityPerformed(Capacities capacity, int[] targets)
     {
+        UnfreezePlayer();
+        
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
+                Debug.Log("Try to find something");
                 int damages = Mathf.RoundToInt(ActiveCapacity1.activeCapacitySo.amount * damageMultiplier.Evaluate(force));
-                playerManager.DealDamage(ActiveCapacity1.GetTargets(transform.forward), damages);
+                playerManager.DealDamage(targets, damages);
                 break;
         }
-    }*/
+    }
 
     public void OnAttack()
     {
@@ -445,7 +470,7 @@ public class PlayerController : MonoBehaviour
 
             if (player)
             {
-                transform.rotation = Quaternion.LookRotation(player.PlayerController.transform.position - transform.position);
+                if(!playerManager.isCasting) transform.rotation = Quaternion.LookRotation(player.PlayerController.transform.position - transform.position);
 
                 if (Vector3.SqrMagnitude(player.PlayerController.transform.position - transform.position) > range * range)
                 {
@@ -471,7 +496,7 @@ public class PlayerController : MonoBehaviour
 
             if (minion)
             {
-                transform.rotation = Quaternion.LookRotation(minion.transform.position - transform.position);
+                if(!playerManager.isCasting)  transform.rotation = Quaternion.LookRotation(minion.transform.position - transform.position);
 
                 if (Vector3.SqrMagnitude(minion.transform.position - transform.position) > range * range)
                 {
@@ -547,7 +572,7 @@ public class PlayerController : MonoBehaviour
         if (onRamp)
         {
             transform.position = Vector3.Lerp(ramp.distancedNodes[rampIndex], ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1], rampProgress) + Vector3.up * ramp.heightOnRamp;
-            transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1] - ramp.distancedNodes[rampIndex]),Time.deltaTime*8);
+            if(!playerManager.isCasting) transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1] - ramp.distancedNodes[rampIndex]),Time.deltaTime*8);
             force += ramp.speedBoost.Evaluate(force) * Time.deltaTime;
         }
     }

@@ -36,6 +36,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public int currentHealth;
     public int maxHealth;
     public int currentShield;
+    public bool isCasting;
+    public bool canMove;
 
     [Header("Movement")]
     public float currentSpeed;
@@ -97,6 +99,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void Initialize()
     {
+        canMove = true;
+        
         if (championDataSo)
         {
             PlayerController.ActiveCapacity1SO = championDataSo.ActiveCapacity1So;
@@ -212,6 +216,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         currentHealth = maxHealth;
         PlayerController.transform.position = FindObjectOfType<LevelManager>().spawnPoint.position;
+        PlayerController.agent.ResetPath();
     }
 }
 
