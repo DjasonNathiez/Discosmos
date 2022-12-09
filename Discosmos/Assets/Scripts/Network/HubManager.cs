@@ -108,7 +108,7 @@ public class HubManager : MonoBehaviour
 
    public void DEBUG_ConnectToTestRoom()
    {
-      NetworkManager.instance.SwitchRoom(NetworkManager.instance.sceneTestName);
+      NetworkManager.instance.SwitchRoom("Test");
    }
    
 

@@ -13,6 +13,23 @@ public class PlayerController : MonoBehaviour
     public bool clientPlayer;
     public PlayerManager playerManager;
 
+    [Header("Inputs")] 
+    public KeyCode activeCapacity1 = KeyCode.A;
+    public KeyCode activeCapacity2 = KeyCode.Z;
+    public KeyCode ultimateCapacity = KeyCode.E;
+    
+    [Header("Capacities")] 
+    public PassiveCapacity PassiveCapacity;
+    public ActiveCapacitySO ActiveCapacity1SO;
+    private ActiveCapacity ActiveCapacity1;
+    public ActiveCapacitySO ActiveCapacity2SO;
+    private ActiveCapacity ActiveCapacity2;
+    public ActiveCapacitySO UltimateCapacitySO;
+    private ActiveCapacity UltimateCapacity;
+
+    public delegate void OnCastEnded(Capacities capacity);
+    public OnCastEnded OnCastEnd;
+
     [Header("Auto Attack")] 
     
     public int baseDamages;
@@ -67,6 +84,37 @@ public class PlayerController : MonoBehaviour
     [Header("UI")] 
     [SerializeField] private Image speedJauge;
 
+    private void OnEnable()
+    {
+        OnCastEnd += OnCapacityActive;
+        
+        ActiveCapacity1SO.GetActiveCapacity();
+        ActiveCapacity1 = ActiveCapacity1SO.activeCapacity;
+        ActiveCapacity1.InitializeCapacity(ActiveCapacity1SO);
+        ActiveCapacity1.owner = this;
+        
+        ActiveCapacity2SO.GetActiveCapacity();
+        ActiveCapacity2 = ActiveCapacity2SO.activeCapacity;
+        ActiveCapacity2.InitializeCapacity(ActiveCapacity2SO);
+        ActiveCapacity2.owner = this;
+        
+        UltimateCapacitySO.GetActiveCapacity();
+        UltimateCapacity = UltimateCapacitySO.activeCapacity;
+        UltimateCapacity.InitializeCapacity(UltimateCapacitySO);
+        UltimateCapacity.owner = this;
+    }
+
+    private void OnDisable()
+    {
+        
+        OnCastEnd -= OnCapacityActive;
+        
+        ActiveCapacity1 = null;
+        ActiveCapacity2 = null;
+        UltimateCapacity = null;
+
+    }
+
     private void Start()
     {
         if (clientPlayer)
@@ -96,6 +144,7 @@ public class PlayerController : MonoBehaviour
         {
             SetTime();
 
+            CapacitiesInputCheck();
             AttackCheck();
             MovementTypeSwitch();
             playerManager.speedBar.fillAmount = force;
@@ -242,6 +291,45 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void CapacitiesInputCheck()
+    {
+        if (Input.GetKeyUp(activeCapacity1))
+        {
+            ActiveCapacity1.Cast();
+        }
+
+        if (Input.GetKeyUp(activeCapacity2))
+        {
+            ActiveCapacity2.Cast();
+        }
+
+        if (Input.GetKeyUp(ultimateCapacity))
+        {
+            UltimateCapacity.Cast();
+        }
+    }
+
+    void OnCapacityActive(Capacities capacity)
+    {
+        switch (capacity)
+        {
+            case Capacities.MIMI_Laser:
+                Debug.Log("Perform the mimi laser at " + PhotonNetwork.Time);
+                break;
+        }
+    }
+    
+    public void OnCapacityPerformed(Capacities capacity)
+    {
+        switch (capacity)
+        {
+            case Capacities.MIMI_Laser:
+                int damages = Mathf.RoundToInt(ActiveCapacity1.activeCapacitySo.amount * damageMultiplier.Evaluate(force));
+                playerManager.DealDamage(ActiveCapacity1.GetTargets(transform.forward), damages);
+                break;
+        }
+    }
+    
     public void OnAttack()
     {
         int damages = Mathf.RoundToInt(baseDamages * damageMultiplier.Evaluate(force));

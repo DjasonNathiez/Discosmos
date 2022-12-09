@@ -8069,6 +8069,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clientPlayer: 1
   playerManager: {fileID: 3242392941343150298}
+  activeCapacity1: 97
+  activeCapacity2: 122
+  ultimateCapacity: 101
+  PassiveCapacity: {fileID: 0}
+  ActiveCapacity1SO: {fileID: 0}
+  ActiveCapacity2SO: {fileID: 0}
+  UltimateCapacitySO: {fileID: 0}
   baseDamages: 10
   damageMultiplier:
     serializedVersion: 2
