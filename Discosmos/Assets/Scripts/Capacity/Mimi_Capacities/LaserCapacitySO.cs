@@ -5,7 +5,8 @@ public class LaserCapacitySO : ActiveCapacitySO
     [Header("Effect")]
     public short damage;
     public PassiveCapacitySO[] additionalPassiveEffect;
-
+    public float range;
+    public float size;
 
     [Header("Visual")]
     public GameObject projectile;

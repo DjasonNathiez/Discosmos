@@ -12,6 +12,8 @@ using UnityEngine;
 public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
    public static NetworkManager instance;
+   [Header("TEST")] 
+   public string sceneTestName;
 
    [SerializeField] private DebugNetworkShower _debugNetworkShower;
 
