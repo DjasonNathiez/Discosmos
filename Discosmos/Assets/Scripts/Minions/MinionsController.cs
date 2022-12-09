@@ -14,6 +14,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private float speed;
     [SerializeField] private bool master;
     [SerializeField] public int id;
+    public Targetable myTargetable;
 
     public int currentHealth;
     public int currentShield;
@@ -65,7 +66,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             agent.enabled = false;
         }
 
-        MobsUIManager.instance.MinionSpawned(this);
+        myTargetable.photonID = photonView.ViewID;
     }
 
     private void FollowFromNearestToFarthest()
@@ -115,15 +116,10 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             }   
         }
     }
-    
-    public void ShowTarget()
+
+    private void LateUpdate()
     {
-        MobsUIManager.instance.healthBars[id].target.gameObject.SetActive(true);
-    }
-    
-    public void HideTarget()
-    {
-        MobsUIManager.instance.healthBars[id].target.gameObject.SetActive(false);
+        myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
     private void MoveToWaypoint()

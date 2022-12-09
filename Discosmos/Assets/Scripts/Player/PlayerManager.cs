@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] public string username;
     public PlayerController PlayerController;
     public GameObject hud;
+    public Transform canvas;
     public GameObject cam;
     public IPlayer iplayer;
     public ChampionDataSO championDataSo;
@@ -21,17 +22,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     
     [SerializeField] private bool overwriteOnline;
     
-    [SerializeField] private Image healthBar;
-    [SerializeField] public Image speedBar;
-    [SerializeField] private TextMeshProUGUI healthText;
-    [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private Transform uiStatsTransform;
-    [SerializeField] private Transform target;
-    [SerializeField] private float heightUI;
     [SerializeField] public Camera _camera;
-    [SerializeField] private GameObject healthBarObj;
-    [SerializeField] private Transform canvas;
-    
+
     [Header("State")]
     public int currentHealth;
     public int maxHealth;
@@ -48,7 +40,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [Header("FX")]
     public ParticleSystem attackFx;
     public ParticleSystem laserFX;
-    
+    public GameObject textDamage;
 
     private void Awake()
     {
@@ -59,30 +51,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
         }
 
-        GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
-        uiStatsTransform = healthBarObject.transform;
-        healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
-        speedBar = uiStatsTransform.GetChild(1).GetComponent<Image>();
-        healthText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        nameText = uiStatsTransform.GetChild(3).GetComponent<TextMeshProUGUI>();
-        target = uiStatsTransform.GetChild(4);
+        PlayerController.myTargetable.photonID = photonView.ViewID;
     }
 
     private void Start()
     {
         username = photonView.Controller.NickName;
-        nameText.text = username;
-    }
-
-    public void ShowTarget()
-    {
-        target.gameObject.SetActive(true);
+        PlayerController.myTargetable.healthBar.name = username;
+        PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth,false,0,true,username);
     }
     
-    public void HideTarget()
-    {
-        target.gameObject.SetActive(false);
-    }
 
     public void CallFX(VisualEffects effect)
     {
@@ -125,9 +103,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     void SetUI()
     {
-        uiStatsTransform.position = GameAdministrator.instance.localPlayer._camera.WorldToScreenPoint(PlayerController.transform.position + Vector3.up) + Vector3.up * heightUI;
-        healthBar.fillAmount = currentHealth / (float) maxHealth;
-        healthText.text = currentHealth + " / " + maxHealth;
+        PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
     private void OnDestroy()
@@ -189,11 +165,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             if (holdingDamage > 0)
             {
                 currentHealth -= amount;
+                GameObject textDmg = Instantiate(textDamage, PlayerController.myTargetable.healthBar.transform.position + Vector3.up * 30, quaternion.identity, MobsUIManager.instance.canvas);
+                textDmg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "-" + amount;
             }
         }
         else
         {
             currentHealth -= amount;
+            GameObject textDmg = Instantiate(textDamage, PlayerController.myTargetable.healthBar.transform.position + Vector3.up * 30, quaternion.identity, MobsUIManager.instance.canvas);
+            textDmg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "-" + amount;
+            Debug.Log("Spawned " + textDmg);
         }
         
         Debug.Log("Take Damage");

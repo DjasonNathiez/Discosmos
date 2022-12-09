@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4840115583177159771}
   - component: {fileID: 53187641744449011}
   - component: {fileID: 6415914947484446384}
+  - component: {fileID: 1367352334353916023}
   m_Layer: 0
   m_Name: minion
   m_TagString: Targetable
@@ -104,6 +105,7 @@ MonoBehaviour:
   speed: 0
   master: 0
   id: 0
+  myTargetable: {fileID: 1367352334353916023}
   currentHealth: 0
   currentShield: 0
   maxHealth: 100
@@ -150,6 +152,32 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &1367352334353916023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149152815251019513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47dad944a2169b24dbb80328a893b894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar:
+    transform: {fileID: 0}
+    healthFill: {fileID: 0}
+    speedFill: {fileID: 0}
+    healthText: {fileID: 0}
+    nameText: {fileID: 0}
+    target: {fileID: 0}
+    name: 
+  uiObject: {fileID: 3013384326752953839, guid: 5826689cfc69c6940b9ce75d191718a4,
+    type: 3}
+  photonID: 0
+  targetableBody: {fileID: 4603925499178921403}
+  heightUI: 40
+  type: 1
 --- !u!1001 &1750849515327818136
 PrefabInstance:
   m_ObjectHideFlags: 0
