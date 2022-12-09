@@ -49,7 +49,9 @@ public class LaserCapacity : ActiveCapacity
 
     public override int[] GetTargets(Vector3 initPos)
     {
-        
+        Debug.Log("try to get targets");
+        initPos = owner.transform.forward;
+
         Vector3 rectCenter = new Vector3(initPos.x, 1, laserSO.range/2);
         Vector3 halfExtend = new Vector3(laserSO.size, 0.3f / 2, laserSO.size);
 
@@ -59,6 +61,7 @@ public class LaserCapacity : ActiveCapacity
         
         foreach (var targets in hit)
         {
+            Debug.Log(targets.GetComponent<PlayerManager>().username);
             var targetView = targets.GetComponent<PhotonView>();
             if (targetView != null)
             {
@@ -66,6 +69,7 @@ public class LaserCapacity : ActiveCapacity
             }
         }
 
+        
         return hitID.Count switch
         {
             <= 0 => hitID.ToArray(),
