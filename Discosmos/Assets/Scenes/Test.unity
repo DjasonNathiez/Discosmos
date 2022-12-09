@@ -721,7 +721,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mobs: []
-  healthBar: {fileID: 3013384326752953839, guid: e5f0c106ce0987943986a70b3b362df4,
+  healthBar: {fileID: 3013384326752953839, guid: 5826689cfc69c6940b9ce75d191718a4,
     type: 3}
   healthBars: []
   canvas: {fileID: 296060272}
