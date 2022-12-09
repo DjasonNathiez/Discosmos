@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 public class PoolMinionsSpawner : MonoBehaviour
@@ -25,12 +26,20 @@ public class PoolMinionsSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //create the pool of enemies
-        for (int i = 0; i < poolSize; i++)
+
+        if (PhotonNetwork.IsMasterClient)
         {
-            GameObject enemy = Instantiate(prefab, transform.position, Quaternion.identity);
-            enemy.SetActive(false);
-            pool.Add(enemy);
+            //create the pool of enemies
+            for (int i = 0; i < poolSize; i++)
+            {
+                GameObject enemy = PhotonNetwork.Instantiate(prefab.name, firstWaypointPosition.position, Quaternion.identity);
+                enemy.SetActive(false);
+                pool.Add(enemy);
+            }   
+        }
+        else
+        {
+            this.enabled = false;
         }
     }
     
