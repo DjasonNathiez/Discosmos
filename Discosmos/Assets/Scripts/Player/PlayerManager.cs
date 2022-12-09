@@ -45,6 +45,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     
     [Header("FX")]
     public ParticleSystem attackFx;
+    
 
     private void Awake()
     {
@@ -92,6 +93,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void Initialize()
     {
+        if (championDataSo)
+        {
+            PlayerController.ActiveCapacity1SO = championDataSo.ActiveCapacity1So;
+            PlayerController.ActiveCapacity2SO = championDataSo.ActiveCapacity2So;
+            PlayerController.UltimateCapacitySO = championDataSo.UltimateCapacitySo;
+        }
+        
         if (photonView.IsMine)
         {
             PlayerController.enabled = true;
@@ -207,4 +215,9 @@ public enum VisualEffects
 {
     MimiAutoAttack,
     MimiLaser
+}
+
+public enum Capacities
+{
+    MIMI_Laser
 }

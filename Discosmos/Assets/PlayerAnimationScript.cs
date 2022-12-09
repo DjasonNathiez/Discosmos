@@ -8,6 +8,11 @@ public class PlayerAnimationScript : MonoBehaviour
     {
         playerController.OnAttack();
     }
+
+    public void CallMimiLaser()
+    {
+        //playerController.OnCapacityPerfom(MimiLaser);
+    }
     
     public void CallMimiAttackFX()
     {

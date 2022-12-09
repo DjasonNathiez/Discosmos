@@ -14,6 +14,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    public static NetworkManager instance;
    [Header("TEST")] 
    public string sceneTestName;
+   public ChampionDataSO testChamp;
 
    [SerializeField] private DebugNetworkShower _debugNetworkShower;
 
@@ -72,7 +73,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       
       if (GameAdministrator.instance.currentScene == Enums.Scenes.Login)
       {
-         GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+         GameAdministrator.instance.LoadScene(GameAdministrator.instance.hubSceneName);
       }
 
       JoinRoom();
@@ -104,10 +105,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
          
          playerTest.GetPhotonView().Controller.NickName = GameAdministrator.instance.username;
-         
+         playerTest.GetComponent<PlayerManager>().championDataSo = testChamp;
          playerTest.GetComponent<PlayerManager>().Initialize();
          
-         PhotonNetwork.LoadLevel("Test");
+         PhotonNetwork.LoadLevel(sceneTestName);
       }
    }
 
@@ -440,6 +441,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void SwitchRoom(string roomName)
    {
+      roomBackup = roomName;
+      
       if (PhotonNetwork.InRoom)
       {
          PhotonNetwork.LeaveRoom();
@@ -459,7 +462,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          }
       }
       
-      roomBackup = roomName;
    }
 }
 

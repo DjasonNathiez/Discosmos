@@ -1,25 +1,29 @@
 using System.Collections.Generic;
-using System.Numerics;
 using Photon.Pun;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
 public class LaserCapacity : ActiveCapacity
 {
-    private LaserCapacitySO laserSO;
+    public LaserCapacitySO laserSO;
 
-    public override void InitializeCapacity()
+    public override void InitializeCapacity(ActiveCapacitySO so)
     {
-        SetCapacityData(laserSO);
+        base.InitializeCapacity(so);
+        laserSO = (LaserCapacitySO)so;
     }
 
     public override void Cast()
     {
-        if(onCooldown) return;
+        if(onCooldown)
+        {
+            Debug.Log("Capacity on cooldown");
+            return;
+        }
 
         serverTimeBackup = PhotonNetwork.Time;
         GameAdministrator.OnServerUpdate += CastRoutine;
-        Debug.Log(laserSO.name + " Start cast");
+        Debug.Log("Start cast the mimi laser at " + PhotonNetwork.Time);
     }
 
     public override void CastRoutine()
@@ -28,6 +32,7 @@ public class LaserCapacity : ActiveCapacity
         {
             Active();
             GameAdministrator.OnServerUpdate -= CastRoutine;
+            castTimer = 0;
         }
         else
         {
@@ -37,7 +42,9 @@ public class LaserCapacity : ActiveCapacity
 
     public override void Active()
     {
-        Debug.Log(laserSO.name + " Active");
+        owner.OnCastEnd?.Invoke(Capacities.MIMI_Laser);
+        onCooldown = true;
+        GameAdministrator.OnServerUpdate += Cooldown;
     }
 
     public override int[] GetTargets(Vector3 initPos)
@@ -68,7 +75,17 @@ public class LaserCapacity : ActiveCapacity
 
     public override void Cooldown()
     {
-        
+        if (cooldownTimer >= laserSO.cooldownTime)
+        {
+            Debug.Log("Capacity is no longer on cooldown");
+            onCooldown = false;
+            GameAdministrator.OnServerUpdate -= Cooldown;
+            cooldownTimer = 0;
+        }
+        else
+        {
+            cooldownTimer = (float)(PhotonNetwork.Time - serverTimeBackup);
+        }
         
     }
 }
