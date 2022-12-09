@@ -115,6 +115,16 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             }   
         }
     }
+    
+    public void ShowTarget()
+    {
+        MobsUIManager.instance.healthBars[id].target.gameObject.SetActive(true);
+    }
+    
+    public void HideTarget()
+    {
+        MobsUIManager.instance.healthBars[id].target.gameObject.SetActive(false);
+    }
 
     private void MoveToWaypoint()
     {

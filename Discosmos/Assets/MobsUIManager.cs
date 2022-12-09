@@ -34,6 +34,7 @@ public class MobsUIManager : MonoBehaviour
         bar.transform = Instantiate(healthBar, Vector3.zero, quaternion.identity, canvas).transform;
         bar.healthFill = bar.transform.GetChild(0).GetComponent<Image>();
         bar.healthText = bar.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        bar.target = bar.transform.GetChild(2);
         healthBars.Add(bar);
     }
 
@@ -57,4 +58,5 @@ public class HealthBar
     public Image speedFill;
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI nameText;
+    public Transform target;
 }
