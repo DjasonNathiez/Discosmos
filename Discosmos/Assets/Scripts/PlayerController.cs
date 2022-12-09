@@ -311,6 +311,7 @@ public class PlayerController : MonoBehaviour
         {
             case Capacities.MIMI_Laser:
                 Debug.Log("Perform the mimi laser at " + PhotonNetwork.Time);
+                OnCapacityPerformed(Capacities.MIMI_Laser);
                 break;
         }
     }
@@ -325,7 +326,7 @@ public class PlayerController : MonoBehaviour
                 break;
         }
     }
-    
+
     public void OnAttack()
     {
         int damages = Mathf.RoundToInt(baseDamages * damageMultiplier.Evaluate(force));
