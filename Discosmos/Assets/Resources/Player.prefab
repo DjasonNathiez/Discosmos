@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1542195264
 Transform:
   m_ObjectHideFlags: 0
@@ -7980,6 +7980,7 @@ GameObject:
   - component: {fileID: 2011121328774887626}
   - component: {fileID: 2819507938827760034}
   - component: {fileID: 2646178798639229222}
+  - component: {fileID: 3114507236072290442}
   m_Layer: 0
   m_Name: Player_1
   m_TagString: Targetable
@@ -8106,6 +8107,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   range: 5
   cible: {fileID: 0}
+  myTargetable: {fileID: 3114507236072290442}
   isAttacking: 0
   movementType: 0
   force: 0
@@ -8211,6 +8213,32 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &3114507236072290442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011121328774887620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47dad944a2169b24dbb80328a893b894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar:
+    transform: {fileID: 0}
+    healthFill: {fileID: 0}
+    speedFill: {fileID: 0}
+    healthText: {fileID: 0}
+    nameText: {fileID: 0}
+    target: {fileID: 0}
+    name: 
+  uiObject: {fileID: 3013384326752953839, guid: e5f0c106ce0987943986a70b3b362df4,
+    type: 3}
+  photonID: 0
+  targetableBody: {fileID: 2011121328774887630}
+  heightUI: 40
+  type: 0
 --- !u!1 &2011121328806635972
 GameObject:
   m_ObjectHideFlags: 0
@@ -8788,20 +8816,11 @@ MonoBehaviour:
   username: 
   PlayerController: {fileID: 2011121328774887626}
   hud: {fileID: 337513683121942551}
+  canvas: {fileID: 3190069372747769583}
   cam: {fileID: 1542195262}
   championDataSo: {fileID: 0}
   overwriteOnline: 1
-  healthBar: {fileID: 0}
-  speedBar: {fileID: 0}
-  healthText: {fileID: 0}
-  nameText: {fileID: 0}
-  uiStatsTransform: {fileID: 0}
-  target: {fileID: 0}
-  heightUI: 50
   _camera: {fileID: 620923166}
-  healthBarObj: {fileID: 3013384326752953839, guid: e5f0c106ce0987943986a70b3b362df4,
-    type: 3}
-  canvas: {fileID: 3190069372747769583}
   currentHealth: 100
   maxHealth: 100
   currentShield: 0
@@ -8813,6 +8832,8 @@ MonoBehaviour:
   speedMultiplier: 0
   attackFx: {fileID: 366544346915499827}
   laserFX: {fileID: 6752564076481717480}
+  textDamage: {fileID: 3013384326752953839, guid: 0ceff084b68ce4644a0145ec20fbc8ea,
+    type: 3}
 --- !u!114 &3242392941343150297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96574,6 +96595,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.905
+      objectReference: {fileID: 0}
+    - target: {fileID: 5630065728431165031, guid: fff5768d7213f164e89e8f881e662957,
+        type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5630065728567652745, guid: fff5768d7213f164e89e8f881e662957,
+        type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fff5768d7213f164e89e8f881e662957, type: 3}
