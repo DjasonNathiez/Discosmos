@@ -1,5 +1,13 @@
 namespace Toolbox.Variable
 {
+    public static class RaiseEvent
+    {
+        //BEGIN AT 100
+        public static byte DamageTarget = 100;
+        public static byte HealTarget = 101;
+        public static byte Death = 102;
+    }
+    
     public static class NetworkDelegate
     {
         public delegate void OnServerUpdate();

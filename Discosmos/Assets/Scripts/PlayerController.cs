@@ -13,14 +13,33 @@ public class PlayerController : MonoBehaviour
     public bool clientPlayer;
     public PlayerManager playerManager;
 
+    [Header("Inputs")] 
+    public KeyCode activeCapacity1 = KeyCode.A;
+    public KeyCode activeCapacity2 = KeyCode.Z;
+    public KeyCode ultimateCapacity = KeyCode.E;
+    
+    [Header("Capacities")] 
+    public PassiveCapacity PassiveCapacity;
+    public ActiveCapacitySO ActiveCapacity1SO;
+    private ActiveCapacity ActiveCapacity1;
+    public ActiveCapacitySO ActiveCapacity2SO;
+    private ActiveCapacity ActiveCapacity2;
+    public ActiveCapacitySO UltimateCapacitySO;
+    private ActiveCapacity UltimateCapacity;
+
+    public delegate void OnCastEnded(Capacities capacity);
+    public OnCastEnded OnCastEnd;
+
     [Header("Auto Attack")] 
     
     public int baseDamages;
-    public int maxSpeedBonusDamages;
+    public AnimationCurve damageMultiplier;
     public float range;
-    public PlayerController cible;
+    public GameObject cible;
+    PlayerManager player;
+    MinionsController minion;
     public bool isAttacking;
-    
+
     [Header("Movement")]
     
     [SerializeField] private MovementType movementType = MovementType.MoveToClickWithNavMesh;
@@ -67,6 +86,37 @@ public class PlayerController : MonoBehaviour
     [Header("UI")] 
     [SerializeField] private Image speedJauge;
 
+    private void OnEnable()
+    {
+        OnCastEnd += OnCapacityActive;
+        
+        ActiveCapacity1SO.GetActiveCapacity();
+        ActiveCapacity1 = ActiveCapacity1SO.activeCapacity;
+        ActiveCapacity1.InitializeCapacity(ActiveCapacity1SO);
+        ActiveCapacity1.owner = this;
+        
+        ActiveCapacity2SO.GetActiveCapacity();
+        ActiveCapacity2 = ActiveCapacity2SO.activeCapacity;
+        ActiveCapacity2.InitializeCapacity(ActiveCapacity2SO);
+        ActiveCapacity2.owner = this;
+        
+        UltimateCapacitySO.GetActiveCapacity();
+        UltimateCapacity = UltimateCapacitySO.activeCapacity;
+        UltimateCapacity.InitializeCapacity(UltimateCapacitySO);
+        UltimateCapacity.owner = this;
+    }
+
+    private void OnDisable()
+    {
+        
+        OnCastEnd -= OnCapacityActive;
+        
+        ActiveCapacity1 = null;
+        ActiveCapacity2 = null;
+        UltimateCapacity = null;
+
+    }
+
     private void Start()
     {
         if (clientPlayer)
@@ -96,8 +146,10 @@ public class PlayerController : MonoBehaviour
         {
             SetTime();
 
+            CapacitiesInputCheck();
+            AttackCheck();
             MovementTypeSwitch();
-            speedJauge.fillAmount = force;
+            playerManager.speedBar.fillAmount = force;
             currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
             agent.speed = currentSpeed;
 
@@ -187,6 +239,9 @@ public class PlayerController : MonoBehaviour
         MoveToClickWithNavMesh,
         KeepDirectionWithoutNavMesh,
         Slide,
+        FollowCible,
+        Attack,
+        Block
     }
 
 
@@ -204,11 +259,249 @@ public class PlayerController : MonoBehaviour
             case MovementType.Slide:
                 Slide();
                 break;
+            case MovementType.FollowCible:
+                FollowCible();
+                break;
+            case MovementType.Attack:
+                Attack();
+                break;
+            case MovementType.Block:
+                BlockPlayer();
+                break;
+        }
+    }
+
+    void AttackCheck()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.transform.CompareTag("Targetable"))
+                {
+                    if (player)
+                    {
+                        player.HideTarget();
+                    }
+                    
+                    cible = hit.transform.gameObject;
+
+                    minion = cible.GetComponent<MinionsController>();
+                    player = cible.GetComponentInParent<PlayerManager>();
+
+                    if (player)
+                    {
+                        minion = null;
+                        player.ShowTarget();
+                    }
+
+                    if (minion)
+                    {
+                        player = null;
+                    }
+                    
+                    if (onRamp)
+                    {
+                        OnExitRamp();
+                    }
+                    movementType = MovementType.FollowCible;
+                    ChangeAnimation(force <= 0 ? 1 : 2);
+                }
+            }
+        }
+    }
+
+    void CapacitiesInputCheck()
+    {
+        if (Input.GetKeyUp(activeCapacity1))
+        {
+            ActiveCapacity1.Cast();
+        }
+
+        if (Input.GetKeyUp(activeCapacity2))
+        {
+            ActiveCapacity2.Cast();
+        }
+
+        if (Input.GetKeyUp(ultimateCapacity))
+        {
+            UltimateCapacity.Cast();
+        }
+    }
+
+    void OnCapacityActive(Capacities capacity)
+    {
+        switch (capacity)
+        {
+            case Capacities.MIMI_Laser:
+                Debug.Log("Perform the mimi laser at " + PhotonNetwork.Time);
+                ChangeAnimation(6);
+                break;
+        }
+    }
+    
+    /*public void OnCapacityPerformed(Capacities capacity)
+    {
+        switch (capacity)
+        {
+            case Capacities.MIMI_Laser:
+                int damages = Mathf.RoundToInt(ActiveCapacity1.activeCapacitySo.amount * damageMultiplier.Evaluate(force));
+                playerManager.DealDamage(ActiveCapacity1.GetTargets(transform.forward), damages);
+                break;
+        }
+    }*/
+
+    public void OnAttack()
+    {
+        int damages = Mathf.RoundToInt(baseDamages * damageMultiplier.Evaluate(force));
+        force = 0;
+        playerManager.DealDamage(new []{cible.GetComponent<PhotonView>().ViewID}, damages);
+    }
+
+    void FollowCible()
+    {
+        agent.ResetPath();
+        
+        if (player)
+        {       
+            agent.SetDestination(player.PlayerController.transform.position);
+        }
+
+        if (minion)
+        {
+            agent.SetDestination(minion.transform.position);
+        }
+        
+        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
+        force = Mathf.Clamp01(force);
+        agent.enabled = true;
+        if (moving && agent.remainingDistance == 0)
+        {
+            moving = false;
+            ChangeAnimation(0);
+        }
+
+        if (player)
+        {
+            if (Vector3.SqrMagnitude(player.PlayerController.transform.position - transform.position) <= range * range)
+            {
+                agent.ResetPath();
+                movementType = MovementType.Attack;
+            }
+        }
+
+        if (minion)
+        {
+            if (Vector3.SqrMagnitude(minion.transform.position - transform.position) <= range * range)
+            {
+                agent.ResetPath();
+                movementType = MovementType.Attack;
+            }
+        }
+        
+        
+        if (Input.GetMouseButton(1))
+        {
+            if (Physics.Raycast(ray, out hit))
+            {
+                agent.ResetPath();
+                ResetTarget();
+                agent.SetDestination(hit.point);
+                movementType = MovementType.MoveToClickWithNavMesh;
+                moving = true;
+                ChangeAnimation(force <= 0 ? 1 : 2);
+            }
+        }
+    }
+
+    public void ChangeAnimation(int index)
+    {
+        Debug.Log(index);
+        animator.SetInteger("Animation",index);
+    }
+
+    public void ResetTarget()
+    {
+        if (player)
+        {
+            player.HideTarget();
+        }
+        
+        cible = null;
+        player = null;
+        minion = null;
+    }
+
+    public void Attack()
+    {
+        if (!isAttacking)
+        {
+            ChangeAnimation(4);
+            isAttacking = true;
+        }
+        else
+        {
+            force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
+
+            if (player)
+            {
+                transform.rotation = Quaternion.LookRotation(player.PlayerController.transform.position - transform.position);
+
+                if (Vector3.SqrMagnitude(player.PlayerController.transform.position - transform.position) > range * range)
+                {
+                    isAttacking = false;
+                    movementType = MovementType.FollowCible;
+                    ChangeAnimation(force <= 0 ? 1 : 2);
+                }
+            
+                if (Input.GetMouseButton(1))
+                {
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        ResetTarget();
+                        isAttacking = false;
+                        movementType = MovementType.MoveToClickWithNavMesh;
+                        agent.ResetPath();
+                        agent.SetDestination(hit.point);
+                        moving = true;
+                        ChangeAnimation(force <= 0 ? 1 : 2);
+                    }
+                }
+            }
+
+            if (minion)
+            {
+                transform.rotation = Quaternion.LookRotation(minion.transform.position - transform.position);
+
+                if (Vector3.SqrMagnitude(minion.transform.position - transform.position) > range * range)
+                {
+                    isAttacking = false;
+                    movementType = MovementType.FollowCible;
+                    ChangeAnimation(force <= 0 ? 1 : 2);
+                }
+            
+                if (Input.GetMouseButton(1))
+                {
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        ResetTarget();
+                        isAttacking = false;
+                        movementType = MovementType.MoveToClickWithNavMesh;
+                        agent.ResetPath();
+                        agent.SetDestination(hit.point);
+                        moving = true;
+                        ChangeAnimation(force <= 0 ? 1 : 2);
+                    }
+                }
+            }
+            
+            
         }
     }
 
     public void OnEnterRamp(Rampe_LD rampeLd,bool forward,int startIndex)
     {
+        ResetTarget();
         onRamp = true;
         forwardOnRamp = forward;
         rampIndex = startIndex;
@@ -216,7 +509,7 @@ public class PlayerController : MonoBehaviour
         ramp = rampeLd;
         movementType = MovementType.Slide;
         agent.ResetPath();
-        animator.Play("Slide");
+        ChangeAnimation(3);
         sparkles.SetActive(true);
     }
 
@@ -261,7 +554,7 @@ public class PlayerController : MonoBehaviour
 
     void OnExitRamp()
     {
-        animator.Play("Roller");
+        ChangeAnimation(force <= 0 ? 1 : 2);
         onRamp = false;
         movementType = MovementType.KeepDirectionWithoutNavMesh;
         ramp.OnExitRamp();
@@ -277,7 +570,7 @@ public class PlayerController : MonoBehaviour
         {
             agent.ResetPath();
             movementType = MovementType.MoveToClickWithNavMesh;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
         if (Input.GetMouseButton(1))
         {
@@ -299,7 +592,7 @@ public class PlayerController : MonoBehaviour
         if (moving && agent.remainingDistance == 0)
         {
             moving = false;
-            animator.Play("Idle");
+            ChangeAnimation(0);
         }
         
         
@@ -310,15 +603,49 @@ public class PlayerController : MonoBehaviour
                 agent.ResetPath();
                 agent.SetDestination(hit.point);
                 moving = true;
-                if (force <= 0)
-                {
-                    animator.Play("Run");
-                }
-                else
-                {
-                    animator.Play("Roller");
-                }
+                ChangeAnimation(force <= 0 ? 1 : 2);
             }
         }
+    }
+    
+    public float GetForce()
+    {
+        return force;
+    }
+    
+    public void SetForce(float force)
+    {
+        this.force = force;
+    }
+
+    public void BlockPlayer()
+    {
+        if (movementType == MovementType.MoveToClickWithNavMesh)
+        {
+            agent.ResetPath();
+            moving = false;
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.FollowCible)
+        {
+            agent.ResetPath();
+            moving = false;
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.Attack)
+        {
+            isAttacking = false;
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.KeepDirectionWithoutNavMesh)
+        {
+            animator.Play("Idle");
+        }
+        else if (movementType == MovementType.Slide)
+        {
+            OnExitRamp();
+        }
+        movementType = MovementType.Block;
+        
     }
 }

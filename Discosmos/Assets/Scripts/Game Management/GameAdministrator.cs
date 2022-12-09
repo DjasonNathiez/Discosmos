@@ -98,12 +98,12 @@ public class GameAdministrator : MonoBehaviour
         OnServerUpdate?.Invoke();
     }
 
-    public void LoadScene(Enums.Scenes scenes)
+    public void LoadScene(string sceneName)
     {
-        if (currentScene == scenes) return;
+        //if (currentScene == scenes) return;
         
-        SceneManager.LoadScene(GetSceneName(scenes));
-        currentScene = scenes;
+        SceneManager.LoadScene(sceneName);
+      //  currentScene = scenes;
         SetGameState();
     }
 

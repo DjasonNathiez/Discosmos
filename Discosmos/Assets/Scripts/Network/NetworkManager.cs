@@ -12,6 +12,9 @@ using UnityEngine;
 public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
    public static NetworkManager instance;
+   [Header("TEST")] 
+   public string sceneTestName;
+   public ChampionDataSO testChamp;
 
    [SerializeField] private DebugNetworkShower _debugNetworkShower;
 
@@ -30,7 +33,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    
    RoomOptions roomOptions = new RoomOptions
    {
-      MaxPlayers = 4,
       IsOpen = true,
       IsVisible = true
    };
@@ -71,9 +73,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       
       if (GameAdministrator.instance.currentScene == Enums.Scenes.Login)
       {
-         GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+         GameAdministrator.instance.LoadScene(GameAdministrator.instance.hubSceneName);
       }
 
+      JoinRoom();
+   }
+
+   public void JoinRoom()
+   {
       if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
       {
          PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
@@ -96,9 +103,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       if (roomBackup == "Test")
       {
          GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
+         
+         playerTest.GetPhotonView().Controller.NickName = GameAdministrator.instance.username;
+         playerTest.GetComponent<PlayerManager>().championDataSo = testChamp;
          playerTest.GetComponent<PlayerManager>().Initialize();
          
-         PhotonNetwork.LoadLevel("Test");
+         PhotonNetwork.LoadLevel(sceneTestName);
       }
    }
 
@@ -190,7 +200,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    {
       SetPlayerData(result.Username);
       
-      GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+      _debugNetworkShower.photonStatue = "Connecting...";
+      _debugNetworkShower.playFabStatue = "Connected";
+      PhotonNetwork.ConnectUsingSettings();
    }
    
    private void OnRegisterFailed(PlayFabError error)
@@ -429,8 +441,27 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void SwitchRoom(string roomName)
    {
-      PhotonNetwork.LeaveRoom();
       roomBackup = roomName;
+      
+      if (PhotonNetwork.InRoom)
+      {
+         PhotonNetwork.LeaveRoom();
+      }
+      else
+      {
+         if (PhotonNetwork.InLobby)
+         {
+            if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
+            {
+               PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
+            }
+         }
+         else
+         {
+            PhotonNetwork.JoinLobby(typedLobby: new TypedLobby("World", LobbyType.Default));
+         }
+      }
+      
    }
 }
 

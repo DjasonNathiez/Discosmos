@@ -25,23 +25,17 @@ public class TowerDetection : MonoBehaviour
 
     private void Start()
     {
-        //set the top of the tower to the position of the child of the tower detection object named "TowerShoot"
-        topOfTower = transform.GetChild(0).position;
+        topOfTower = transform.parent.position;
     }
 
     void Update()
     {
-        //clear the list of enemies in range
         enemiesInRange.Clear();
-        //get all the colliders in the detection radius
         Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
-        //loop through all the colliders
         foreach (Collider collider in colliders)
         {
-            //if the collider has "Player" in its name
             if (collider.name.Contains("Player") /* && si la team du gameObject = variable team*/)
             {
-                //add the collider to the list of enemies in range
                 enemiesInRange.Add(collider.gameObject);
             }
         }
@@ -49,17 +43,14 @@ public class TowerDetection : MonoBehaviour
         if (enemiesInRange.Count > 0)
         {
             hasEnnemiesInRange = true;
-            //if there isn't a target yet set the first enemy in the list as the target or if the target is not in the list of enemies in range set the first enemy in the list as the target
             if (target == null || !enemiesInRange.Contains(target))
             {
                 target = enemiesInRange[0];
             }
 
-            //launch a raycast from the top of the tower to the enemy
             RaycastHit hit;
             if (Physics.Raycast(topOfTower, target.transform.position - topOfTower, out hit))
             {
-                //rotate the tower to face the enemy but to not change the y rotation
                 if (!rotationLocked)
                 {
                     targetPosition = new Vector3(target.transform.position.x, transform.position.y,
@@ -78,10 +69,4 @@ public class TowerDetection : MonoBehaviour
         }
     }
 
-    //draw the detection radius in the scene view
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-    }
 }
