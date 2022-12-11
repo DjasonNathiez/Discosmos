@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    [HideInInspector] public NavMeshAgent agent;
+    public NavMeshAgent agent;
     public bool clientPlayer;
     public PlayerManager playerManager;
 
@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     [Header("Capacities")] 
     public PassiveCapacity PassiveCapacity;
     public ActiveCapacitySO ActiveCapacity1SO;
-    private ActiveCapacity ActiveCapacity1;
+    public ActiveCapacity ActiveCapacity1;
     public ActiveCapacitySO ActiveCapacity2SO;
     private ActiveCapacity ActiveCapacity2;
     public ActiveCapacitySO UltimateCapacitySO;
@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
 
     public delegate void OnCastEnded(Capacities capacity);
     public OnCastEnded OnCastEnd;
+
+    public GameObject visuLaser;
 
     [Header("Auto Attack")] 
     
@@ -48,6 +50,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AnimationCurve slowDownCurve;
     [SerializeField] private float currentSpeed;
     [SerializeField] private bool moving;
+    public bool movementEnabled = true;
+    public float hitStopTime;
 
     [Header("Ramps")] 
     
@@ -62,6 +66,14 @@ public class PlayerController : MonoBehaviour
     private RaycastHit hit;
     private Vector3 destination;
     private Vector3 direction;
+    
+    
+    [SerializeField] private Vector3 knockbackDirection;
+    [SerializeField] private float knockBackForce;
+    [SerializeField] private float knockBackTime;
+    [SerializeField] private float knockBackDuration;
+    [SerializeField] private bool knockBackImmediatly;
+    
 
     private bool attacking = false;
 
@@ -120,7 +132,6 @@ public class PlayerController : MonoBehaviour
     {
         if (clientPlayer)
         {
-            agent = GetComponent<NavMeshAgent>();
             agent.speed = currentSpeed;
             //if photon is on, then we are in multiplayer
             SetTime();   
@@ -143,16 +154,21 @@ public class PlayerController : MonoBehaviour
     {
         if (clientPlayer)
         {
+
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                playerManager.HitStop(new []{myTargetable.photonID}, 0.7f,0.3f);
+                playerManager.KnockBack(new []{myTargetable.photonID}, 0.45f ,9f ,Vector3.left);
+            }
             SetTime();
 
             CapacitiesInputCheck();
             AttackCheck();
             MovementTypeSwitch();
-            myTargetable.UpdateUI(false,false,0,0,true,force);
+            myTargetable.UpdateUI(false,false,0,0,true,Mathf.Lerp(myTargetable.healthBar.speedFill.fillAmount,force,Time.deltaTime * 5f));
             currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
             agent.speed = currentSpeed;
-
-            Debug.DrawLine(transform.position, agent.destination, Color.yellow);
+            animator.SetFloat("Speed",force*1.5f+1);
 
             SpeedPadFunction();   
         }
@@ -246,7 +262,16 @@ public class PlayerController : MonoBehaviour
 
     private void MovementTypeSwitch()
     {
-        if(!playerManager.canMove) return;
+        if (knockBackTime > 0)
+        {
+            if(knockBackImmediatly || movementEnabled) ApplyKnockBack();
+        }
+        
+        if (!movementEnabled)
+        {
+            HitStopTimer();
+            return;
+        }
 
         if (playerManager._camera != null) ray = playerManager._camera.ScreenPointToRay(Input.mousePosition);
         switch (movementType)
@@ -299,6 +324,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void HitStop(float time)
+    {
+        Debug.Log("hitStop " + time);
+        movementEnabled = false;
+        hitStopTime = time;
+        agent.isStopped = true;
+    }
+
+    void HitStopTimer()
+    {
+        if (hitStopTime > 0)
+        {
+            hitStopTime -= Time.deltaTime;
+        }
+        else
+        {
+            movementEnabled = true;
+            agent.isStopped = false;
+        }
+    }
+    
     public void FreezePlayer()
     {
         playerManager.canMove = false;
@@ -315,15 +361,29 @@ public class PlayerController : MonoBehaviour
     {
         if(playerManager.isCasting) return;
         
-        if (Input.GetKeyUp(activeCapacity1) && !ActiveCapacity1.onCooldown)
+        if (Input.GetKeyDown(activeCapacity1) && !ActiveCapacity1.onCooldown)
+        {
+            visuLaser.SetActive(true);
+        }
+        
+        if (Input.GetKey(activeCapacity1))
         {
             if (Physics.Raycast(ray, out hit))
             {
-                transform.rotation = Quaternion.LookRotation(hit.point - transform.position);
+                visuLaser.transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(hit.point - transform.position).eulerAngles.y,0);
             }
-            
-            ActiveCapacity1.Cast();
+        }
+        
+        if (Input.GetKeyUp(activeCapacity1) && !ActiveCapacity1.onCooldown)
+        {
+            Debug.Log("WORKS HERE");
+            visuLaser.SetActive(false);
+            if (Physics.Raycast(ray, out hit))
+            {
+                transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(hit.point - transform.position).eulerAngles.y,0);
+            }
             playerManager.isCasting = true;
+            ActiveCapacity1.Cast();
         }
 
         if (Input.GetKeyUp(activeCapacity2))
@@ -342,7 +402,7 @@ public class PlayerController : MonoBehaviour
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
-                Debug.Log("Perform the mimi laser at " + PhotonNetwork.Time);
+                Debug.Log("Animate");
                 ChangeAnimation(6);
                 break;
         }
@@ -350,14 +410,16 @@ public class PlayerController : MonoBehaviour
     
     public void OnCapacityPerformed(Capacities capacity, int[] targets)
     {
-        UnfreezePlayer();
+        playerManager.isCasting = false;
         
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
-                Debug.Log("Try to find something");
                 int damages = Mathf.RoundToInt(ActiveCapacity1.activeCapacitySo.amount * damageMultiplier.Evaluate(force));
                 playerManager.DealDamage(targets, damages);
+                playerManager.HitStop(targets, force > 0 ? 0.7f * force + 0.2f: 0.2f,force > 0 ? 0.3f * force + 0.1f: 0.1f);
+                Vector3 kbDirection = transform.forward;
+                playerManager.KnockBack(targets, force > 0 ? 0.45f * force : 0,force > 0 ? 9f * force : 0,kbDirection.normalized);
                 break;
         }
     }
@@ -367,9 +429,13 @@ public class PlayerController : MonoBehaviour
         if (enabled)
         {
             int damages = Mathf.RoundToInt(baseDamages * damageMultiplier.Evaluate(force));
-            force = 0;
 
             playerManager.DealDamage(new []{cible.photonID}, damages);
+            playerManager.HitStop(new []{cible.photonID}, force > 0 ? 0.7f * force : 0,force > 0 ? 0.3f * force : 0);
+            Vector3 kbDirection = cible.targetableBody.position - transform.position;
+            playerManager.KnockBack(new []{cible.photonID}, force > 0 ? 0.45f * force : 0,force > 0 ? 9f * force : 0,kbDirection.normalized);
+            if(force > 0) InitializeKnockBack(0.2f,speedCurve.Evaluate(force),kbDirection,true);
+            force = 0;
         }
     }
 
@@ -413,7 +479,6 @@ public class PlayerController : MonoBehaviour
 
     public void ChangeAnimation(int index)
     {
-        Debug.Log(index);
         animator.SetInteger("Animation",index);
     }
 
@@ -431,8 +496,17 @@ public class PlayerController : MonoBehaviour
     {
         if (!isAttacking)
         {
-            ChangeAnimation(4);
-            isAttacking = true;
+            if (Vector3.SqrMagnitude(cible.targetableBody.transform.position - transform.position) > range * range)
+            {
+                isAttacking = false;
+                movementType = MovementType.FollowCible;
+                ChangeAnimation(force <= 0 ? 1 : 2);
+            }
+            else
+            {
+                ChangeAnimation(4);
+                isAttacking = true;
+            }
         }
         else
         {
@@ -441,11 +515,9 @@ public class PlayerController : MonoBehaviour
             
             if(!playerManager.isCasting) transform.rotation = Quaternion.LookRotation(cible.targetableBody.position - transform.position);
 
-            if (Vector3.SqrMagnitude(cible.targetableBody.transform.position - transform.position) > range * range)
+            if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
             {
-                    isAttacking = false;
-                    movementType = MovementType.FollowCible;
-                    ChangeAnimation(force <= 0 ? 1 : 2);
+                isAttacking = false;
             }
             
             if (Input.GetMouseButton(1))
@@ -547,6 +619,22 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    
+    private void ApplyKnockBack()
+    {
+        agent.nextPosition += knockbackDirection * (knockBackForce * Time.deltaTime * (knockBackTime / knockBackDuration));
+        //transform.position += knockbackDirection * (knockBackForce * Time.deltaTime * (knockBackTime / knockBackDuration));
+        knockBackTime -= Time.deltaTime;
+    }
+
+    public void InitializeKnockBack(float kbTime,float kbForce, Vector3 kbDirection,bool applyImmediatly = false)
+    {
+        knockbackDirection = kbDirection;
+        knockBackDuration = kbTime;
+        knockBackTime = kbTime;
+        knockBackForce = kbForce;
+        knockBackImmediatly = applyImmediatly;
+    }
 
 
     private void MoveToClickUsingTheNavMesh()
@@ -557,6 +645,7 @@ public class PlayerController : MonoBehaviour
         if (moving && agent.remainingDistance == 0)
         {
             moving = false;
+            agent.ResetPath();
             ChangeAnimation(0);
         }
         
@@ -573,16 +662,6 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    public float GetForce()
-    {
-        return force;
-    }
-    
-    public void SetForce(float force)
-    {
-        this.force = force;
-    }
-
     public void BlockPlayer()
     {
         if (movementType == MovementType.MoveToClickWithNavMesh)

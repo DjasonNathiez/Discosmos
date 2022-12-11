@@ -31,7 +31,7 @@ public class Targetable : MonoBehaviour
                 healthBar.healthText =  healthBar.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
                 healthBar.nameText =  healthBar.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
                 healthBar.target =  healthBar.transform.GetChild(4);
-                if(healthBar.nameText.name != string.Empty) healthBar.nameText.text = healthBar.nameText.name;
+                if(healthBar.name != string.Empty) healthBar.nameText.text = healthBar.name;
                 break;
             
             case UIType.ClassicUI:
@@ -71,7 +71,7 @@ public class Targetable : MonoBehaviour
         if (updateName)
         {
             healthBar.name = name;
-            healthBar.nameText.text = name;
+            if(healthBar.nameText) healthBar.nameText.text = name;
         }
     }
 }

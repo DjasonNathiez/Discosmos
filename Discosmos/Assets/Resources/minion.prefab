@@ -104,14 +104,27 @@ MonoBehaviour:
   range: 0
   speed: 0
   master: 0
-  id: 0
   myTargetable: {fileID: 1367352334353916023}
+  renderBody: {fileID: 2289795804090265203}
   currentHealth: 0
   currentShield: 0
   maxHealth: 100
   currentWaypoint: 0
   target: {fileID: 0}
   loopMode: 1
+  shaking: 0
+  shakingForce: 0
+  shakingTime: 0
+  shakingDuration: 0
+  truePos: {x: 0, y: 0, z: 0}
+  previousShake: 1
+  nextShakeTimer: 0.02
+  shakeFrequency: 0.02
+  movementEnabled: 1
+  knockbackDirection: {x: 0, y: 0, z: 0}
+  knockBackForce: 0
+  knockBackTime: 0
+  knockBackDuration: 0
   followType: 1
 --- !u!114 &53187641744449011
 MonoBehaviour:
