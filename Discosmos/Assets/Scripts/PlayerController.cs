@@ -160,6 +160,15 @@ public class PlayerController : MonoBehaviour
                 playerManager.HitStop(new []{myTargetable.photonID}, 0.7f,0.3f);
                 playerManager.KnockBack(new []{myTargetable.photonID}, 0.45f ,9f ,Vector3.left);
             }
+            
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                playerManager.playerAnimationScript.ChangeTeam(false);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                playerManager.playerAnimationScript.ChangeTeam(true);
+            }
             SetTime();
 
             CapacitiesInputCheck();
@@ -419,7 +428,7 @@ public class PlayerController : MonoBehaviour
                 playerManager.DealDamage(targets, damages);
                 playerManager.HitStop(targets, force > 0 ? 0.7f * force + 0.2f: 0.2f,force > 0 ? 0.3f * force + 0.1f: 0.1f);
                 Vector3 kbDirection = transform.forward;
-                playerManager.KnockBack(targets, force > 0 ? 0.45f * force : 0,force > 0 ? 9f * force : 0,kbDirection.normalized);
+                playerManager.KnockBack(targets, force > 0 ? 0.6f * force : 0,force > 0 ? 11f * force : 0,kbDirection.normalized);
                 break;
         }
     }
@@ -434,7 +443,6 @@ public class PlayerController : MonoBehaviour
             playerManager.HitStop(new []{cible.photonID}, force > 0 ? 0.7f * force : 0,force > 0 ? 0.3f * force : 0);
             Vector3 kbDirection = cible.targetableBody.position - transform.position;
             playerManager.KnockBack(new []{cible.photonID}, force > 0 ? 0.45f * force : 0,force > 0 ? 9f * force : 0,kbDirection.normalized);
-            if(force > 0) InitializeKnockBack(0.2f,speedCurve.Evaluate(force),kbDirection,true);
             force = 0;
         }
     }
@@ -506,6 +514,7 @@ public class PlayerController : MonoBehaviour
             {
                 ChangeAnimation(4);
                 isAttacking = true;
+                if(force > 0) InitializeKnockBack(0.1f,speedCurve.Evaluate(force),cible.targetableBody.position - transform.position,true);
             }
         }
         else

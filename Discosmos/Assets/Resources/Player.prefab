@@ -7026,6 +7026,20 @@ MonoBehaviour:
   previousShake: 1
   nextShakeTimer: 0.04
   shakeFrequency: 0.04
+  meshRenderers:
+  - {fileID: 2011121327675724185}
+  - {fileID: 2011121328015984291}
+  - {fileID: 2011121328975480910}
+  - {fileID: 2011121328133518803}
+  - {fileID: 2011121328763587619}
+  - {fileID: 2011121326939266668}
+  - {fileID: 2011121328425767438}
+  - {fileID: 2011121328991211515}
+  - {fileID: 2011121328594959135}
+  - {fileID: 2011121328428195101}
+  - {fileID: 2011121327412599262}
+  mimiPurple: {fileID: 2100000, guid: 5d7e2bbe50a32b04faf71bed3030b2f5, type: 2}
+  mimiGreen: {fileID: 2100000, guid: d98785670353a064fb5e0859aeb221e5, type: 2}
 --- !u!114 &3430333572778568441
 MonoBehaviour:
   m_ObjectHideFlags: 0

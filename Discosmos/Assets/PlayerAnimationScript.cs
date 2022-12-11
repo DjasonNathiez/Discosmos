@@ -7,6 +7,8 @@ public class PlayerAnimationScript : MonoBehaviour
     [SerializeField] private PlayerController playerController;
     [Header("Mimi Hit Box")]
     public CapacitiesHitBox laserHitBox;
+    
+    [Header("Shaking")]
     public bool shaking;
     public float shakingForce;
     public float shakingTime;
@@ -15,6 +17,12 @@ public class PlayerAnimationScript : MonoBehaviour
     public float previousShake = 1;
     public float nextShakeTimer = 0.02f;
     public float shakeFrequency = 0.02f;
+
+    [Header("Teams Skins")] 
+    [SerializeField] private SkinnedMeshRenderer[] meshRenderers;
+    [SerializeField] private Material mimiPurple;
+    [SerializeField] private Material mimiGreen;
+    
 
     public void Awake()
     {
@@ -49,6 +57,23 @@ public class PlayerAnimationScript : MonoBehaviour
         shaking = true;
     }
 
+    public void ChangeTeam(bool purple)
+    {
+        if (purple)
+        {
+            foreach (var meshRenderer in meshRenderers)
+            {
+                meshRenderer.material = mimiPurple;
+            }
+        }
+        else
+        {
+            foreach (var meshRenderer in meshRenderers)
+            {
+                meshRenderer.material = mimiGreen;
+            }
+        }
+    }
     private void Update()
     {
         if (shaking)
