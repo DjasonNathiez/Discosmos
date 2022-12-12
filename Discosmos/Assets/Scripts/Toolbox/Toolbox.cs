@@ -54,7 +54,7 @@ namespace Toolbox.Variable
         {
             None,
             Green,
-            Yellow,
+            Pink,
             Neutral
         }
         

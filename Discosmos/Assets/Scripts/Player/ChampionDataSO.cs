@@ -12,9 +12,15 @@ public class ChampionDataSO : ScriptableObject
 
     [Header("Movement")] 
     public float baseSpeed;
-    public float baseGroovySpeed;
-    public float baseSpeedMultiplier;
+    public AnimationCurve speedCurve;
+    public AnimationCurve slowDownCurve;
 
+    [Header("Attack")] 
+    public int baseDamage;
+    public AnimationCurve damageMultiplier;
+    public float baseAttackSpeed;
+    public float attackRange;
+    
     [Header("Capacity")] 
     public PassiveCapacitySO PassiveCapacitySo;
     public ActiveCapacitySO ActiveCapacity1So;

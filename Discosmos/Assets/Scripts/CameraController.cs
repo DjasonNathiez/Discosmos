@@ -95,7 +95,7 @@ public class CameraController : MonoBehaviour
             if (cameraLock)
             {
                 transform.position = Vector3.Lerp(transform.position, player.position, Time.deltaTime * 5);
-                speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(playerController.force)), Time.deltaTime * 5);
+                speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(playerController.manager.force)), Time.deltaTime * 5);
             }
             else
             {
@@ -134,7 +134,7 @@ public class CameraController : MonoBehaviour
             }
             else
             {
-                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * cameraZoomCurve.Evaluate(playerController.force), Time.deltaTime * 3);   
+                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * cameraZoomCurve.Evaluate(playerController.manager.force), Time.deltaTime * 3);   
             }
         }
 
