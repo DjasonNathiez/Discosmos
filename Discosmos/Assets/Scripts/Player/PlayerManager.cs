@@ -17,6 +17,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public GameObject cam;
     public IPlayer iplayer;
     public ChampionDataSO championDataSo;
+    public PlayerAnimationScript playerAnimationScript;
+    public CameraController cameraController;
 
     [Header("Stats and UI")]
     
@@ -58,7 +60,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         username = photonView.Controller.NickName;
         PlayerController.myTargetable.healthBar.name = username;
-        PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth,false,0,true,username);
+        PlayerController.myTargetable.UpdateUI(false,false,0, 0,false,0,true,username);
     }
     
 
@@ -124,6 +126,35 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         PhotonNetwork.RaiseEvent(RaiseEvent.DamageTarget, data, raiseEventOptions, SendOptions.SendReliable);
     }
 
+    public void HitStop(int[] targetsID,float time,float shakeForce)
+    {
+        Hashtable data = new Hashtable
+        {
+            {"TargetsID", targetsID},
+            {"Time", time},
+            {"Force", shakeForce}
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.HitStopTarget, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+    
+    public void KnockBack(int[] targetsID,float time,float force,Vector3 direction)
+    {
+        Hashtable data = new Hashtable
+        {
+            {"TargetsID", targetsID},
+            {"Time", time},
+            {"Force", force},
+            {"Direction", direction}
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.KnockBackTarget, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
     public void OnEvent(EventData photonEvent)
     {
         if (photonEvent.Code == RaiseEvent.DamageTarget)
@@ -140,6 +171,34 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 }
             }
         }
+        
+        if (photonEvent.Code == RaiseEvent.HitStopTarget)
+        {
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
+
+            foreach (int id in targets)
+            {
+                if (photonView.ViewID == id)
+                {
+                    InitializeHitStop(data);
+                }
+            }
+        }
+        
+        if (photonEvent.Code == RaiseEvent.KnockBackTarget)
+        {
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
+
+            foreach (int id in targets)
+            {
+                if (photonView.ViewID == id)
+                {
+                    InitializeKnockBack(data);
+                }
+            }
+        }
 
         if (photonEvent.Code == RaiseEvent.Death)
         {
@@ -152,6 +211,26 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
 
+    public void InitializeHitStop(Hashtable data)
+    {
+        float time = (float) data["Time"];
+        float shakeForce = (float) data["Force"];
+        PlayerController.HitStop(time);
+        
+        if (shakeForce > 0)
+        {
+            playerAnimationScript.Shake(shakeForce,time);
+        }
+    }
+    
+    public void InitializeKnockBack(Hashtable data)
+    {
+        float time = (float) data["Time"];
+        float force = (float) data["Force"];
+        Vector3 direction = (Vector3) data["Direction"];
+        PlayerController.InitializeKnockBack(time,force,direction);
+    }
+    
     public void TakeDamage(Hashtable data)
     {
         int amount = (int)data["Amount"];

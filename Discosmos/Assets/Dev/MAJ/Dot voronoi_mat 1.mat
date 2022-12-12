@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Rolling cloud_mat
-  m_Shader: {fileID: -6465566751694194690, guid: 5e11d8007990e6043ac906910ba085b6,
+  m_Name: Dot voronoi_mat 1
+  m_Shader: {fileID: -6465566751694194690, guid: 03e7e91940e6e784da9e14efec822ca2,
     type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -21,8 +21,12 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _SampleTexture2D_e653c1079b344518b24e641b8e042b1a_Texture_1:
-        m_Texture: {fileID: 0}
+    - _SampleTexture2D_3c23abe150c64c6c9a08dce8224105d0_Texture_1:
+        m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_c4ce8ad8e3734f7b8ef45ed2a57b667b_Texture_1:
+        m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -39,13 +43,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _D_grad_taille: 3.47
+    - _Finesse_des_points: 0.779
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _speed_scrolling: 0.89
+    - _Smoothness: 0.71
+    - _taille_des_points: 3.46
     m_Colors:
-    - _Color: {r: 1.1335571, g: 0, b: 0.19585018, a: 0}
+    - _Color: {r: 15.535338, g: 15.535338, b: 15.535338, a: 0.5254902}
   m_BuildTextureStacks: []
---- !u!114 &3921988883185106210
+--- !u!114 &1642070588358092801
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

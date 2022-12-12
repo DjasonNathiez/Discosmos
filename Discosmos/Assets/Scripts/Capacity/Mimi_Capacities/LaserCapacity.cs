@@ -15,6 +15,7 @@ public class LaserCapacity : ActiveCapacity
 
     public override void Cast()
     {
+        owner.playerManager.isCasting = false;
         cooldownTimer = 0;
         
         if(onCooldown)
@@ -23,19 +24,19 @@ public class LaserCapacity : ActiveCapacity
             return;
         }
         onCooldown = true;
-        
 
-        owner.FreezePlayer();
-        
+        Debug.Log("Launched Laser " + owner.playerManager.isCasting);
         serverTimeBackup = PhotonNetwork.Time;
 
         if (laserSO.castTime != 0)
         {
             GameAdministrator.OnServerUpdate += CastRoutine;
+            Debug.Log("Routine");
         }
         else
         {
             Active();
+            Debug.Log("NoRoutine");
         }
     }
 
@@ -55,6 +56,7 @@ public class LaserCapacity : ActiveCapacity
 
     public override void Active()
     {
+        Debug.Log("Invoked");
         owner.OnCastEnd?.Invoke(Capacities.MIMI_Laser);
         
         GameAdministrator.OnServerUpdate += Cooldown;
