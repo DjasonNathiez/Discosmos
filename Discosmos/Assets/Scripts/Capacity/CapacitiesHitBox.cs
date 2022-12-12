@@ -10,17 +10,21 @@ public class CapacitiesHitBox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<PhotonView>())
+        Targetable targetable = other.GetComponent<Targetable>();
+
+        if (targetable && !idOnIt.Contains(targetable.photonID))
         {
-            idOnIt.Add(PhotonView.Get(other.gameObject).ViewID);
+            idOnIt.Add(targetable.photonID);
         }
     }
     
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<PhotonView>())
+        Targetable targetable = other.GetComponent<Targetable>();
+
+        if (targetable && idOnIt.Contains(targetable.photonID))
         {
-            idOnIt.Remove(PhotonView.Get(other.gameObject).ViewID);
+            idOnIt.Remove(targetable.photonID);
         }
     }
 }

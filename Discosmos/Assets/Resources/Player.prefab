@@ -8270,6 +8270,7 @@ MonoBehaviour:
     name: 
   uiObject: {fileID: 3013384326752953839, guid: e5f0c106ce0987943986a70b3b362df4,
     type: 3}
+  masterPhotonView: {fileID: 3242392941343150297}
   photonID: 0
   targetableBody: {fileID: 2011121328774887630}
   heightUI: 40
@@ -8670,8 +8671,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 9.17675, y: 0.6633438, z: 1.9771919}
-  m_Center: {x: 4.6869345, y: 0.5567773, z: -0.5387714}
+  m_Size: {x: 9.17675, y: 2.5602996, z: 1.9771919}
+  m_Center: {x: 4.6869345, y: 0.71847284, z: -0.5387714}
 --- !u!114 &4236691471067634882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8740,7 +8741,7 @@ MonoBehaviour:
   hud: {fileID: 337513683121942551}
   canvas: {fileID: 3190069372747769583}
   cam: {fileID: 1542195262}
-  championDataSo: {fileID: 0}
+  championDataSo: {fileID: 11400000, guid: 46d034678dd2a284795b334f7f787e4e, type: 2}
   playerAnimationScript: {fileID: 7491848806132056061}
   cameraController: {fileID: 1542195263}
   overwriteOnline: 1

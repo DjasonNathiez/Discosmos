@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -10,10 +11,21 @@ public class Targetable : MonoBehaviour
 {
     public HealthBar healthBar;
     public GameObject uiObject;
+    public PhotonView masterPhotonView;
     public int photonID;
     public Transform targetableBody;
     public float heightUI;
     public UIType type;
+
+    private void Awake()
+    {
+        if (!masterPhotonView)
+        {
+            masterPhotonView = PhotonView.Get(gameObject);
+        }
+        
+        photonID = masterPhotonView.ViewID;
+    }
 
     private void Start()
     {
