@@ -9,10 +9,10 @@ using UnityEngine.UI;
 
 public class Targetable : MonoBehaviour
 {
-    public HealthBar healthBar;
+    [HideInInspector] public HealthBar healthBar;
     public GameObject uiObject;
     public PhotonView masterPhotonView;
-    public int photonID;
+    [HideInInspector] public int photonID;
     public Transform targetableBody;
     public float heightUI;
     public UIType type;

@@ -7999,15 +7999,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2011121328774887630}
+  - component: {fileID: 2011121328774887626}
+  - component: {fileID: 3114507236072290442}
   - component: {fileID: 2011121328774887625}
   - component: {fileID: 2011121328774887624}
   - component: {fileID: 2011121328774887627}
-  - component: {fileID: 2011121328774887626}
   - component: {fileID: 2819507938827760034}
   - component: {fileID: 2646178798639229222}
-  - component: {fileID: 3114507236072290442}
   m_Layer: 0
-  m_Name: Player_1
+  m_Name: Body
   m_TagString: Targetable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8034,6 +8034,62 @@ Transform:
   m_Father: {fileID: 3242392941343150299}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2011121328774887626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011121328774887620}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d40d14d79c52bd449b58993e7431e33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 2011121328774887624}
+  clientPlayer: 1
+  manager: {fileID: 0}
+  activeCapacity1: 97
+  activeCapacity2: 122
+  ultimateCapacity: 101
+  PassiveCapacitySO: {fileID: 0}
+  ActiveCapacity1SO: {fileID: 0}
+  ActiveCapacity2SO: {fileID: 0}
+  UltimateCapacitySO: {fileID: 0}
+  mimiLaserVisualization: {fileID: 6752564075716415838}
+  myTargetable: {fileID: 3114507236072290442}
+  rampIndex: 0
+  rampProgress: 0
+  forwardOnRamp: 0
+  animator: {fileID: 2011121328163866931}
+  sparkles: {fileID: 3429143047530009641}
+--- !u!114 &3114507236072290442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011121328774887620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47dad944a2169b24dbb80328a893b894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar:
+    transform: {fileID: 0}
+    healthFill: {fileID: 0}
+    speedFill: {fileID: 0}
+    healthText: {fileID: 0}
+    nameText: {fileID: 0}
+    target: {fileID: 0}
+    name: 
+  uiObject: {fileID: 3013384326752953839, guid: e5f0c106ce0987943986a70b3b362df4,
+    type: 3}
+  masterPhotonView: {fileID: 3242392941343150297}
+  photonID: 0
+  targetableBody: {fileID: 2011121328774887630}
+  heightUI: 40
+  type: 0
 --- !u!65 &2011121328774887625
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8085,130 +8141,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
---- !u!114 &2011121328774887626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2011121328774887620}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d40d14d79c52bd449b58993e7431e33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 2011121328774887624}
-  clientPlayer: 1
-  playerManager: {fileID: 3242392941343150298}
-  activeCapacity1: 97
-  activeCapacity2: 122
-  ultimateCapacity: 101
-  PassiveCapacity: {fileID: 0}
-  ActiveCapacity1SO: {fileID: 0}
-  ActiveCapacity2SO: {fileID: 0}
-  UltimateCapacitySO: {fileID: 0}
-  visuLaser: {fileID: 4698363779945167057}
-  baseDamages: 10
-  damageMultiplier:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 3
-      outSlope: 3
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 4
-      inSlope: 3
-      outSlope: 3
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  range: 5
-  cible: {fileID: 0}
-  myTargetable: {fileID: 3114507236072290442}
-  isAttacking: 0
-  movementType: 0
-  force: 0
-  baseSpeed: 3
-  speedCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 13.676356
-      outSlope: 13.676356
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.05210397
-    - serializedVersion: 3
-      time: 1
-      value: 6
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  slowDownCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.01
-      inSlope: 0.010054215
-      outSlope: 0.010054215
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.9993002
-    - serializedVersion: 3
-      time: 1
-      value: 0.02
-      inSlope: 0.0043485193
-      outSlope: 0.0043485193
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.043386996
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  currentSpeed: 0
-  moving: 0
-  movementEnabled: 1
-  hitStopTime: 0
-  onRamp: 0
-  rampIndex: 0
-  ramp: {fileID: 0}
-  rampProgress: 0
-  forwardOnRamp: 0
-  knockbackDirection: {x: 0, y: 0, z: 0}
-  knockBackForce: 0
-  knockBackTime: 0
-  knockBackDuration: 0
-  knockBackImmediatly: 0
-  precisionAnglePad: 90
-  slowSpeedPadDuration: 0.5
-  fastSpeedPadDuration: 2
-  speedPadLerp: 0.1
-  animator: {fileID: 2011121328163866931}
-  sparkles: {fileID: 3429143047530009641}
-  speedJauge: {fileID: 0}
 --- !u!114 &2819507938827760034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8248,33 +8180,6 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
---- !u!114 &3114507236072290442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2011121328774887620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47dad944a2169b24dbb80328a893b894, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthBar:
-    transform: {fileID: 0}
-    healthFill: {fileID: 0}
-    speedFill: {fileID: 0}
-    healthText: {fileID: 0}
-    nameText: {fileID: 0}
-    target: {fileID: 0}
-    name: 
-  uiObject: {fileID: 3013384326752953839, guid: e5f0c106ce0987943986a70b3b362df4,
-    type: 3}
-  masterPhotonView: {fileID: 3242392941343150297}
-  photonID: 0
-  targetableBody: {fileID: 2011121328774887630}
-  heightUI: 40
-  type: 0
 --- !u!1 &2011121328806635972
 GameObject:
   m_ObjectHideFlags: 0
@@ -8741,20 +8646,41 @@ MonoBehaviour:
   hud: {fileID: 337513683121942551}
   canvas: {fileID: 3190069372747769583}
   cam: {fileID: 1542195262}
+  currentTeam: 0
   championDataSo: {fileID: 11400000, guid: 46d034678dd2a284795b334f7f787e4e, type: 2}
   playerAnimationScript: {fileID: 7491848806132056061}
   cameraController: {fileID: 1542195263}
-  overwriteOnline: 1
+  modelBody: {fileID: 2011121328774887620}
   _camera: {fileID: 620923166}
   currentHealth: 100
   maxHealth: 100
   currentShield: 0
   isCasting: 0
   canMove: 0
+  baseDamage: 0
+  damageMultiplier:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  baseAttackSpeed: 0
+  attackRange: 0
   currentSpeed: 0
-  normalSpeed: 0
-  groovySpeed: 0
-  speedMultiplier: 0
+  baseSpeed: 0
+  speedCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  slowDownCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  force: 0
   attackFx: {fileID: 366544346915499827}
   laserFX: {fileID: 6752564076481717480}
   textDamage: {fileID: 3013384326752953839, guid: 0ceff084b68ce4644a0145ec20fbc8ea,

@@ -68,8 +68,8 @@ public class Wall : MonoBehaviour
 
     private void ForceBoost()
     {
-        currentForce = playerController.force;
-        playerController.force = (Mathf.Lerp(currentForce, currentForce + forceBoost, 1));
+        currentForce = playerController.manager.force;
+        playerController.manager.force = (Mathf.Lerp(currentForce, currentForce + forceBoost, 1));
         cooldownTimer = cooldown;
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -6,43 +5,50 @@ using TMPro;
 using Toolbox.Variable;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.AI;
 
-public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
+public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeamable
 {
-    [SerializeField] public string username;
-    public PlayerController PlayerController;
-    public GameObject hud;
-    public Transform canvas;
-    public GameObject cam;
-    public IPlayer iplayer;
+    [HideInInspector] public string username;
+    [HideInInspector] public PlayerController PlayerController;
+    [HideInInspector] public GameObject hud;
+    [HideInInspector] public Transform canvas;
+    [HideInInspector] public GameObject cam;
+    [HideInInspector] public IPlayer iplayer;
+    [HideInInspector] public Enums.Teams currentTeam;
     public ChampionDataSO championDataSo;
-    public PlayerAnimationScript playerAnimationScript;
-    public CameraController cameraController;
-
+    [HideInInspector] public PlayerAnimationScript playerAnimationScript;
+    [HideInInspector] public CameraController cameraController;
+    [HideInInspector] public GameObject modelBody;
+    
     [Header("Stats and UI")]
-    
-    [SerializeField] private bool overwriteOnline;
-    
-    [SerializeField] public Camera _camera;
+    private bool overwriteOnline;
+    [HideInInspector] public Camera _camera;
 
     [Header("State")]
-    public int currentHealth;
-    public int maxHealth;
-    public int currentShield;
-    public bool isCasting;
-    public bool canMove;
-
+    [HideInInspector] public int currentHealth;
+    [HideInInspector] public int maxHealth;
+    [HideInInspector] public int currentShield;
+    [HideInInspector] public bool isCasting;
+    [HideInInspector] public bool canMove;
+    
+    [Header("Attack")]
+    [HideInInspector] public int baseDamage;
+    [HideInInspector] public AnimationCurve damageMultiplier;
+    [HideInInspector] public float baseAttackSpeed;
+    [HideInInspector] public float attackRange;
+    
     [Header("Movement")]
-    public float currentSpeed;
-    public float normalSpeed;
-    public float groovySpeed;
-    public float speedMultiplier;
+    [HideInInspector] public float currentSpeed;
+    [HideInInspector] public float baseSpeed;
+    [HideInInspector] public AnimationCurve speedCurve;
+    [HideInInspector] public AnimationCurve slowDownCurve;
+    [HideInInspector] [Range(0, 1)] public float force;
     
     [Header("FX")]
-    public ParticleSystem attackFx;
-    public ParticleSystem laserFX;
-    public GameObject textDamage;
+    [HideInInspector] public ParticleSystem attackFx;
+    [HideInInspector] public ParticleSystem laserFX;
+    [HideInInspector] public GameObject textDamage;
 
     private void Awake()
     {
@@ -54,6 +60,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
 
         PlayerController.myTargetable.photonID = photonView.ViewID;
+        PlayerController.agent = GetComponentInChildren<NavMeshAgent>();
+        PlayerController.manager = this;
+        PlayerController.animator = GetComponentInChildren<Animator>();
     }
 
     private void Start()
@@ -80,14 +89,37 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public void Initialize()
     {
         canMove = true;
-        
+
+        #region DATA
+
         if (championDataSo)
         {
+            //DATA
+            
+            //Movement
+            currentSpeed = championDataSo.baseSpeed;
+            baseSpeed = championDataSo.baseSpeed;
+            speedCurve = championDataSo.speedCurve;
+            slowDownCurve = championDataSo.slowDownCurve;
+
+            //Attack
+            baseDamage = championDataSo.baseDamage;
+            damageMultiplier = championDataSo.damageMultiplier;
+            baseAttackSpeed = championDataSo.baseAttackSpeed;
+            attackRange = championDataSo.attackRange;
+
+            //CAPACITIES
             PlayerController.ActiveCapacity1SO = championDataSo.ActiveCapacity1So;
             PlayerController.ActiveCapacity2SO = championDataSo.ActiveCapacity2So;
             PlayerController.UltimateCapacitySO = championDataSo.UltimateCapacitySo;
         }
+
+        #endregion
         
+       
+
+        #region PHOTON
+
         if (photonView.IsMine)
         {
             PlayerController.enabled = true;
@@ -96,6 +128,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             
             GameAdministrator.instance.localPlayer = this;
         }
+
+        #endregion
+        
+        playerAnimationScript.SetTeamModel(currentTeam);
+    }
+
+    public void SetPlayerActiveState(bool isActive)
+    {
+        playerAnimationScript.SetTeamModel(currentTeam);
+        modelBody.SetActive(isActive);
     }
 
     private void LateUpdate()
@@ -157,56 +199,34 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void OnEvent(EventData photonEvent)
     {
-        if (photonEvent.Code == RaiseEvent.DamageTarget)
+        Hashtable data = (Hashtable)photonEvent.CustomData;
+        if (data == null) return;
+        int[] targets = (int[])data["TargetsID"];
+        if(targets == null) return;
+        
+        foreach (int id in targets)
         {
-            Debug.Log("Damage event reiceveid");
-            Hashtable data = (Hashtable)photonEvent.CustomData;
-            int[] targets = (int[])data["TargetsID"];
-
-            foreach (int id in targets)
+            if (photonView.ViewID == id)
             {
-                if (photonView.ViewID == id)
+                if (photonEvent.Code == RaiseEvent.DamageTarget)
                 {
                     TakeDamage(data);
                 }
-            }
-        }
-        
-        if (photonEvent.Code == RaiseEvent.HitStopTarget)
-        {
-            Hashtable data = (Hashtable)photonEvent.CustomData;
-            int[] targets = (int[])data["TargetsID"];
 
-            foreach (int id in targets)
-            {
-                if (photonView.ViewID == id)
-                {
-                    InitializeHitStop(data);
-                }
-            }
-        }
-        
-        if (photonEvent.Code == RaiseEvent.KnockBackTarget)
-        {
-            Hashtable data = (Hashtable)photonEvent.CustomData;
-            int[] targets = (int[])data["TargetsID"];
-
-            foreach (int id in targets)
-            {
-                if (photonView.ViewID == id)
+                if (photonEvent.Code == RaiseEvent.KnockBackTarget)
                 {
                     InitializeKnockBack(data);
                 }
-            }
-        }
+                
+                if (photonEvent.Code == RaiseEvent.HitStopTarget)
+                {
+                    InitializeHitStop(data);
+                }
 
-        if (photonEvent.Code == RaiseEvent.Death)
-        {
-            Hashtable data = (Hashtable)photonEvent.CustomData;
-            
-            if (photonView.ViewID == (int)data["ID"])
-            {
-                Death();
+                if (photonEvent.Code == RaiseEvent.Death)
+                {
+                    Death();
+                }
             }
         }
     }
@@ -253,10 +273,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             currentHealth -= amount;
             GameObject textDmg = Instantiate(textDamage, PlayerController.myTargetable.healthBar.transform.position + Vector3.up * 30, quaternion.identity, MobsUIManager.instance.canvas);
             textDmg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "-" + amount;
-            Debug.Log("Spawned " + textDmg);
         }
-        
-        Debug.Log("Take Damage");
         
         if(currentHealth <= 0)
         {
@@ -277,6 +294,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         currentHealth = maxHealth;
         PlayerController.transform.position = FindObjectOfType<LevelManager>().spawnPoint.position;
         PlayerController.agent.ResetPath();
+    }
+
+    public Enums.Teams CurrentTeam()
+    {
+        return currentTeam;
     }
 }
 

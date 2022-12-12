@@ -1,4 +1,5 @@
 using System;
+using Toolbox.Variable;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -36,17 +37,17 @@ public class PlayerAnimationScript : MonoBehaviour
 
     public void CallMimiLaser()
     {
-        playerController.OnCapacityPerformed(Capacities.MIMI_Laser, laserHitBox.idOnIt.ToArray());
+        playerController.OnCapacityPerformed(Capacities.MIMI_Laser, laserHitBox.idOnIt);
     }
     
     public void CallMimiAttackFX()
     {
-        playerController.playerManager.CallFX(VisualEffects.MimiAutoAttack);
+        playerController.manager.CallFX(VisualEffects.MimiAutoAttack);
     }
 
     public void CallMimiLaserVFX()
     {
-        playerController.playerManager.CallFX(VisualEffects.MimiLaser);
+        playerController.manager.CallFX(VisualEffects.MimiLaser);
     }
 
     public void Shake(float force, float time)
@@ -57,21 +58,23 @@ public class PlayerAnimationScript : MonoBehaviour
         shaking = true;
     }
 
-    public void ChangeTeam(bool purple)
+    public void SetTeamModel(Enums.Teams teams)
     {
-        if (purple)
+        switch (teams)
         {
-            foreach (var meshRenderer in meshRenderers)
-            {
-                meshRenderer.material = mimiPurple;
-            }
-        }
-        else
-        {
-            foreach (var meshRenderer in meshRenderers)
-            {
-                meshRenderer.material = mimiGreen;
-            }
+            case Enums.Teams.Green:
+                foreach (var meshRenderer in meshRenderers)
+                {
+                    meshRenderer.material = mimiGreen;
+                }
+                break;
+            
+            case Enums.Teams.Pink:
+                foreach (var meshRenderer in meshRenderers)
+                {
+                    meshRenderer.material = mimiPurple;
+                }
+                break;
         }
     }
     private void Update()

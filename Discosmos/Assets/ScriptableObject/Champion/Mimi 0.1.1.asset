@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb60d75db08a4e44897a11dcc2e2f8c6, type: 3}
+  m_Name: Mimi 0.1.1
+  m_EditorClassIdentifier: 
+  championName: Mimi
+  championDescription: ceci est une description
+  baseMaxHealth: 200
+  baseShield: 0
+  isAlive: 0
+  baseSpeed: 4
+  speedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.3808908
+      outSlope: 2.3808908
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.25236887
+      value: 0.60086274
+      inSlope: 0.79389733
+      outSlope: 0.79389733
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.12862767
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.5338692
+      outSlope: 0.5338692
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  slowDownCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  baseDamage: 10
+  damageMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  baseAttackSpeed: 2
+  attackRange: 3
+  PassiveCapacitySo: {fileID: 0}
+  ActiveCapacity1So: {fileID: 11400000, guid: 5c3aea6a65835584f804ac84114ecffa, type: 2}
+  ActiveCapacity2So: {fileID: 11400000, guid: 5c3aea6a65835584f804ac84114ecffa, type: 2}
+  UltimateCapacitySo: {fileID: 11400000, guid: 5c3aea6a65835584f804ac84114ecffa, type: 2}

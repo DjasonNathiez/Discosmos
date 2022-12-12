@@ -10,96 +10,84 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     public NavMeshAgent agent;
-    public bool clientPlayer;
-    public PlayerManager playerManager;
+    [HideInInspector] public bool clientPlayer;
+    [HideInInspector] public PlayerManager manager;
 
     [Header("Inputs")] 
     public KeyCode activeCapacity1 = KeyCode.A;
     public KeyCode activeCapacity2 = KeyCode.Z;
     public KeyCode ultimateCapacity = KeyCode.E;
     
-    [Header("Capacities")] 
-    public PassiveCapacity PassiveCapacity;
-    public ActiveCapacitySO ActiveCapacity1SO;
-    public ActiveCapacity ActiveCapacity1;
-    public ActiveCapacitySO ActiveCapacity2SO;
+    [Header("Capacities")]
+    
+    [HideInInspector]public PassiveCapacitySO PassiveCapacitySO;
+    [HideInInspector]public ActiveCapacitySO ActiveCapacity1SO;
+    [HideInInspector]public ActiveCapacitySO ActiveCapacity2SO;
+    [HideInInspector]public ActiveCapacitySO UltimateCapacitySO;
+    
+    private PassiveCapacity PassiveCapacity;
+    private ActiveCapacity ActiveCapacity1;
     private ActiveCapacity ActiveCapacity2;
-    public ActiveCapacitySO UltimateCapacitySO;
     private ActiveCapacity UltimateCapacity;
 
-    public delegate void OnCastEnded(Capacities capacity);
-    public OnCastEnded OnCastEnd;
+    public delegate void CastEnded(Capacities capacity);
+    public CastEnded OnCastEnded;
 
-    public GameObject visuLaser;
+    public GameObject mimiLaserVisualization;
 
     [Header("Auto Attack")] 
     
-    public int baseDamages;
-    public AnimationCurve damageMultiplier;
-    public float range;
-    public Targetable cible;
-    public Targetable myTargetable;
-    public bool isAttacking;
+    private Targetable cible;
+    [HideInInspector] public Targetable myTargetable;
+    private bool isAttacking;
 
     [Header("Movement")]
-    
-    [SerializeField] private MovementType movementType = MovementType.MoveToClickWithNavMesh;
-    [Range(0, 1)] public float force; //from 0 to 1
-    [Range(0, 20)] [SerializeField] public float baseSpeed;
-    [SerializeField] private AnimationCurve speedCurve;
-    [SerializeField] private AnimationCurve slowDownCurve;
-    [SerializeField] private float currentSpeed;
-    [SerializeField] private bool moving;
-    public bool movementEnabled = true;
-    public float hitStopTime;
+    private MovementType movementType = MovementType.MoveToClickWithNavMesh;
+    private bool moving;
+    private bool movementEnabled = true;
+    private float hitStopTime;
 
-    [Header("Ramps")] 
+    [Header("Ramps")]
+    private bool onRamp;
+    [HideInInspector] public int rampIndex;
+    private Rampe_LD ramp;
+    [HideInInspector] public float rampProgress;
+    [HideInInspector] public bool forwardOnRamp;
     
-    [SerializeField] public bool onRamp;
-    [SerializeField] public int rampIndex;
-    [SerializeField] private Rampe_LD ramp;
-    [SerializeField] public float rampProgress;
-    [SerializeField] public bool forwardOnRamp;
-    
-    
-    private Ray ray;
-    private RaycastHit hit;
     private Vector3 destination;
     private Vector3 direction;
     
-    
-    [SerializeField] private Vector3 knockbackDirection;
-    [SerializeField] private float knockBackForce;
-    [SerializeField] private float knockBackTime;
-    [SerializeField] private float knockBackDuration;
-    [SerializeField] private bool knockBackImmediatly;
-    
+    private Vector3 knockbackDirection;
+    private float knockBackForce;
+    private float knockBackTime;
+    private float knockBackDuration;
+    private bool knockBackImmediatly;
 
     private bool attacking = false;
 
+    [Header("SpeedPads")]
     private bool speedPadTriggered = false;
     private Transform speedPad;
-    
-    [Header("SpeedPads")]
-    
-    [SerializeField] private float precisionAnglePad;
-    [SerializeField] private float slowSpeedPadDuration = 0.5f;
-    [SerializeField] private float fastSpeedPadDuration = 2;
+    private float precisionAnglePad;
+    private float slowSpeedPadDuration = 0.5f;
+    private float fastSpeedPadDuration = 2;
     private float forcePad = 0;
     private double speedPadTimer = 0;
     private double time;
-    [SerializeField] private float speedPadLerp = 1;
+   private float speedPadLerp = 1;
 
     [Header("Animation")] 
-    [SerializeField] private Animator animator;
+    [HideInInspector] public Animator animator;
     [SerializeField] private GameObject sparkles;
 
     [Header("UI")] 
-    [SerializeField] private Image speedJauge;
+    private Image speedJauge;
+
+    #region INITIALIZATION
 
     private void OnEnable()
     {
-        OnCastEnd += OnCapacityActive;
+        OnCastEnded += OnCapacityActive;
         
         ActiveCapacity1SO.GetActiveCapacity();
         ActiveCapacity1 = ActiveCapacity1SO.activeCapacity;
@@ -120,7 +108,7 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         
-        OnCastEnd -= OnCapacityActive;
+        OnCastEnded -= OnCapacityActive;
         
         ActiveCapacity1 = null;
         ActiveCapacity2 = null;
@@ -128,26 +116,25 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    #endregion
+
+    #region UNITY CALLBACKS
+
     private void Start()
     {
         if (clientPlayer)
         {
-            agent.speed = currentSpeed;
+            agent.speed = manager.currentSpeed;
             //if photon is on, then we are in multiplayer
             SetTime();   
         }
     }
 
+    #endregion
+    
     private void SetTime()
     {
-        if (PhotonNetwork.IsConnected)
-        {
-            time = PhotonNetwork.Time;
-        }
-        else
-        {
-            time = Time.deltaTime;
-        }
+        time = PhotonNetwork.IsConnected ? PhotonNetwork.Time : Time.deltaTime;
     }
 
     private void Update()
@@ -157,27 +144,18 @@ public class PlayerController : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.K))
             {
-                playerManager.HitStop(new []{myTargetable.photonID}, 0.7f,0.3f);
-                playerManager.KnockBack(new []{myTargetable.photonID}, 0.45f ,9f ,Vector3.left);
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Alpha0))
-            {
-                playerManager.playerAnimationScript.ChangeTeam(false);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                playerManager.playerAnimationScript.ChangeTeam(true);
+                manager.HitStop(new []{myTargetable.photonID}, 0.7f,0.3f);
+                manager.KnockBack(new []{myTargetable.photonID}, 0.45f ,9f ,Vector3.left);
             }
             SetTime();
 
             CapacitiesInputCheck();
             AttackCheck();
             MovementTypeSwitch();
-            myTargetable.UpdateUI(false,false,0,0,true,Mathf.Lerp(myTargetable.healthBar.speedFill.fillAmount,force,Time.deltaTime * 5f));
-            currentSpeed = speedCurve.Evaluate(force) + baseSpeed;
-            agent.speed = currentSpeed;
-            animator.SetFloat("Speed",force*1.5f+1);
+            myTargetable.UpdateUI(false,false,0,0,true,Mathf.Lerp(myTargetable.healthBar.speedFill.fillAmount,manager.force,Time.deltaTime * 5f));
+            manager.currentSpeed = manager.speedCurve.Evaluate(manager.force) + manager.baseSpeed;
+            agent.speed = manager.currentSpeed;
+            animator.SetFloat("Speed",manager.force*1.5f+1);
 
             SpeedPadFunction();   
         }
@@ -257,7 +235,6 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-
     private enum MovementType
     {
         MoveToClickWithNavMesh,
@@ -268,71 +245,137 @@ public class PlayerController : MonoBehaviour
         Block
     }
 
+    #region INPUT
 
-    private void MovementTypeSwitch()
+    public Vector3 MouseWorldPosition()
     {
-        if (knockBackTime > 0)
+        Ray ray = manager._camera.ScreenPointToRay(Input.mousePosition);
+        
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            if(knockBackImmediatly || movementEnabled) ApplyKnockBack();
+            return hit.point;
         }
         
-        if (!movementEnabled)
-        {
-            HitStopTimer();
-            return;
-        }
-
-        if (playerManager._camera != null) ray = playerManager._camera.ScreenPointToRay(Input.mousePosition);
-        switch (movementType)
-        {
-            case MovementType.MoveToClickWithNavMesh:
-                MoveToClickUsingTheNavMesh();
-                break;
-            case MovementType.KeepDirectionWithoutNavMesh:
-                KeepDirectionNoNavMesh();
-                break;
-            case MovementType.Slide:
-                Slide();
-                break;
-            case MovementType.FollowCible:
-                FollowCible();
-                break;
-            case MovementType.Attack:
-                Attack();
-                break;
-            case MovementType.Block:
-                BlockPlayer();
-                break;
-        }
+        return Vector3.zero;
     }
+    
+    public Targetable GetTarget()
+    {
+        if (manager._camera == null) return null;
+        
+        Ray ray = manager._camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Targetable targetable = hit.transform.GetComponent<Targetable>();
+            ITeamable teamable = hit.transform.GetComponent<ITeamable>();
+
+            if (targetable == null) return null;
+
+            if (teamable != null)
+            {
+                if (manager.CurrentTeam() == teamable.CurrentTeam()) return null;
+            }
+            
+            return targetable;
+
+        }
+        return null;
+    }
+    
+
+    #endregion
+    
+    #region COMBAT
 
     void AttackCheck()
     {
         if (Input.GetMouseButton(0))
         {
-            if (Physics.Raycast(ray, out hit))
+            if (cible)
             {
-                if (hit.transform.CompareTag("Targetable"))
-                {
-                    if (cible)
-                    {
-                        cible.HideTarget();
-                    }
-                    
-                    cible = hit.transform.GetComponent<Targetable>();
-                    cible.ShowTarget();
+                cible.HideTarget();
+            }
+            
+            cible = GetTarget();
+            cible.ShowTarget();
 
-                    if (onRamp)
-                    {
-                        OnExitRamp();
-                    }
-                    movementType = MovementType.FollowCible;
-                    ChangeAnimation(force <= 0 ? 1 : 2);
-                }
+            if (onRamp)
+            {
+                OnExitRamp();
+            }
+            
+            movementType = MovementType.FollowCible;
+            ChangeAnimation(manager.force <= 0 ? 1 : 2);
+        }
+    }
+    
+    private void Attack()
+    {
+        if (!isAttacking)
+        {
+            if (Vector3.SqrMagnitude(cible.targetableBody.transform.position - transform.position) > manager.attackRange * manager.attackRange)
+            {
+                isAttacking = false;
+                movementType = MovementType.FollowCible;
+                ChangeAnimation(manager.force <= 0 ? 1 : 2);
+            }
+            else
+            {
+                ChangeAnimation(4);
+                isAttacking = true;
+                if(manager.force > 0) InitializeKnockBack(0.1f,manager.speedCurve.Evaluate(manager.force),cible.targetableBody.position - transform.position,true);
+            }
+        }
+        else
+        {
+            manager.force -= manager.slowDownCurve.Evaluate(manager.force) * Time.deltaTime;
+
+            
+            if(!manager.isCasting) transform.rotation = Quaternion.LookRotation(cible.targetableBody.position - transform.position);
+
+            if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            {
+                isAttacking = false;
+            }
+            
+            if (Input.GetMouseButton(1))
+            {
+                ResetTarget();
+                isAttacking = false;
+                movementType = MovementType.MoveToClickWithNavMesh;
+                agent.ResetPath();
+                agent.SetDestination(MouseWorldPosition());
+                moving = true;
+                ChangeAnimation(manager.force <= 0 ? 1 : 2);
             }
         }
     }
 
+    public void OnAttack()
+    {
+        if (enabled)
+        {
+            int damages = Mathf.RoundToInt(manager.baseDamage * manager.damageMultiplier.Evaluate(manager.force));
+
+            manager.DealDamage(new []{cible.photonID}, damages);
+            manager.HitStop(new []{cible.photonID}, manager.force > 0 ? 0.7f * manager.force : 0,manager.force > 0 ? 0.3f * manager.force : 0);
+            Vector3 kbDirection = cible.targetableBody.position - transform.position;
+            manager.KnockBack(new []{cible.photonID}, manager.force > 0 ? 0.45f * manager.force : 0,manager.force > 0 ? 9f * manager.force : 0,kbDirection.normalized);
+            manager.force = 0;
+        }
+    }
+
+    
+    public void ResetTarget()
+    {
+        if (cible)
+        {
+            cible.HideTarget();
+        }
+        
+        cible = null;
+    }
+    
     public void HitStop(float time)
     {
         Debug.Log("hitStop " + time);
@@ -353,45 +396,35 @@ public class PlayerController : MonoBehaviour
             agent.isStopped = false;
         }
     }
-    
-    public void FreezePlayer()
-    {
-        playerManager.canMove = false;
-        agent.ResetPath();
-    }
 
-    public void UnfreezePlayer()
-    {
-        playerManager.canMove = true;
-        playerManager.isCasting = false;
-    }
+    #endregion
     
+    #region CAPACITIES
+
     void CapacitiesInputCheck()
     {
-        if(playerManager.isCasting) return;
+        if(manager.isCasting) return;
         
         if (Input.GetKeyDown(activeCapacity1) && !ActiveCapacity1.onCooldown)
         {
-            visuLaser.SetActive(true);
+            mimiLaserVisualization.SetActive(true);
         }
         
         if (Input.GetKey(activeCapacity1))
         {
-            if (Physics.Raycast(ray, out hit))
-            {
-                visuLaser.transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(hit.point - transform.position).eulerAngles.y,0);
-            }
+            mimiLaserVisualization.transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
         }
         
         if (Input.GetKeyUp(activeCapacity1) && !ActiveCapacity1.onCooldown)
         {
-            Debug.Log("WORKS HERE");
-            visuLaser.SetActive(false);
-            if (Physics.Raycast(ray, out hit))
+            if (onRamp)
             {
-                transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(hit.point - transform.position).eulerAngles.y,0);
+                OnExitRamp();
             }
-            playerManager.isCasting = true;
+            
+            mimiLaserVisualization.SetActive(false);
+            transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
+            manager.isCasting = true;
             ActiveCapacity1.Cast();
         }
 
@@ -417,140 +450,52 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    public void OnCapacityPerformed(Capacities capacity, int[] targets)
+    public void OnCapacityPerformed(Capacities capacity, List<int> targets)
     {
-        playerManager.isCasting = false;
-
-        for (int i = 0; i < targets.Length; i++)
-        {
-            Debug.Log(targets[i]);
-        }
+        manager.isCasting = false;
         
+        List<int> enemies = new List<int>();
+        
+        for (int i = 0; i < targets.Count; i++)
+        {
+            ITeamable teamable = PhotonView.Find(targets[i]).GetComponent<ITeamable>();
+
+            if (teamable != null)
+            {
+                if (manager.CurrentTeam() != teamable.CurrentTeam())
+                {
+                    enemies.Add(targets[i]);
+                }
+            }
+        }
+
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
-                int damages = Mathf.RoundToInt(ActiveCapacity1SO.amount * damageMultiplier.Evaluate(force));
-                playerManager.DealDamage(targets, damages);
-                playerManager.HitStop(targets, force > 0 ? 0.7f * force + 0.2f: 0.2f,force > 0 ? 0.3f * force + 0.1f: 0.1f);
+                int damages = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                manager.DealDamage(enemies.ToArray(), damages);
+                manager.HitStop(enemies.ToArray(), manager.force > 0 ? 0.7f * manager.force + 0.2f: 0.2f,manager.force > 0 ? 0.3f * manager.force + 0.1f: 0.1f);
                 Vector3 kbDirection = transform.forward;
-                playerManager.KnockBack(targets, force > 0 ? 0.6f * force : 0,force > 0 ? 11f * force : 0,kbDirection.normalized);
+                manager.KnockBack(enemies.ToArray(), manager.force > 0 ? 0.6f * manager.force : 0,manager.force > 0 ? 11f * manager.force : 0,kbDirection.normalized);
                 break;
         }
     }
 
-    public void OnAttack()
-    {
-        if (enabled)
-        {
-            int damages = Mathf.RoundToInt(baseDamages * damageMultiplier.Evaluate(force));
+    #endregion
+    
+    #region VISUAL
 
-            playerManager.DealDamage(new []{cible.photonID}, damages);
-            playerManager.HitStop(new []{cible.photonID}, force > 0 ? 0.7f * force : 0,force > 0 ? 0.3f * force : 0);
-            Vector3 kbDirection = cible.targetableBody.position - transform.position;
-            playerManager.KnockBack(new []{cible.photonID}, force > 0 ? 0.45f * force : 0,force > 0 ? 9f * force : 0,kbDirection.normalized);
-            force = 0;
-        }
-    }
-
-    void FollowCible()
-    {
-        agent.ResetPath();
-
-
-        agent.SetDestination(cible.targetableBody.position);
-
-        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
-        force = Mathf.Clamp01(force);
-        agent.enabled = true;
-        if (moving && agent.remainingDistance == 0)
-        {
-            moving = false;
-            ChangeAnimation(0);
-        }
-
-        
-        if (Vector3.SqrMagnitude(cible.targetableBody.position - transform.position) <= range * range)
-        {
-            agent.ResetPath();
-            movementType = MovementType.Attack;
-        }
-
-
-        if (Input.GetMouseButton(1))
-        {
-            if (Physics.Raycast(ray, out hit))
-            {
-                agent.ResetPath();
-                ResetTarget();
-                agent.SetDestination(hit.point);
-                movementType = MovementType.MoveToClickWithNavMesh;
-                moving = true;
-                ChangeAnimation(force <= 0 ? 1 : 2);
-            }
-        }
-    }
-
+    
     public void ChangeAnimation(int index)
     {
         animator.SetInteger("Animation",index);
     }
 
-    public void ResetTarget()
-    {
-        if (cible)
-        {
-            cible.HideTarget();
-        }
-        
-        cible = null;
-    }
+    #endregion
+    
+    #region RAMP
 
-    public void Attack()
-    {
-        if (!isAttacking)
-        {
-            if (Vector3.SqrMagnitude(cible.targetableBody.transform.position - transform.position) > range * range)
-            {
-                isAttacking = false;
-                movementType = MovementType.FollowCible;
-                ChangeAnimation(force <= 0 ? 1 : 2);
-            }
-            else
-            {
-                ChangeAnimation(4);
-                isAttacking = true;
-                if(force > 0) InitializeKnockBack(0.1f,speedCurve.Evaluate(force),cible.targetableBody.position - transform.position,true);
-            }
-        }
-        else
-        {
-            force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
-
-            
-            if(!playerManager.isCasting) transform.rotation = Quaternion.LookRotation(cible.targetableBody.position - transform.position);
-
-            if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
-            {
-                isAttacking = false;
-            }
-            
-            if (Input.GetMouseButton(1))
-            {
-                if (Physics.Raycast(ray, out hit))
-                {
-                    ResetTarget();
-                    isAttacking = false;
-                    movementType = MovementType.MoveToClickWithNavMesh;
-                    agent.ResetPath();
-                    agent.SetDestination(hit.point);
-                    moving = true;
-                    ChangeAnimation(force <= 0 ? 1 : 2);
-                }
-            }
-        }
-    }
-
-    public void OnEnterRamp(Rampe_LD rampeLd,bool forward,int startIndex)
+     public void OnEnterRamp(Rampe_LD rampeLd,bool forward,int startIndex)
     {
         ResetTarget();
         onRamp = true;
@@ -561,14 +506,15 @@ public class PlayerController : MonoBehaviour
         movementType = MovementType.Slide;
         agent.ResetPath();
         ChangeAnimation(3);
-        sparkles.SetActive(true);
+        
+        if(sparkles) sparkles.SetActive(true);
     }
 
     public void Slide()
     {
         if (rampProgress < 1)
         {
-            rampProgress += (Time.deltaTime * currentSpeed) / ramp.distBetweenNodes;
+            rampProgress += (Time.deltaTime * manager.currentSpeed) / ramp.distBetweenNodes;
         }
         else
         {
@@ -598,42 +544,23 @@ public class PlayerController : MonoBehaviour
         if (onRamp)
         {
             transform.position = Vector3.Lerp(ramp.distancedNodes[rampIndex], ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1], rampProgress) + Vector3.up * ramp.heightOnRamp;
-            if(!playerManager.isCasting) transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1] - ramp.distancedNodes[rampIndex]),Time.deltaTime*8);
-            force += ramp.speedBoost.Evaluate(force) * Time.deltaTime;
+            if(!manager.isCasting) transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(ramp.distancedNodes[forwardOnRamp ? rampIndex + 1 : rampIndex -1] - ramp.distancedNodes[rampIndex]),Time.deltaTime*8);
+            manager.force += ramp.speedBoost.Evaluate(manager.force) * Time.deltaTime;
         }
     }
 
     void OnExitRamp()
     {
-        ChangeAnimation(force <= 0 ? 1 : 2);
+        ChangeAnimation(manager.force <= 0 ? 1 : 2);
         onRamp = false;
         movementType = MovementType.KeepDirectionWithoutNavMesh;
         ramp.OnExitRamp();
         sparkles.SetActive(false);
     }
 
-    private void KeepDirectionNoNavMesh()
-    {
-        transform.position += direction * (currentSpeed * Time.deltaTime);
-        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
-        force = Mathf.Clamp01(force);
-        if (force <= 0)
-        {
-            agent.ResetPath();
-            movementType = MovementType.MoveToClickWithNavMesh;
-            ChangeAnimation(0);
-        }
-        if (Input.GetMouseButton(1))
-        {
-            if (Physics.Raycast(ray, out hit))
-            {
-                agent.ResetPath();
-                agent.SetDestination(hit.point);
-                movementType = MovementType.MoveToClickWithNavMesh;
-            }
-        }
-    }
+    #endregion
     
+    #region KNOCKBACK
     private void ApplyKnockBack()
     {
         agent.nextPosition += knockbackDirection * (knockBackForce * Time.deltaTime * (knockBackTime / knockBackDuration));
@@ -649,12 +576,16 @@ public class PlayerController : MonoBehaviour
         knockBackForce = kbForce;
         knockBackImmediatly = applyImmediatly;
     }
+    
 
-
+    #endregion
+    
+    #region MOVEMENT
+    
     private void MoveToClickUsingTheNavMesh()
     {
-        force -= slowDownCurve.Evaluate(force) * Time.deltaTime;
-        force = Mathf.Clamp01(force);
+        manager.force -= manager.slowDownCurve.Evaluate(manager.force) * Time.deltaTime;
+        manager.force = Mathf.Clamp01(manager.force);
         agent.enabled = true;
         if (moving && agent.remainingDistance == 0)
         {
@@ -666,15 +597,103 @@ public class PlayerController : MonoBehaviour
         
         if (Input.GetMouseButton(1))
         {
-            if (Physics.Raycast(ray, out hit))
-            {
-                agent.ResetPath();
-                agent.SetDestination(hit.point);
-                moving = true;
-                ChangeAnimation(force <= 0 ? 1 : 2);
-            }
+            agent.ResetPath();
+            agent.SetDestination(MouseWorldPosition());
+            moving = true;
+            ChangeAnimation(manager.force <= 0 ? 1 : 2);
         }
     }
+    
+    private void KeepDirectionNoNavMesh()
+    {
+        transform.position += direction * (manager.currentSpeed * Time.deltaTime);
+        manager.force -= manager.slowDownCurve.Evaluate(manager.force) * Time.deltaTime;
+        manager.force = Mathf.Clamp01(manager.force);
+        if (manager.force <= 0)
+        {
+            agent.ResetPath();
+            movementType = MovementType.MoveToClickWithNavMesh;
+            ChangeAnimation(0);
+        }
+        if (Input.GetMouseButton(1))
+        {
+            agent.ResetPath();
+            agent.SetDestination(MouseWorldPosition());
+            movementType = MovementType.MoveToClickWithNavMesh;
+        }
+    }
+    
+    void FollowTarget()
+    {
+        agent.ResetPath();
+
+
+        agent.SetDestination(cible.targetableBody.position);
+
+        manager.force -= manager.slowDownCurve.Evaluate(manager.force) * Time.deltaTime;
+        manager.force = Mathf.Clamp01(manager.force);
+        agent.enabled = true;
+        if (moving && agent.remainingDistance == 0)
+        {
+            moving = false;
+            ChangeAnimation(0);
+        }
+
+        
+        if (Vector3.SqrMagnitude(cible.targetableBody.position - transform.position) <= manager.attackRange * manager.attackRange)
+        {
+            agent.ResetPath();
+            movementType = MovementType.Attack;
+        }
+
+
+        if (Input.GetMouseButton(1))
+        {
+            agent.ResetPath();
+            ResetTarget();
+            agent.SetDestination(MouseWorldPosition());
+            movementType = MovementType.MoveToClickWithNavMesh;
+            moving = true;
+            ChangeAnimation(manager.force <= 0 ? 1 : 2);
+        }
+    }
+    
+    private void MovementTypeSwitch()
+    {
+        if (knockBackTime > 0)
+        {
+            if(knockBackImmediatly || movementEnabled) ApplyKnockBack();
+        }
+        
+        if (!movementEnabled)
+        {
+            HitStopTimer();
+            return;
+        }
+        
+        switch (movementType)
+        {
+            case MovementType.MoveToClickWithNavMesh:
+                MoveToClickUsingTheNavMesh();
+                break;
+            case MovementType.KeepDirectionWithoutNavMesh:
+                KeepDirectionNoNavMesh();
+                break;
+            case MovementType.Slide:
+                Slide();
+                break;
+            case MovementType.FollowCible:
+                FollowTarget();
+                break;
+            case MovementType.Attack:
+                Attack();
+                break;
+            case MovementType.Block:
+                BlockPlayer();
+                break;
+        }
+    }
+
     
     public void BlockPlayer()
     {
@@ -706,4 +725,7 @@ public class PlayerController : MonoBehaviour
         movementType = MovementType.Block;
         
     }
+    
+    #endregion
+    
 }
