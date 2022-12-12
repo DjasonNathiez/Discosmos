@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80054ce40552edc4692627e6b54b2640, type: 3}
   m_Name: new Mimi Laser
   m_EditorClassIdentifier: 
-  amount: 10
+  amount: 20
   index: 0
   castTime: 0
   cooldownTime: 4

@@ -187,6 +187,7 @@ MonoBehaviour:
     name: 
   uiObject: {fileID: 3013384326752953839, guid: 5826689cfc69c6940b9ce75d191718a4,
     type: 3}
+  masterPhotonView: {fileID: 53187641744449011}
   photonID: 0
   targetableBody: {fileID: 4603925499178921403}
   heightUI: 40

@@ -420,11 +420,16 @@ public class PlayerController : MonoBehaviour
     public void OnCapacityPerformed(Capacities capacity, int[] targets)
     {
         playerManager.isCasting = false;
+
+        for (int i = 0; i < targets.Length; i++)
+        {
+            Debug.Log(targets[i]);
+        }
         
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
-                int damages = Mathf.RoundToInt(ActiveCapacity1.activeCapacitySo.amount * damageMultiplier.Evaluate(force));
+                int damages = Mathf.RoundToInt(ActiveCapacity1SO.amount * damageMultiplier.Evaluate(force));
                 playerManager.DealDamage(targets, damages);
                 playerManager.HitStop(targets, force > 0 ? 0.7f * force + 0.2f: 0.2f,force > 0 ? 0.3f * force + 0.1f: 0.1f);
                 Vector3 kbDirection = transform.forward;
