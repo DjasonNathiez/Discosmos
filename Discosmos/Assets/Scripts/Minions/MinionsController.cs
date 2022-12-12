@@ -6,6 +6,7 @@ using Photon.Realtime;
 using Toolbox.Variable;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
 {
@@ -13,7 +14,8 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private float range;
     [SerializeField] private float speed;
     [SerializeField] private bool master;
-    [SerializeField] public int id;
+    public Targetable myTargetable;
+    public Transform renderBody;
 
     public int currentHealth;
     public int currentShield;
@@ -34,6 +36,25 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     private GameObject waypoints;
     
     [SerializeField] private bool loopMode;
+    
+    [Header("HIT STOP AND SHAKING")]
+    public bool shaking;
+    public float shakingForce;
+    public float shakingTime;
+    public float shakingDuration;
+    public Vector3 truePos;
+    public float previousShake = 1;
+    public float nextShakeTimer = 0.02f;
+    public float shakeFrequency = 0.02f;
+    public bool  movementEnabled = false;
+    
+    
+    [Header("KNOCKBACK")]
+    [SerializeField] private Vector3 knockbackDirection;
+    [SerializeField] private float knockBackForce;
+    [SerializeField] private float knockBackTime;
+    [SerializeField] private float knockBackDuration;
+    
     
     
     private enum FollowType
@@ -65,7 +86,8 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             agent.enabled = false;
         }
 
-        MobsUIManager.instance.MinionSpawned(this);
+        myTargetable.photonID = photonView.ViewID;
+        truePos = renderBody.transform.localPosition;
     }
 
     private void FollowFromNearestToFarthest()
@@ -92,6 +114,21 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (master)
         {
+            if (shaking)
+            {
+                ApplyShaking();
+            }
+
+            if (!movementEnabled)
+            {
+                return;
+            }
+            
+            if (knockBackTime > 0)
+            { 
+                ApplyKnockBack();
+            }
+            
             //while there are no GameObjects with the team != this.team in the entitiesInRange list and the currentWaypoint is not the last waypoint move to the next waypoint else move In Range and attack
             if (entitiesInRange.Count == 0 && currentWaypoint < _waypoints.Length)
             {
@@ -114,6 +151,11 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
                 MoveInRange();
             }   
         }
+    }
+
+    private void LateUpdate()
+    {
+        myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
     private void MoveToWaypoint()
@@ -146,6 +188,60 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             }
         }
     }
+    
+    public void InitializeHitStop(float time,float force)
+    {
+        shakingForce = force;
+        shakingTime = time;
+        shakingDuration = time;
+        shaking = true;
+        movementEnabled = false;
+        agent.isStopped = true;
+    }
+    
+    public void InitializeKnockBack(float kbTime,float kbForce, Vector3 kbDirection)
+    {
+        knockbackDirection = kbDirection;
+        knockBackDuration = kbTime;
+        knockBackTime = kbTime;
+        knockBackForce = kbForce;
+    }
+    
+    private void ApplyKnockBack()
+    {
+        agent.nextPosition += knockbackDirection * (knockBackForce * Time.deltaTime * (knockBackTime / knockBackDuration));
+        knockBackTime -= Time.deltaTime;
+    }
+
+    void ApplyShaking()
+    {
+        if (shaking)
+        {
+            if (shakingTime > 0)
+            {
+                shakingTime -= Time.deltaTime;
+                if (nextShakeTimer > 0)
+                {
+                    nextShakeTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    nextShakeTimer = shakeFrequency;
+                    Vector2 shake = new Vector2(Random.Range(0.2f, 1f) * shakingForce * (shakingTime /(shakingDuration / 0.7f) + 0.3f)* previousShake, Random.Range(0.2f, 1f) * shakingForce * (shakingTime /(shakingDuration / 0.7f) + 0.3f) * previousShake);
+                    renderBody.localPosition = new Vector3(truePos.x + shake.x, truePos.y, truePos.z + shake.y);
+                    previousShake = -previousShake;
+                }
+            }
+            else
+            {
+                renderBody.localPosition = truePos;
+                shakingTime = 0;
+                shaking = false;
+                movementEnabled = true;
+                agent.isStopped = false;
+            }   
+        }
+    }
 
     private void Attack()
     {
@@ -169,7 +265,6 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (photonEvent.Code == RaiseEvent.DamageTarget)
         {
-            Debug.Log("Damage event reiceveid");
             Hashtable data = (Hashtable)photonEvent.CustomData;
             int[] targets = (int[])data["TargetsID"];
 
@@ -178,6 +273,40 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
                 if (photonView.ViewID == id)
                 {
                     TakeDamage(data);
+                }
+            }
+        }
+        
+        if (photonEvent.Code == RaiseEvent.HitStopTarget)
+        {
+            if (master)
+            {
+                Hashtable data = (Hashtable)photonEvent.CustomData;
+                int[] targets = (int[])data["TargetsID"];
+
+                foreach (int id in targets)
+                {
+                    if (photonView.ViewID == id)
+                    {
+                        InitializeHitStop((float)data["Time"],(float)data["Force"]);
+                    }
+                }   
+            }
+        }
+        
+        if (photonEvent.Code == RaiseEvent.KnockBackTarget)
+        {
+            if (master)
+            {
+                Hashtable data = (Hashtable) photonEvent.CustomData;
+                int[] targets = (int[]) data["TargetsID"];
+
+                foreach (int id in targets)
+                {
+                    if (photonView.ViewID == id)
+                    {
+                        InitializeKnockBack((float) data["Time"], (float) data["Force"], (Vector3) data["Direction"]);
+                    }
                 }
             }
         }
@@ -217,9 +346,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             currentHealth -= amount;
         }
-        
-        Debug.Log("Take Damage");
-        
+
         if(currentHealth <= 0)
         {
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };

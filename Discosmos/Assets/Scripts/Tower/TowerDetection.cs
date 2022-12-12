@@ -4,24 +4,21 @@ using UnityEngine;
 
 public class TowerDetection : MonoBehaviour
 {
-    //this script is attached to the tower detection object which is a child of the tower object and is used to detect enemies in range of the tower 
-    //every game objects that are named "*Player*" are considered as enemies
-
-    //set the range of the tower
     public float detectionRadius = 5f;
-
-    //create a list of enemies in range
+    private Collider[] collidersDetection;
     public List<GameObject> enemiesInRange = new List<GameObject>();
     public GameObject target;
     private Vector3 topOfTower;
 
-    //debug values
     [SerializeField] private Vector3 targetPosition;
     [SerializeField] private bool hasEnnemiesInRange;
     [SerializeField] private bool rayCastHit;
 
     [SerializeField] private bool rotationLocked = true;
     /*il faudra créer une variable pour savoir la team ici*/
+    
+    [SerializeField] private float cooldown = 0.5f;
+    [SerializeField] private float timer = 0f;
 
     private void Start()
     {
@@ -31,8 +28,8 @@ public class TowerDetection : MonoBehaviour
     void Update()
     {
         enemiesInRange.Clear();
-        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius);
-        foreach (Collider collider in colliders)
+        collidersDetection = Physics.OverlapSphere(transform.position, detectionRadius);
+        foreach (Collider collider in collidersDetection)
         {
             if (collider.name.Contains("Player") /* && si la team du gameObject = variable team*/)
             {
@@ -67,6 +64,27 @@ public class TowerDetection : MonoBehaviour
             target = null;
             hasEnnemiesInRange = false;
         }
+        
+        if (hasEnnemiesInRange)
+        {
+            timer += Time.deltaTime;
+            if (timer >= cooldown)
+            {
+                timer = 0;
+                Shoot();
+            }
+        }
     }
 
+    private void Shoot()
+    {
+        Debug.Log("Tower shoot");
+    }
+    
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        
+    }
 }

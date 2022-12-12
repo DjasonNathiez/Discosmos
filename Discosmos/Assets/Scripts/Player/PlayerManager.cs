@@ -13,29 +13,25 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] public string username;
     public PlayerController PlayerController;
     public GameObject hud;
+    public Transform canvas;
     public GameObject cam;
     public IPlayer iplayer;
     public ChampionDataSO championDataSo;
+    public PlayerAnimationScript playerAnimationScript;
+    public CameraController cameraController;
 
     [Header("Stats and UI")]
     
     [SerializeField] private bool overwriteOnline;
     
-    [SerializeField] private Image healthBar;
-    [SerializeField] public Image speedBar;
-    [SerializeField] private TextMeshProUGUI healthText;
-    [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private Transform uiStatsTransform;
-    [SerializeField] private Transform target;
-    [SerializeField] private float heightUI;
     [SerializeField] public Camera _camera;
-    [SerializeField] private GameObject healthBarObj;
-    [SerializeField] private Transform canvas;
-    
+
     [Header("State")]
     public int currentHealth;
     public int maxHealth;
     public int currentShield;
+    public bool isCasting;
+    public bool canMove;
 
     [Header("Movement")]
     public float currentSpeed;
@@ -46,7 +42,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [Header("FX")]
     public ParticleSystem attackFx;
     public ParticleSystem laserFX;
-    
+    public GameObject textDamage;
 
     private void Awake()
     {
@@ -57,30 +53,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             GameAdministrator.instance.localPlayerView = GetComponent<PhotonView>();   
         }
 
-        GameObject healthBarObject = Instantiate(healthBarObj, Vector3.zero, quaternion.identity, canvas);
-        uiStatsTransform = healthBarObject.transform;
-        healthBar = uiStatsTransform.GetChild(0).GetComponent<Image>();
-        speedBar = uiStatsTransform.GetChild(1).GetComponent<Image>();
-        healthText = uiStatsTransform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        nameText = uiStatsTransform.GetChild(3).GetComponent<TextMeshProUGUI>();
-        target = uiStatsTransform.GetChild(4);
+        PlayerController.myTargetable.photonID = photonView.ViewID;
     }
 
     private void Start()
     {
         username = photonView.Controller.NickName;
-        nameText.text = username;
-    }
-
-    public void ShowTarget()
-    {
-        target.gameObject.SetActive(true);
+        PlayerController.myTargetable.healthBar.name = username;
+        PlayerController.myTargetable.UpdateUI(false,false,0, 0,false,0,true,username);
     }
     
-    public void HideTarget()
-    {
-        target.gameObject.SetActive(false);
-    }
 
     public void CallFX(VisualEffects effect)
     {
@@ -97,6 +79,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void Initialize()
     {
+        canMove = true;
+        
         if (championDataSo)
         {
             PlayerController.ActiveCapacity1SO = championDataSo.ActiveCapacity1So;
@@ -121,9 +105,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     void SetUI()
     {
-        uiStatsTransform.position = GameAdministrator.instance.localPlayer._camera.WorldToScreenPoint(PlayerController.transform.position + Vector3.up) + Vector3.up * heightUI;
-        healthBar.fillAmount = currentHealth / (float) maxHealth;
-        healthText.text = currentHealth + " / " + maxHealth;
+        PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
     private void OnDestroy()
@@ -144,6 +126,35 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         PhotonNetwork.RaiseEvent(RaiseEvent.DamageTarget, data, raiseEventOptions, SendOptions.SendReliable);
     }
 
+    public void HitStop(int[] targetsID,float time,float shakeForce)
+    {
+        Hashtable data = new Hashtable
+        {
+            {"TargetsID", targetsID},
+            {"Time", time},
+            {"Force", shakeForce}
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.HitStopTarget, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+    
+    public void KnockBack(int[] targetsID,float time,float force,Vector3 direction)
+    {
+        Hashtable data = new Hashtable
+        {
+            {"TargetsID", targetsID},
+            {"Time", time},
+            {"Force", force},
+            {"Direction", direction}
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.KnockBackTarget, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
     public void OnEvent(EventData photonEvent)
     {
         if (photonEvent.Code == RaiseEvent.DamageTarget)
@@ -160,6 +171,34 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 }
             }
         }
+        
+        if (photonEvent.Code == RaiseEvent.HitStopTarget)
+        {
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
+
+            foreach (int id in targets)
+            {
+                if (photonView.ViewID == id)
+                {
+                    InitializeHitStop(data);
+                }
+            }
+        }
+        
+        if (photonEvent.Code == RaiseEvent.KnockBackTarget)
+        {
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
+
+            foreach (int id in targets)
+            {
+                if (photonView.ViewID == id)
+                {
+                    InitializeKnockBack(data);
+                }
+            }
+        }
 
         if (photonEvent.Code == RaiseEvent.Death)
         {
@@ -172,6 +211,26 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
 
+    public void InitializeHitStop(Hashtable data)
+    {
+        float time = (float) data["Time"];
+        float shakeForce = (float) data["Force"];
+        PlayerController.HitStop(time);
+        
+        if (shakeForce > 0)
+        {
+            playerAnimationScript.Shake(shakeForce,time);
+        }
+    }
+    
+    public void InitializeKnockBack(Hashtable data)
+    {
+        float time = (float) data["Time"];
+        float force = (float) data["Force"];
+        Vector3 direction = (Vector3) data["Direction"];
+        PlayerController.InitializeKnockBack(time,force,direction);
+    }
+    
     public void TakeDamage(Hashtable data)
     {
         int amount = (int)data["Amount"];
@@ -185,11 +244,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
             if (holdingDamage > 0)
             {
                 currentHealth -= amount;
+                GameObject textDmg = Instantiate(textDamage, PlayerController.myTargetable.healthBar.transform.position + Vector3.up * 30, quaternion.identity, MobsUIManager.instance.canvas);
+                textDmg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "-" + amount;
             }
         }
         else
         {
             currentHealth -= amount;
+            GameObject textDmg = Instantiate(textDamage, PlayerController.myTargetable.healthBar.transform.position + Vector3.up * 30, quaternion.identity, MobsUIManager.instance.canvas);
+            textDmg.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "-" + amount;
+            Debug.Log("Spawned " + textDmg);
         }
         
         Debug.Log("Take Damage");
@@ -212,6 +276,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         currentHealth = maxHealth;
         PlayerController.transform.position = FindObjectOfType<LevelManager>().spawnPoint.position;
+        PlayerController.agent.ResetPath();
     }
 }
 
