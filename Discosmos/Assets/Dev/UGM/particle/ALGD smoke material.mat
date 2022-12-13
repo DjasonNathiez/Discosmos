@@ -43,9 +43,10 @@ Material:
     - _Fin_Horaire: 0.1
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Speed_scroolling: 4.87
-    - _Texture: 1
-    m_Colors: []
+    - _Speed_scroolling: 5.25
+    - _Texture: 0
+    m_Colors:
+    - _Color: {r: 4, g: 3.0117648, b: 0.0627451, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &8785848138764910909
 MonoBehaviour:
