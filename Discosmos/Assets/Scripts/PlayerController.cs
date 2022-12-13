@@ -275,7 +275,9 @@ public class PlayerController : MonoBehaviour
             {
                 if (manager.CurrentTeam() == teamable.CurrentTeam()) return null;
             }
-            
+            Debug.Log("OUI OK " + targetable.bodyPhotonID);
+            animator.SetInteger("Target",targetable.bodyPhotonID);
+            Debug.Log("OUI OK DACC " + animator.GetInteger("Target"));
             return targetable;
 
         }
