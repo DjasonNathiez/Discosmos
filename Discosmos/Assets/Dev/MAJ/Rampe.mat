@@ -116,7 +116,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _NextColor: {r: 0.4339623, g: 0.29543176, b: 0.25996798, a: 0}
+    - _NextColor: {r: 0.5, g: 0.32830188, b: 0.28537735, a: 0}
     - _PreviousColor: {r: 0.9137255, g: 0.33975148, b: 0.29803917, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _UsingColor: {r: 1, g: 0, b: 0, a: 0}

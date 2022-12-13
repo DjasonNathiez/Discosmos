@@ -279,19 +279,18 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
         
         if (photonEvent.Code == RaiseEvent.HitStopTarget)
         {
-            if (master)
-            {
-                Hashtable data = (Hashtable)photonEvent.CustomData;
-                int[] targets = (int[])data["TargetsID"];
+            
+            Hashtable data = (Hashtable)photonEvent.CustomData;
+            int[] targets = (int[])data["TargetsID"];
 
-                foreach (int id in targets)
+            foreach (int id in targets)
+            {
+                if (photonView.ViewID == id)
                 {
-                    if (photonView.ViewID == id)
-                    {
-                        InitializeHitStop((float)data["Time"],(float)data["Force"]);
-                    }
-                }   
-            }
+                    InitializeHitStop((float)data["Time"],(float)data["Force"]);
+                }
+            }   
+            
         }
         
         if (photonEvent.Code == RaiseEvent.KnockBackTarget)
