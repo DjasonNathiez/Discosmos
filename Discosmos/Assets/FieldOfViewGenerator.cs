@@ -19,6 +19,18 @@ public class FieldOfViewGenerator : MonoBehaviour
 
     private void Update()
     {
+        UpdateMesh();
+    }
+
+    private void OnDrawGizmos()
+    {
+        //UpdateMesh();
+    }
+
+    void UpdateMesh()
+    {
+
+        Mesh newmesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>(0);
         vertices.Add(Vector3.zero);
         List<int> triangles = new List<int>(0);
@@ -43,10 +55,10 @@ public class FieldOfViewGenerator : MonoBehaviour
         }
         triangles.AddRange(new []{0,vertices.Count-1,1});
 
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        meshFilter.mesh = mesh;
+        newmesh.vertices = vertices.ToArray();
+        newmesh.triangles = triangles.ToArray();
+        newmesh.RecalculateNormals();
+        newmesh.RecalculateBounds();
+        meshFilter.mesh = newmesh;
     }
 }
