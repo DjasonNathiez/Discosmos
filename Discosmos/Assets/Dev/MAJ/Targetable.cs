@@ -13,6 +13,7 @@ public class Targetable : MonoBehaviour
     public GameObject uiObject;
     public PhotonView masterPhotonView;
     [HideInInspector] public int photonID;
+    [HideInInspector] public int bodyPhotonID;
     public Transform targetableBody;
     public float heightUI;
     public UIType type;

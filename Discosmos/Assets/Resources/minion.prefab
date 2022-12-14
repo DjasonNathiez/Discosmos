@@ -175,6 +175,7 @@ MonoBehaviour:
     type: 3}
   masterPhotonView: {fileID: 53187641744449011}
   photonID: 0
+  bodyPhotonID: 0
   targetableBody: {fileID: 4603925499178921403}
   heightUI: 40
   type: 1
