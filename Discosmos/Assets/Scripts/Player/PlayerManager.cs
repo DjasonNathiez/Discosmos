@@ -311,5 +311,8 @@ public enum VisualEffects
 
 public enum Capacities
 {
-    MIMI_Laser
+    MIMI_Laser,
+    MIMI_Ultimate,
+    VEGA_Blackhole,
+    VEGA_Ultimate
 }
