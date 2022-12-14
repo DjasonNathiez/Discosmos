@@ -423,6 +423,7 @@ public class PlayerController : MonoBehaviour
             {
                 OnExitRamp();
             }
+            StopMovement();
             
             mimiLaserVisualization.SetActive(false);
             transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
@@ -479,6 +480,7 @@ public class PlayerController : MonoBehaviour
                 manager.HitStop(enemies.ToArray(), manager.force > 0 ? 0.7f * manager.force + 0.2f: 0.2f,manager.force > 0 ? 0.3f * manager.force + 0.1f: 0.1f);
                 Vector3 kbDirection = transform.forward;
                 manager.KnockBack(enemies.ToArray(), manager.force > 0 ? 0.6f * manager.force : 0,manager.force > 0 ? 11f * manager.force : 0,kbDirection.normalized);
+                EnableMovement();
                 break;
         }
     }
@@ -726,6 +728,28 @@ public class PlayerController : MonoBehaviour
         }
         movementType = MovementType.Block;
         
+    }
+    
+    private List<Vector3> agentsLastPath = new List<Vector3>();
+    private void StopMovement()
+    {
+        movementEnabled = false;
+        for (int i = 0; i < agent.path.corners.Length; i++)
+        {
+            agentsLastPath.Add(agent.path.corners[i]);
+        }
+        agent.ResetPath();
+        moving = false;
+    }
+    
+    private void EnableMovement()
+    {
+        movementEnabled = true;
+        for (int i = 0; i < agentsLastPath.Count; i++)
+        {
+            agent.SetDestination(agentsLastPath[i]);
+        }
+        moving = true;
     }
     
     #endregion
