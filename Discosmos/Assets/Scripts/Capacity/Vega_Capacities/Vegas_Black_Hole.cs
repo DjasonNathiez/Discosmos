@@ -10,11 +10,13 @@ public class Vegas_Black_Hole : MonoBehaviour
 
     [SerializeField] private float forwardSpeed = 0;
     [SerializeField] private float duration = 0;
+    [SerializeField] private GameObject blackHole;
     
 
     private void Start()
     {
         forward = transform.forward;
+        blackHole.transform.position = transform.position;
     }
     
     private void Update()
@@ -27,6 +29,7 @@ public class Vegas_Black_Hole : MonoBehaviour
         else
         {
             duration -= Time.deltaTime;
+            
         }
     }
 }
