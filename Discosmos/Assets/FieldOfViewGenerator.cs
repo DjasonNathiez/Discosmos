@@ -9,6 +9,7 @@ public class FieldOfViewGenerator : MonoBehaviour
     public float lenght;
     public MeshFilter meshFilter;
     public Mesh mesh;
+    public LayerMask layerMask;
 
 
     private void Awake()
@@ -37,7 +38,7 @@ public class FieldOfViewGenerator : MonoBehaviour
         for (int i = 0; i < precision; i++)
         {
             Ray ray = new Ray(transform.position, Quaternion.Euler(0, 360 / precision * i, 0) * Vector3.left);
-            if (Physics.Raycast(ray, out RaycastHit hit, lenght))
+            if (Physics.Raycast(ray, out RaycastHit hit, lenght,layerMask))
             {
                 Debug.DrawRay(ray.origin,ray.direction*hit.distance);
                 vertices.Add(transform.InverseTransformPoint(hit.point));
