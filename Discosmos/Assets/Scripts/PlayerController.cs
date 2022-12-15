@@ -269,7 +269,7 @@ public class PlayerController : MonoBehaviour
             Targetable targetable = hit.transform.GetComponent<Targetable>();
             ITeamable teamable = hit.transform.GetComponent<ITeamable>();
 
-            if (targetable == null) return null;
+            if (targetable == null || targetable == myTargetable) return null;
 
             if (teamable != null)
             {
@@ -299,15 +299,25 @@ public class PlayerController : MonoBehaviour
             }
             
             cible = GetTarget();
-            cible.ShowTarget();
-
-            if (onRamp)
+            
+            if(cible)
             {
-                OnExitRamp();
+                cible.ShowTarget();
+               
+                if (onRamp)
+                {
+                    OnExitRamp();
+                }
+            
+                movementType = MovementType.FollowCible;
+                ChangeAnimation(manager.force <= 0 ? 1 : 2);
+            }
+            else
+            {
+                movementType = MovementType.MoveToClickWithNavMesh;
+                ChangeAnimation(0);
             }
             
-            movementType = MovementType.FollowCible;
-            ChangeAnimation(manager.force <= 0 ? 1 : 2);
         }
     }
     
