@@ -299,15 +299,24 @@ public class PlayerController : MonoBehaviour
             }
             
             cible = GetTarget();
-            cible.ShowTarget();
 
-            if (onRamp)
+            if (cible != null)
             {
-                OnExitRamp();
+                cible.ShowTarget();
+
+                if (onRamp)
+                {
+                    OnExitRamp();
+                }
+                
+                
+                movementType = MovementType.FollowCible;
+                ChangeAnimation(manager.force <= 0 ? 1 : 2);
             }
-            
-            movementType = MovementType.FollowCible;
-            ChangeAnimation(manager.force <= 0 ? 1 : 2);
+            else
+            {
+                ChangeAnimation(0);
+            }
         }
     }
     
