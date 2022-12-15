@@ -25,9 +25,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     public int currentWaypoint = 0;
     private bool isMoving = false;
     private bool isAttacking = false;
-
-    private Team team;
-
+        
     private List<GameObject> entitiesInRange = new List<GameObject>();
     public GameObject target;
     private Vector3 targetPosition;
@@ -72,9 +70,8 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
         if (PhotonNetwork.IsMasterClient)
         {
             agent = GetComponent<NavMeshAgent>();
-            team = GetComponent<Team>();
             //Find the gameObject named "WaypointsTeam" + team.teamID and add the transforms of its children to the waypoints array
-            waypoints = GameObject.Find("WaypointsTeam" + team.TeamID);
+            waypoints = GameObject.Find("WaypointsTeam" + 0);
             _waypoints = waypoints.GetComponentsInChildren<Transform>();
             _waypoints = _waypoints[1..];
             ChooseTypeOfFollow();
@@ -87,6 +84,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
         }
 
         myTargetable.photonID = photonView.ViewID;
+        myTargetable.bodyPhotonID = photonView.ViewID;
         truePos = renderBody.transform.localPosition;
     }
 
@@ -175,7 +173,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             if (collider.gameObject.GetComponent<Team>() != null)
             {
-                if (collider.gameObject.GetComponent<Team>().TeamID != team.TeamID)
+                if (collider.gameObject.GetComponent<Team>().TeamID != 0)
                 {
                     target = collider.gameObject;
                     targetPosition = target.transform.position;

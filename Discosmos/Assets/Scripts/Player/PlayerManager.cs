@@ -20,6 +20,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
     [HideInInspector] public PlayerAnimationScript playerAnimationScript;
     [HideInInspector] public CameraController cameraController;
     [HideInInspector] public GameObject modelBody;
+    public Transform fogOfWarRenderer;
     
     [Header("Stats and UI")]
     private bool overwriteOnline;
@@ -148,6 +149,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
 
     void SetUI()
     {
+        fogOfWarRenderer.position = PlayerController.transform.position;
         PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
