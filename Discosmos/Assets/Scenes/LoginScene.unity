@@ -4080,7 +4080,7 @@ PrefabInstance:
         type: 3}
       propertyPath: testChamp
       value: 
-      objectReference: {fileID: 11400000, guid: 46d034678dd2a284795b334f7f787e4e,
+      objectReference: {fileID: 11400000, guid: 8d43d84285d267e418f03050abf44a68,
         type: 2}
     - target: {fileID: 5318078956135858034, guid: e5929c7f48d5fe3488b53706ac06db92,
         type: 3}
