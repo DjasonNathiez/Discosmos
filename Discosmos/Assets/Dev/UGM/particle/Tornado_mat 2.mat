@@ -48,10 +48,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Direction: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Treshold_size: 0.5
+    - _Scale_noise: 4.63
+    - _Treshold_size: 0.36
     m_Colors:
-    - _Color: {r: 3.592157, g: 0.015686275, b: 3.8117647, a: 0}
+    - _Color: {r: 0, g: 0.7169812, b: 0.66848963, a: 0}
     - _Color_1: {r: 0.32091716, g: 0.03137255, b: 0.7647059, a: 0}
   m_BuildTextureStacks: []

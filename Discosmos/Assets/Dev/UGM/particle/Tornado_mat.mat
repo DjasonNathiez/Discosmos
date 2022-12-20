@@ -52,8 +52,8 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Scale_noise: 5
-    - _Treshold_size: 0.88
+    - _Treshold_size: 0.89
     m_Colors:
-    - _Color: {r: 3.193101, g: 0.47896513, b: 30.494114, a: 0}
+    - _Color: {r: 30.494114, g: 7.1479826, b: 0.47896427, a: 0}
     - _Color_1: {r: 0.32091716, g: 0.03137255, b: 0.7647059, a: 0}
   m_BuildTextureStacks: []
