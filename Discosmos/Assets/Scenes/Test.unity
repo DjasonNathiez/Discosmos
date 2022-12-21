@@ -5873,7 +5873,7 @@ GameObject:
   - component: {fileID: 1252218677}
   - component: {fileID: 1252218681}
   m_Layer: 0
-  m_Name: Camera
+  m_Name: FOWCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5977,15 +5977,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252218676}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd1bce5b8a46c6e4b8b9cc2bbe48e05d, type: 3}
+  m_Script: {fileID: 11500000, guid: f7e5dc93ecab7e54eb596e7db23a0f84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sourceImage: {fileID: 0}
-  texture: {fileID: 0}
-  radius: 0
-  iterations: 0
+  _iteration: 4
+  upscaleTexture: 4
+  _useBlur: 1
+  _material: {fileID: 0}
+  _material1: {fileID: 0}
+  myTexture: {fileID: 8400000, guid: 4c0fa24af4ffef44a807812a73306198, type: 2}
+  productTexture: {fileID: 0}
 --- !u!1 &1252326857
 GameObject:
   m_ObjectHideFlags: 0
