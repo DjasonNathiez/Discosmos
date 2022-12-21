@@ -221,6 +221,20 @@
             },
             "m_InputSlot": {
                 "m_Node": {
+                    "m_Id": "7458851d228547a3ba5219b1191d5600"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "754f40faf35d471e9c239a24cfcd24a3"
+                },
+                "m_SlotId": 1
+            },
+            "m_InputSlot": {
+                "m_Node": {
                     "m_Id": "c7aea9955bb746fc82084564011054e6"
                 },
                 "m_SlotId": 0
@@ -372,8 +386,8 @@
     },
     "m_FragmentContext": {
         "m_Position": {
-            "x": 0.0,
-            "y": 200.0
+            "x": 0.000011444091796875,
+            "y": 196.0
         },
         "m_Blocks": [
             {
@@ -2753,7 +2767,7 @@
     "m_SurfaceType": 1,
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
-    "m_AlphaMode": 0,
+    "m_AlphaMode": 1,
     "m_RenderFace": 0,
     "m_AlphaClip": false,
     "m_CastShadows": true,
