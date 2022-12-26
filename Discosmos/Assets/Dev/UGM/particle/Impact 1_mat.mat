@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Impact 2_mat
+  m_Name: Impact 1_mat
   m_Shader: {fileID: -6465566751694194690, guid: 2a63b2b4c0f9d4241b90c2938b147cf8,
     type: 3}
   m_ValidKeywords: []
