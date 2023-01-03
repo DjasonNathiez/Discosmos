@@ -23,8 +23,8 @@ public class PlayerAnimationScript : MonoBehaviour
 
     [Header("Teams Skins")] 
     [SerializeField] private SkinnedMeshRenderer[] meshRenderers;
-    [SerializeField] private Material mimiPurple;
-    [SerializeField] private Material mimiGreen;
+    [SerializeField] private Material purpleSkin;
+    [SerializeField] private Material greenSkin;
 
     [Header("VFX")] 
     public ParticleSystem autoAttackFX;
@@ -51,7 +51,7 @@ public class PlayerAnimationScript : MonoBehaviour
     {
         playerController.OnCapacityPerformed(Capacities.MIMI_Laser, laserHitBox.idOnIt);
     }
-    
+
     public void CallMimiAttackFX()
     {
         autoAttackFX.Play();
@@ -61,6 +61,14 @@ public class PlayerAnimationScript : MonoBehaviour
         target = PhotonView.Find(playerController.animator.GetInteger("Target")).transform;
         autoAttackTrail.SetPosition(1,target.position);
         attackFX = true;
+        autoAttackImpactFX.Play();
+        autoAttackImpactFX.transform.position = target.position;
+    }
+    
+    public void CallVegaAttackFX()
+    {
+        autoAttackFX.Play();
+        target = PhotonView.Find(playerController.animator.GetInteger("Target")).transform;
         autoAttackImpactFX.Play();
         autoAttackImpactFX.transform.position = target.position;
     }
@@ -85,14 +93,14 @@ public class PlayerAnimationScript : MonoBehaviour
             case Enums.Teams.Green:
                 foreach (var meshRenderer in meshRenderers)
                 {
-                    meshRenderer.material = mimiGreen;
+                    meshRenderer.material = greenSkin;
                 }
                 break;
             
             case Enums.Teams.Pink:
                 foreach (var meshRenderer in meshRenderers)
                 {
-                    meshRenderer.material = mimiPurple;
+                    meshRenderer.material = purpleSkin;
                 }
                 break;
         }
