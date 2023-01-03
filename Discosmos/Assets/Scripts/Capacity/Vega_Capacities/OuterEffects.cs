@@ -35,9 +35,9 @@ public class OuterEffects : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if(other.GetComponent<PlayerController>())
+        if(other.GetComponent<Targetable>())
         {
-            _rigidbody = other.GetComponent<PlayerController>().GetComponent<Rigidbody>();
+            _rigidbody = other.GetComponent<Targetable>().GetComponent<Rigidbody>();
             if (_rigidbody != null)
             {
                 _rigidbodies.Add(_rigidbody);
@@ -47,9 +47,9 @@ public class OuterEffects : MonoBehaviour
     
     private void OnTriggerExit(Collider other)
     {
-        if(other.GetComponent<PlayerController>())
+        if(other.GetComponent<Targetable>())
         {
-            _rigidbody = other.GetComponent<PlayerController>().GetComponent<Rigidbody>();
+            _rigidbody = other.GetComponent<Targetable>().GetComponent<Rigidbody>();
             if (_rigidbody != null)
             {
                 _rigidbodies.Remove(_rigidbody);

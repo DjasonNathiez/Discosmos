@@ -52,11 +52,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Distorsion_ammount: 0.182
-    - _Distorsion_scale: 35
+    - _Distorsion_ammount: 1
+    - _Distorsion_scale: 40
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Twist_strenght: 30
-    - _rotation_ammount: -1
+    - _Twist_strenght: 5
+    - _rotation_ammount: 1
     m_Colors: []
   m_BuildTextureStacks: []

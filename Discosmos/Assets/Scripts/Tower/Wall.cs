@@ -64,6 +64,10 @@ public class Wall : MonoBehaviour
         {
             cooldownTimer -= Time.deltaTime;
         }
+        if (!tower1.activeSelf || !tower2.activeSelf)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private void ForceBoost()

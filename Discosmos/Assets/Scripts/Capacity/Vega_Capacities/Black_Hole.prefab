@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   succForce: 1.5
-  damages: 0
+  damages: 0.01
   tickDamage: 0.5
   timer: 0
   radius: 1
@@ -405,6 +405,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5658631460306412346, guid: 9414fd004ad50564e998634d719cffe9,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8979726659461911187, guid: 9414fd004ad50564e998634d719cffe9,
         type: 3}

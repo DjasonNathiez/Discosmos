@@ -52,6 +52,8 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private float knockBackForce;
     [SerializeField] private float knockBackTime;
     [SerializeField] private float knockBackDuration;
+
+    private Rigidbody rb;
     
     
     
@@ -66,6 +68,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
     private void Start()
     {
         currentHealth = maxHealth;
+        rb = GetComponent<Rigidbody>();
         
         if (PhotonNetwork.IsMasterClient)
         {
@@ -148,6 +151,26 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             {
                 MoveInRange();
             }   
+        }
+    }
+    
+    private void FixedUpdate()
+    {
+        if (rb.velocity != Vector3.zero)
+        {
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, Time.deltaTime * 5f);
+        }
+        if (rb.velocity.magnitude < 0.5f)
+        {
+            rb.velocity = Vector3.zero;
+        }
+        if (rb.angularVelocity != Vector3.zero)
+        {
+            rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, Vector3.zero, Time.deltaTime * 5f);
+        }
+        if (rb.angularVelocity.magnitude < 0.5f)
+        {
+            rb.angularVelocity = Vector3.zero;
         }
     }
 
