@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Radial impact
+  m_Name: Radial impact 2
   m_Shader: {fileID: -6465566751694194690, guid: 345d0019157f88c4d8c0cbd60f650927,
     type: 3}
   m_ValidKeywords: []
@@ -35,7 +35,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Scrolling_texture:
-        m_Texture: {fileID: 2800000, guid: 2d26dd383606b484dac93c060530e449, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6c98efab45dc8c040a3294ee1971fcf8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture2D:
@@ -56,13 +56,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Opacit_texture: 1.96
+    - _Opacit_texture: 4.44
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Size_gradient: -0.41
-    - _Speed_rotation: 0
+    - _Size_gradient: 0.71
+    - _Speed_rotation: 0.09
     - _Speed_scroolling: -0.94
     - _Texture: 0
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Color: {r: 2, g: 2, b: 2, a: 0}
   m_BuildTextureStacks: []
