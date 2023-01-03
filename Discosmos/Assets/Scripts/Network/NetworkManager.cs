@@ -435,14 +435,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void OnEvent(EventData photonEvent)
    {
-      if (photonEvent.Code == 1)
+      if (photonEvent.Code == 200)
       {
          Hashtable options = (Hashtable)photonEvent.CustomData;
 
          AddNewRoomToList((string)options["RoomName"], (string)options["RoomPassword"], (string)options["RoomPrivacy"]);
       }
 
-      if (photonEvent.Code == 2)
+      if (photonEvent.Code == 201)
       {
          Hashtable options = (Hashtable)photonEvent.CustomData;
 
