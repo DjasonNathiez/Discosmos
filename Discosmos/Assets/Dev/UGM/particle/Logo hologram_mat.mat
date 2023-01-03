@@ -67,7 +67,7 @@ Material:
     - _DstBlend: 10
     - _Intensit_hologramme: 2.71
     - _Nombre_de_colonne: 1
-    - _Nombre_de_frame: 61.43
+    - _Nombre_de_frame: 71.09
     - _Nombre_de_ligne: 1
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -80,5 +80,5 @@ Material:
     - _ZWriteControl: 0
     - _taille_hologramme: 12.6
     m_Colors:
-    - _Color: {r: 7.999999, g: 7.999999, b: 7.999999, a: 0}
+    - _Color: {r: 10.640322, g: 2.1906543, b: 79.80241, a: 0}
   m_BuildTextureStacks: []

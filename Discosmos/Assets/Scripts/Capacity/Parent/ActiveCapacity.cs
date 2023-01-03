@@ -22,22 +22,58 @@ public class ActiveCapacity
 
     public virtual void Cast()
     {
+        owner.manager.isCasting = false;
+        cooldownTimer = 0;
         
+        if(onCooldown)
+        {
+            return;
+        }
+        onCooldown = true;
+
+        serverTimeBackup = PhotonNetwork.Time;
+
+        if (activeCapacitySo.castTime != 0)
+        {
+            GameAdministrator.OnServerUpdate += CastRoutine;
+        }
+        else
+        {
+            Active();
+        }
     }
 
     public virtual void Active()
     {
-        
+        GameAdministrator.OnServerUpdate += Cooldown;
     }
-
     
-    public virtual int[] GetTargets(Vector3 initPos) { return null; }
-
-    public virtual void CastRoutine() {}
+    public virtual void CastRoutine()
+    {
+        if (castTimer >= activeCapacitySo.castTime)
+        {
+            Active();
+            GameAdministrator.OnServerUpdate -= CastRoutine;
+            castTimer = 0;
+        }
+        else
+        {
+            castTimer = (float)(PhotonNetwork.Time - serverTimeBackup);
+        }
+    }
 
     public virtual void Cooldown()
     {
-        
+        if (cooldownTimer >= activeCapacitySo.cooldownTime)
+        {
+            Debug.Log("Capacity is no longer on cooldown");
+            onCooldown = false;
+            GameAdministrator.OnServerUpdate -= Cooldown;
+        }
+        else
+        {
+            cooldownTimer = (float)(PhotonNetwork.Time - serverTimeBackup);
+        }
     }
 
 }

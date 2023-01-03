@@ -1,4 +1,6 @@
 using System;
+using Ara;
+using Photon.Pun;
 using Toolbox.Variable;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -23,6 +25,16 @@ public class PlayerAnimationScript : MonoBehaviour
     [SerializeField] private SkinnedMeshRenderer[] meshRenderers;
     [SerializeField] private Material mimiPurple;
     [SerializeField] private Material mimiGreen;
+
+    [Header("VFX")] 
+    public ParticleSystem autoAttackFX;
+    public ParticleSystem autoAttackImpactFX;
+    public LineRenderer autoAttackTrail;
+    private float trailTimer;
+    public float trailDelay;
+    public Transform firstPos;
+    public Transform target;
+    public bool attackFX;
     
 
     public void Awake()
@@ -42,7 +54,15 @@ public class PlayerAnimationScript : MonoBehaviour
     
     public void CallMimiAttackFX()
     {
-        playerController.manager.CallFX(VisualEffects.MimiAutoAttack);
+        autoAttackFX.Play();
+        autoAttackTrail.gameObject.SetActive(true);
+        autoAttackTrail.SetPosition(0,firstPos.position);
+        trailTimer = trailDelay;
+        target = PhotonView.Find(playerController.animator.GetInteger("Target")).transform;
+        autoAttackTrail.SetPosition(1,target.position);
+        attackFX = true;
+        autoAttackImpactFX.Play();
+        autoAttackImpactFX.transform.position = target.position;
     }
 
     public void CallMimiLaserVFX()
@@ -101,6 +121,21 @@ public class PlayerAnimationScript : MonoBehaviour
                 transform.localPosition = truePos;
                 shakingTime = 0;
                 shaking = false;
+            }   
+        }
+
+        if (attackFX)
+        {
+            if (trailTimer > 0)
+            {
+                trailTimer -= Time.deltaTime;
+                autoAttackTrail.startColor = Color.Lerp(new Color(1,1,1,0),Color.white, trailTimer/trailDelay);
+                autoAttackTrail.endColor = Color.Lerp(new Color(1,1,1,0),Color.white, trailTimer/trailDelay);
+            }
+            else
+            {
+                autoAttackTrail.gameObject.SetActive(false);
+                attackFX = false;
             }   
         }
     }

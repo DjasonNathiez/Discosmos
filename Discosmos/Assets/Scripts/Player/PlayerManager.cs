@@ -20,6 +20,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
     [HideInInspector] public PlayerAnimationScript playerAnimationScript;
     [HideInInspector] public CameraController cameraController;
     [HideInInspector] public GameObject modelBody;
+    public Transform fogOfWarRenderer;
     
     [Header("Stats and UI")]
     private bool overwriteOnline;
@@ -60,6 +61,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         }
 
         PlayerController.myTargetable.photonID = photonView.ViewID;
+        PlayerController.myTargetable.bodyPhotonID = PlayerController.GetComponent<PhotonView>().ViewID;
         PlayerController.agent = GetComponentInChildren<NavMeshAgent>();
         PlayerController.manager = this;
         PlayerController.animator = GetComponentInChildren<Animator>();
@@ -147,6 +149,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
 
     void SetUI()
     {
+        fogOfWarRenderer.position = PlayerController.transform.position;
         PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
@@ -310,5 +313,8 @@ public enum VisualEffects
 
 public enum Capacities
 {
-    MIMI_Laser
+    MIMI_Laser,
+    MIMI_Ultimate,
+    VEGA_Blackhole,
+    VEGA_Ultimate
 }
