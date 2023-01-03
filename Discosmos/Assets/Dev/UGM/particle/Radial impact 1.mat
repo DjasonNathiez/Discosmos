@@ -56,11 +56,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Opacit_texture: 10.34
+    - _Opacit_texture: 18.87
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Speed_scroolling: -1.4
+    - _Size_gradient: 0.64
+    - _Speed_rotation: 0
+    - _Speed_scroolling: -1.53
     - _Texture: 0
     m_Colors:
-    - _Color: {r: 4, g: 4, b: 4, a: 0}
+    - _Color: {r: 3.9999995, g: 3.9999995, b: 3.9999995, a: 0}
   m_BuildTextureStacks: []
