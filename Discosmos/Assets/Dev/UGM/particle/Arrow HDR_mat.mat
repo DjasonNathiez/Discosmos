@@ -40,7 +40,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _4: 8
-    - _D_calage_de_frame: 0
+    - _D_calage_de_frame: 3
     - _Nombre_de_colonne: 1
     - _Nombre_de_frame: 0
     - _Nombre_de_ligne: 4

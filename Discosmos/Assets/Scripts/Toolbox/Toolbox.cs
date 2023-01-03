@@ -1,11 +1,13 @@
 namespace Toolbox.Variable
 {
-    public static class PlayerRaiseEvent
+    public static class RaiseEvent
     {
         //BEGIN AT 100
         public static byte DamageTarget = 100;
         public static byte HealTarget = 101;
         public static byte Death = 102;
+        public static byte HitStopTarget = 103;
+        public static byte KnockBackTarget = 104;
     }
     
     public static class NetworkDelegate
@@ -52,7 +54,7 @@ namespace Toolbox.Variable
         {
             None,
             Green,
-            Yellow,
+            Pink,
             Neutral
         }
         

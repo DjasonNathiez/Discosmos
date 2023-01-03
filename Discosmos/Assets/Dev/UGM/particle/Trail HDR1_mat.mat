@@ -52,7 +52,7 @@ Material:
     - _QueueOffset: 0
     - _Transparent: 1
     m_Colors:
-    - _Color: {r: 13.928809, g: 0.4375542, b: 10.574227, a: 0}
+    - _Color: {r: 0.42565697, g: 0.21877714, b: 6.9644046, a: 0}
     - _main_tex_speed: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &3017723563517958477

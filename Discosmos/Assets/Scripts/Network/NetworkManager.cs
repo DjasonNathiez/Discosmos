@@ -12,6 +12,9 @@ using UnityEngine;
 public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
    public static NetworkManager instance;
+   [Header("TEST")] 
+   public string sceneTestName;
+   public ChampionDataSO testChamp;
 
    [SerializeField] private DebugNetworkShower _debugNetworkShower;
 
@@ -20,13 +23,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
    [Header("Connection")]
    [HideInInspector] public LoginScreen LoginScreen;
    private string _playFabPlayerIdCache;
+   private bool isSwitchingRoom;
 
    [Header("Room List")] 
    public List<CustomRoom> roomsList;
    public CustomRoom currentPlayerRoom;
    private string currentTargetingRoom;
 
-   private string roomBackup;
+   private string roomBackup = "Hub";
    
    RoomOptions roomOptions = new RoomOptions
    {
@@ -70,18 +74,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       
       if (GameAdministrator.instance.currentScene == Enums.Scenes.Login)
       {
-         GameAdministrator.instance.LoadScene(Enums.Scenes.Hub);
+         GameAdministrator.instance.LoadScene(GameAdministrator.instance.hubSceneName);
       }
 
-      JoinRoom();
+      if (!PhotonNetwork.InRoom && !isSwitchingRoom)
+      {
+         SwitchRoom("Hub");
+      }
+      else
+      {
+         JoinRoom();
+      }
+      
    }
 
    public void JoinRoom()
    {
-      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
+      if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != String.Empty)
       {
          PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
       }
+
+      isSwitchingRoom = false;
    }
 
    public override void OnCreatedRoom()
@@ -102,10 +116,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
          
          playerTest.GetPhotonView().Controller.NickName = GameAdministrator.instance.username;
-         
+         playerTest.GetComponent<PlayerManager>().championDataSo = testChamp;
          playerTest.GetComponent<PlayerManager>().Initialize();
          
-         PhotonNetwork.LoadLevel("Test");
+         PhotonNetwork.LoadLevel(sceneTestName);
       }
    }
 
@@ -438,6 +452,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void SwitchRoom(string roomName)
    {
+      roomBackup = roomName;
+      isSwitchingRoom = true;
+      
       if (PhotonNetwork.InRoom)
       {
          PhotonNetwork.LeaveRoom();
@@ -446,10 +463,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
       {
          if (PhotonNetwork.InLobby)
          {
-            if (GameAdministrator.instance.currentScene == Enums.Scenes.Hub && roomBackup != "")
-            {
-               PhotonNetwork.JoinOrCreateRoom(roomBackup, roomOptions, TypedLobby.Default);
-            }
+            JoinRoom();
          }
          else
          {
@@ -457,7 +471,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          }
       }
       
-      roomBackup = roomName;
    }
 }
 

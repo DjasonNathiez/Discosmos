@@ -1,5 +1,5 @@
 using UnityEngine;
-
+[CreateAssetMenu(order = 0, menuName = "Champion Data/Mimi", fileName = "new Mimi data")]
 public class ChampionDataSO : ScriptableObject
 {
     public string championName;
@@ -12,7 +12,19 @@ public class ChampionDataSO : ScriptableObject
 
     [Header("Movement")] 
     public float baseSpeed;
-    public float baseGroovySpeed;
-    public float baseSpeedMultiplier;
+    public AnimationCurve speedCurve;
+    public AnimationCurve slowDownCurve;
+
+    [Header("Attack")] 
+    public int baseDamage;
+    public AnimationCurve damageMultiplier;
+    public float baseAttackSpeed;
+    public float attackRange;
     
+    [Header("Capacity")] 
+    public PassiveCapacitySO PassiveCapacitySo;
+    public ActiveCapacitySO ActiveCapacity1So;
+    public ActiveCapacitySO ActiveCapacity2So;
+    public ActiveCapacitySO UltimateCapacitySo;
+
 }

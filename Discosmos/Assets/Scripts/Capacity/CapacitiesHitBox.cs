@@ -1,11 +1,30 @@
-
+using System;
+using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 public class CapacitiesHitBox : MonoBehaviour
 {
-    public byte[] GetTargets()
+    [SerializeField] private PlayerManager owner;
+    public List<int> idOnIt;
+
+    private void OnTriggerEnter(Collider other)
     {
-        //TODO do the target detection and send
-        return new byte[2];
+        Targetable targetable = other.GetComponent<Targetable>();
+
+        if (targetable && !idOnIt.Contains(targetable.photonID))
+        {
+            idOnIt.Add(targetable.photonID);
+        }
+    }
+    
+    private void OnTriggerExit(Collider other)
+    {
+        Targetable targetable = other.GetComponent<Targetable>();
+
+        if (targetable && idOnIt.Contains(targetable.photonID))
+        {
+            idOnIt.Remove(targetable.photonID);
+        }
     }
 }

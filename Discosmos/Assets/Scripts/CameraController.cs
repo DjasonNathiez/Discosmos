@@ -13,7 +13,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] private AnimationCurve cameraZoomCurve;
     [SerializeField] private AnimationCurve speedLinesCurve;
     [SerializeField] private Transform speedLines;
-    
+
+    public bool activeZoom;
+    public float zoomInActive;
+    public Vector3 posInActive;
+    public float activeTime;
+
+
+
     private PlayerController playerController;
 
     public bool cameraLock = true;
@@ -57,45 +64,78 @@ public class CameraController : MonoBehaviour
     {
         UpdateCamera();
     }
+    
+    public void SetupActiveZoom(float time,Vector3 position,float zoom)
+    {
+        /*activeTime = time;
+        activeZoom = true;
+        posInActive = position;
+        zoomInActive = zoom;*/
+    }
 
 
     private void UpdateCamera()
     {
 
-        if (cameraLock)
+        if (activeZoom)
         {
-            transform.position = Vector3.Lerp(transform.position, player.position, Time.deltaTime * 5);
-            speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(playerController.force)), Time.deltaTime * 5);
+            transform.position = Vector3.Lerp(transform.position, posInActive, Time.deltaTime * 5);
+
+            if (activeTime > 0)
+            {
+                activeTime -= Time.deltaTime;
+            }
+            else
+            {
+                activeZoom = false;
+            }
         }
         else
         {
-            speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(0)), Time.deltaTime * 5);
-            nextPos = transform.position;
-
-            if (Input.mousePosition.x >= Screen.width - 1)
+            if (cameraLock)
             {
-                nextPos += right * cameraSpeed;
+                transform.position = Vector3.Lerp(transform.position, player.position, Time.deltaTime * 5);
+                speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(playerController.manager.force)), Time.deltaTime * 5);
             }
-
-            if (Input.mousePosition.x <= 0)
+            else
             {
-                nextPos -= right * cameraSpeed;
-            }
+                speedLines.localPosition = Vector3.Lerp(speedLines.localPosition, new Vector3(0,0,speedLinesCurve.Evaluate(0)), Time.deltaTime * 5);
+                nextPos = transform.position;
 
-            if (Input.mousePosition.y >= Screen.height - 1)
-            {
-                //while ignoring rotation on the x axis move the camera forward
-                nextPos += forward * cameraSpeed;
-            }
+                if (Input.mousePosition.x >= Screen.width - 1)
+                {
+                    nextPos += right * cameraSpeed;
+                }
 
-            if (Input.mousePosition.y <= 0)
-            {
-                nextPos -= forward * cameraSpeed;
+                if (Input.mousePosition.x <= 0)
+                {
+                    nextPos -= right * cameraSpeed;
+                }
+
+                if (Input.mousePosition.y >= Screen.height - 1)
+                {
+                    nextPos += forward * cameraSpeed;
+                }
+
+                if (Input.mousePosition.y <= 0)
+                {
+                    nextPos -= forward * cameraSpeed;
+                }
+                transform.position = Vector3.Lerp(transform.position, nextPos, Time.deltaTime * 5);
             }
         }
+        
+        // ZOOM
         if(playerController != null)
         {
-            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * cameraZoomCurve.Evaluate(playerController.force), Time.deltaTime * 5);
+            if (activeZoom)
+            {
+                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * zoomInActive, Time.deltaTime * 5);   
+            }
+            else
+            {
+                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * cameraZoomCurve.Evaluate(playerController.manager.force), Time.deltaTime * 3);   
+            }
         }
 
 

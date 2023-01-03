@@ -38,7 +38,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _SampleTexture2D_b9a821c3c58d4954a19ebfb6a60df44f_Texture_1:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 550eaff7a2c354e42b664395cc98734a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture2D:
@@ -67,7 +67,7 @@ Material:
     - _DstBlend: 10
     - _Intensit_hologramme: 2.71
     - _Nombre_de_colonne: 1
-    - _Nombre_de_frame: 61.43
+    - _Nombre_de_frame: 71.09
     - _Nombre_de_ligne: 1
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -80,5 +80,5 @@ Material:
     - _ZWriteControl: 0
     - _taille_hologramme: 12.6
     m_Colors:
-    - _Color: {r: 7.999999, g: 7.999999, b: 7.999999, a: 0}
+    - _Color: {r: 10.640322, g: 2.1906543, b: 79.80241, a: 0}
   m_BuildTextureStacks: []

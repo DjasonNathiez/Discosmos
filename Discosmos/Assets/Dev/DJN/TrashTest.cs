@@ -9,7 +9,6 @@ namespace Dev.DJN
 
         private void Awake()
         {
-            capacity1.activeCapacity.TryCast();
         }
     }
 }
