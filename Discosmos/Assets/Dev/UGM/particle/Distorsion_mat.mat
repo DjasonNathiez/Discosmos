@@ -52,7 +52,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Distorsion_ammount: 0.182
+    - _Distorsion_ammount: 0.197
     - _Distorsion_scale: 35
     - _QueueControl: 0
     - _QueueOffset: 0
