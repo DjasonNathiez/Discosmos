@@ -321,6 +321,11 @@ public class PlayerController : MonoBehaviour
             }
             
             cible = GetTarget();
+
+            if (cible != null)
+            {
+                cible.ShowTarget();
+
             
             if(cible)
             {
@@ -330,16 +335,20 @@ public class PlayerController : MonoBehaviour
                 {
                     OnExitRamp();
                 }
-            
+                
                 movementType = MovementType.FollowCible;
                 ChangeAnimation(manager.force <= 0 ? 1 : 2);
             }
             else
             {
+
+                ChangeAnimation(0);
+            }
+
                 movementType = MovementType.MoveToClickWithNavMesh;
                 ChangeAnimation(0);
             }
-            
+          
         }
     }
     
