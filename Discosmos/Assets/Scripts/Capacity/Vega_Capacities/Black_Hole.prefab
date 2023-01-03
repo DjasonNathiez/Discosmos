@@ -58,8 +58,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 530486f50d658e046bcbf5aaaf0e285c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  succForce: 3
-  slowForce: 2
+  succForce: 10
+  slowForce: 3
   radius: 5
   _rigidbodies: []
 --- !u!1 &4063074326773203658
@@ -120,9 +120,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1408c38a9db9294eb56519c3b581e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  succForce: 1.5
-  damages: 0.01
-  tickDamage: 0.5
+  succForce: 70
+  damages: 1
+  tickDamage: 1
   timer: 0
   radius: 1
   _rigidbodies: []

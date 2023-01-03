@@ -17,7 +17,8 @@ public class CenterEffects : MonoBehaviour
     [SerializeField] private List<Rigidbody> _rigidbodies;
     private Rigidbody _rigidbody;
     private List<int> hitID = new List<int>();
-    
+    private PlayerManager playerManager;
+    private MinionsController minionsController;
     private void Start()
     {
         _collider = GetComponent<SphereCollider>();
@@ -34,9 +35,44 @@ public class CenterEffects : MonoBehaviour
             foreach (var rb in _rigidbodies)
             {
                 rb.AddForce((transform.position - rb.transform.position).normalized * (succForce * Time.deltaTime));
-                var playerManager = rb.transform.parent.GetComponent<PlayerManager>();
-                if(playerManager !=  null) playerManager.DealDamage(new int[]{playerManager.photonView.ViewID},(int)damages);
-                Debug.DrawLine(transform.position, rb.transform.position, Color.blue);
+            }
+            if (timer > 0)
+            {
+                timer -= Time.deltaTime;
+
+            }
+            else
+            {
+                foreach (var rb in _rigidbodies)
+                {
+                    rb.AddForce((transform.position - rb.transform.position).normalized * (succForce * Time.deltaTime));
+                    if (rb.transform.parent.GetComponent<PlayerManager>())
+                    {
+                        playerManager = rb.transform.parent.GetComponent<PlayerManager>();
+                        minionsController = null;
+                    }
+                    else if (rb.transform.GetComponent<MinionsController>())
+                    {
+                        playerManager = null;
+                        minionsController = rb.transform.GetComponent<MinionsController>();
+                    }
+                    
+                    if (playerManager != null)
+                    {
+                        
+                        playerManager.DealDamage(new int[]{playerManager.photonView.ViewID},(int)damages);
+
+                    }
+                    else if (minionsController != null)
+                    {
+                        
+                        minionsController.DealDamage(new int[]{minionsController.photonView.ViewID},(int)damages);
+                        Debug.Log("Minion");
+                        
+                    }
+                    Debug.DrawLine(transform.position, rb.transform.position, Color.blue);
+                }
+                timer = tickDamage;
             }
         }
     }
