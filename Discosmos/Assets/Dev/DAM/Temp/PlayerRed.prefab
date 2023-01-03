@@ -206,10 +206,7 @@ GameObject:
   - component: {fileID: 7754843790860608217}
   - component: {fileID: 7754843790860608218}
   - component: {fileID: 7754843790860608219}
-  - component: {fileID: 7754843790860608221}
   - component: {fileID: 7754843790860608222}
-  - component: {fileID: 7754843790860608223}
-  - component: {fileID: 3325696154523118556}
   m_Layer: 0
   m_Name: PlayerRed
   m_TagString: Untagged
@@ -297,28 +294,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!195 &7754843790860608221
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754843790860608196}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 9999999
-  avoidancePriority: 50
-  m_AngularSpeed: 9999999
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
-  m_AutoRepath: 1
-  m_Height: 1
-  m_BaseOffset: 0.5
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!54 &7754843790860608222
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -335,51 +310,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!114 &7754843790860608223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754843790860608196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d40d14d79c52bd449b58993e7431e33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementType: 2
-  force: 0
-  baseSpeed: 0
-  speedCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  slowDownCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  speedUp: 10
-  slowDown: 2
-  precisionAnglePad: 0
-  speedPadPositive: 0
-  slowSpeedPadDuration: 0.5
-  fastSpeedPadDuration: 2
-  speedPadLerp: 1
-  canvas: {fileID: 0}
---- !u!114 &3325696154523118556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754843790860608196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac81a7329f83de04298d5758591f181c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  teamID: 0

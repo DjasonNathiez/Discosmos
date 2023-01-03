@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     public NavMeshAgent agent;
+    private Rigidbody rb;
     [HideInInspector] public bool clientPlayer;
     [HideInInspector] public PlayerManager manager;
 
@@ -125,6 +126,7 @@ public class PlayerController : MonoBehaviour
         if (clientPlayer)
         {
             agent.speed = manager.currentSpeed;
+            rb = GetComponent<Rigidbody>();
             //if photon is on, then we are in multiplayer
             SetTime();   
         }
@@ -157,7 +159,27 @@ public class PlayerController : MonoBehaviour
             agent.speed = manager.currentSpeed;
             animator.SetFloat("Speed",manager.force*1.5f+1);
 
-            SpeedPadFunction();   
+            SpeedPadFunction();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (rb.velocity != Vector3.zero)
+        {
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, Time.deltaTime * 5f);
+        }
+        if (rb.velocity.magnitude < 0.5f)
+        {
+            rb.velocity = Vector3.zero;
+        }
+        if (rb.angularVelocity != Vector3.zero)
+        {
+            rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, Vector3.zero, Time.deltaTime * 5f);
+        }
+        if (rb.angularVelocity.magnitude < 0.5f)
+        {
+            rb.angularVelocity = Vector3.zero;
         }
     }
 
@@ -269,7 +291,7 @@ public class PlayerController : MonoBehaviour
             Targetable targetable = hit.transform.GetComponent<Targetable>();
             ITeamable teamable = hit.transform.GetComponent<ITeamable>();
 
-            if (targetable == null) return null;
+            if (targetable == null || targetable == myTargetable) return null;
 
             if (teamable != null)
             {
@@ -304,19 +326,29 @@ public class PlayerController : MonoBehaviour
             {
                 cible.ShowTarget();
 
+            
+            if(cible)
+            {
+                cible.ShowTarget();
+               
                 if (onRamp)
                 {
                     OnExitRamp();
                 }
-                
                 
                 movementType = MovementType.FollowCible;
                 ChangeAnimation(manager.force <= 0 ? 1 : 2);
             }
             else
             {
+
                 ChangeAnimation(0);
             }
+
+                movementType = MovementType.MoveToClickWithNavMesh;
+                ChangeAnimation(0);
+            }
+          
         }
     }
     

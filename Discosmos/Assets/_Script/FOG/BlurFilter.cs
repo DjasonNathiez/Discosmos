@@ -15,6 +15,8 @@ public class BlurFilter : MonoBehaviour
     public Material _material1;
 
     public RenderTexture myTexture;
+    
+    public RenderTexture productTexture;
 
     RenderTexture rt1;
     RenderTexture rt2;
