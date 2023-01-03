@@ -78,7 +78,8 @@ public class PlayerController : MonoBehaviour
    private float speedPadLerp = 1;
 
     [Header("Animation")] 
-    [HideInInspector] public Animator animator;
+    public Animator animatorMimi;
+    public Animator animatorVega;
     [SerializeField] private GameObject sparkles;
 
     [Header("UI")] 
@@ -157,8 +158,8 @@ public class PlayerController : MonoBehaviour
             myTargetable.UpdateUI(false,false,0,0,true,Mathf.Lerp(myTargetable.healthBar.speedFill.fillAmount,manager.force,Time.deltaTime * 5f));
             manager.currentSpeed = manager.speedCurve.Evaluate(manager.force) + manager.baseSpeed;
             agent.speed = manager.currentSpeed;
-            animator.SetFloat("Speed",manager.force*1.5f+1);
-
+            animatorMimi.SetFloat("Speed",manager.force*1.5f+1);
+            animatorVega.SetFloat("Speed",manager.force*1.5f+1);
             SpeedPadFunction();
         }
     }
@@ -298,8 +299,8 @@ public class PlayerController : MonoBehaviour
                 if (manager.CurrentTeam() == teamable.CurrentTeam()) return null;
             }
             Debug.Log("OUI OK " + targetable.bodyPhotonID);
-            animator.SetInteger("Target",targetable.bodyPhotonID);
-            Debug.Log("OUI OK DACC " + animator.GetInteger("Target"));
+            animatorMimi.SetInteger("Target",targetable.bodyPhotonID);
+            Debug.Log("OUI OK DACC " + animatorMimi.GetInteger("Target"));
             return targetable;
         }
         return null;
@@ -367,7 +368,7 @@ public class PlayerController : MonoBehaviour
             
             if(!manager.isCasting) transform.rotation = Quaternion.LookRotation(cible.targetableBody.position - transform.position);
 
-            if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            if (animatorMimi.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
             {
                 isAttacking = false;
             }
@@ -524,7 +525,8 @@ public class PlayerController : MonoBehaviour
     
     public void ChangeAnimation(int index)
     {
-        animator.SetInteger("Animation",index);
+        animatorMimi.SetInteger("Animation",index);
+        animatorVega.SetInteger("Animation",index);
     }
 
     #endregion
@@ -737,22 +739,21 @@ public class PlayerController : MonoBehaviour
         {
             agent.ResetPath();
             moving = false;
-            animator.Play("Idle");
+            
         }
         else if (movementType == MovementType.FollowCible)
         {
             agent.ResetPath();
             moving = false;
-            animator.Play("Idle");
+           
         }
         else if (movementType == MovementType.Attack)
         {
             isAttacking = false;
-            animator.Play("Idle");
         }
         else if (movementType == MovementType.KeepDirectionWithoutNavMesh)
         {
-            animator.Play("Idle");
+            
         }
         else if (movementType == MovementType.Slide)
         {

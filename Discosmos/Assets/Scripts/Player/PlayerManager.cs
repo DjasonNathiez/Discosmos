@@ -69,7 +69,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         PlayerController.myTargetable.bodyPhotonID = PlayerController.GetComponent<PhotonView>().ViewID;
         PlayerController.agent = GetComponentInChildren<NavMeshAgent>();
         PlayerController.manager = this;
-        PlayerController.animator = GetComponentInChildren<Animator>();
     }
 
     private void Start()
