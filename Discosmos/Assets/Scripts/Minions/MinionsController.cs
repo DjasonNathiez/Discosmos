@@ -8,15 +8,17 @@ using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
+public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback, ITeamable
 {
+    
+    public Enums.Teams currentTeam;
+    
     [SerializeField] private Transform[] _waypoints;
     [SerializeField] private float range;
     [SerializeField] private float speed;
     [SerializeField] private bool master;
     public Targetable myTargetable;
     public Transform renderBody;
-
     public int currentHealth;
     public int currentShield;
     public int maxHealth;
@@ -65,6 +67,8 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private void Start()
     {
+        SetTeam(Enums.Teams.Neutral);
+        
         currentHealth = maxHealth;
         
         if (PhotonNetwork.IsMasterClient)
@@ -349,5 +353,15 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, };
             PhotonNetwork.RaiseEvent(RaiseEvent.Death, new Hashtable{{"ID", photonView.ViewID}}, raiseEventOptions, SendOptions.SendReliable);
         }
+    }
+
+    public Enums.Teams CurrentTeam()
+    {
+        return currentTeam;
+    }
+
+    public void SetTeam(Enums.Teams team)
+    {
+        currentTeam = team;
     }
 }

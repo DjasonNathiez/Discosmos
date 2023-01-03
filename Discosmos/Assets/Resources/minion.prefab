@@ -86,6 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c56eda7e24537f845a9ec18cbb92b88f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentTeam: 0
   _waypoints: []
   range: 0
   speed: 0

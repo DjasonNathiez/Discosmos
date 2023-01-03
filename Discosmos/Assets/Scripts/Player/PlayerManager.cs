@@ -303,6 +303,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
     {
         return currentTeam;
     }
+
+    public void SetTeam(Enums.Teams team)
+    {
+        currentTeam = team;
+    }
 }
 
 public enum VisualEffects
