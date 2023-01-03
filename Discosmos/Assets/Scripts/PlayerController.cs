@@ -288,8 +288,8 @@ public class PlayerController : MonoBehaviour
         Ray ray = manager._camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Targetable targetable = hit.transform.GetComponent<Targetable>();
-            ITeamable teamable = hit.transform.GetComponent<ITeamable>();
+            Targetable targetable = hit.transform.GetComponentInParent<Targetable>();
+            ITeamable teamable = hit.transform.GetComponentInParent<ITeamable>();
 
             if (targetable == null || targetable == myTargetable) return null;
 
@@ -301,7 +301,6 @@ public class PlayerController : MonoBehaviour
             animator.SetInteger("Target",targetable.bodyPhotonID);
             Debug.Log("OUI OK DACC " + animator.GetInteger("Target"));
             return targetable;
-
         }
         return null;
     }
@@ -319,37 +318,29 @@ public class PlayerController : MonoBehaviour
             {
                 cible.HideTarget();
             }
-            
+
             cible = GetTarget();
 
-            if (cible != null)
+
+            if (cible)
             {
                 cible.ShowTarget();
 
-            
-            if(cible)
-            {
-                cible.ShowTarget();
-               
                 if (onRamp)
                 {
                     OnExitRamp();
                 }
-                
+
                 movementType = MovementType.FollowCible;
                 ChangeAnimation(manager.force <= 0 ? 1 : 2);
             }
             else
             {
-
-                ChangeAnimation(0);
-            }
-
                 movementType = MovementType.MoveToClickWithNavMesh;
-                ChangeAnimation(0);
-            }
-          
+                ChangeAnimation(0); 
+            } 
         }
+        
     }
     
     private void Attack()
