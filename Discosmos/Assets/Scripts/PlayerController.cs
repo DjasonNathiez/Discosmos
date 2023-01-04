@@ -85,6 +85,12 @@ public class PlayerController : MonoBehaviour
     [Header("UI")] 
     private Image speedJauge;
 
+    [Header("PROVISOIRE")] 
+    
+    // Bool qui définie si le joueur est mimi ou vega 
+    public bool mimi;
+    
+
     #region INITIALIZATION
 
     private void OnEnable()
@@ -158,8 +164,14 @@ public class PlayerController : MonoBehaviour
             myTargetable.UpdateUI(false,false,0,0,true,Mathf.Lerp(myTargetable.healthBar.speedFill.fillAmount,manager.force,Time.deltaTime * 5f));
             manager.currentSpeed = manager.speedCurve.Evaluate(manager.force) + manager.baseSpeed;
             agent.speed = manager.currentSpeed;
-            animatorMimi.SetFloat("Speed",manager.force*1.5f+1);
-            animatorVega.SetFloat("Speed",manager.force*1.5f+1);
+            if (mimi)
+            {
+                animatorMimi.SetFloat("Speed",manager.force*1.5f+1);
+            }
+            else
+            {
+                animatorVega.SetFloat("Speed",manager.force*1.5f+1);   
+            }
             SpeedPadFunction();
         }
     }
@@ -298,9 +310,14 @@ public class PlayerController : MonoBehaviour
             {
                 if (manager.CurrentTeam() == teamable.CurrentTeam()) return null;
             }
-            Debug.Log("OUI OK " + targetable.bodyPhotonID);
-            animatorMimi.SetInteger("Target",targetable.bodyPhotonID);
-            Debug.Log("OUI OK DACC " + animatorMimi.GetInteger("Target"));
+            if (mimi)
+            {
+                animatorMimi.SetInteger("Target",targetable.bodyPhotonID);   
+            }
+            else
+            {
+                animatorVega.SetInteger("Target",targetable.bodyPhotonID);   
+            }
             return targetable;
         }
         return null;
@@ -368,7 +385,11 @@ public class PlayerController : MonoBehaviour
             
             if(!manager.isCasting) transform.rotation = Quaternion.LookRotation(cible.targetableBody.position - transform.position);
 
-            if (animatorMimi.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            if (mimi && animatorMimi.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            {
+                isAttacking = false;
+            }
+            else if (!mimi && animatorVega.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
             {
                 isAttacking = false;
             }
@@ -480,7 +501,6 @@ public class PlayerController : MonoBehaviour
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
-                Debug.Log("Animate");
                 ChangeAnimation(6);
                 break;
         }
@@ -525,8 +545,14 @@ public class PlayerController : MonoBehaviour
     
     public void ChangeAnimation(int index)
     {
-        animatorMimi.SetInteger("Animation",index);
-        animatorVega.SetInteger("Animation",index);
+        if (mimi)
+        {
+            animatorMimi.SetInteger("Animation",index);
+        }
+        else
+        {
+            animatorVega.SetInteger("Animation",index);
+        }
     }
 
     #endregion
