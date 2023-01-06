@@ -24,16 +24,20 @@ public class LevelManager : MonoBehaviourPunCallbacks
     
     public GameObject championSelectCanvas;
     public TextMeshProUGUI waitingForPlayerText;
+    public TextMeshProUGUI timer;
+
+    public int countToLoad;
     
     void Start()
     {
         GameAdministrator.instance.localPlayer.PlayerController.transform.position = hubSpawnPoint.position;
+        CheckForCount();
     }
 
     private void Update()
     {
         
-        if (PhotonNetwork.CurrentRoom.Players.Count >= 4)
+        if (PhotonNetwork.CurrentRoom.Players.Count >= countToLoad)
         {
             waitingForPlayerText.text = "Champion select will start...";
             allPlayersInRoom = true;
@@ -76,24 +80,29 @@ public class LevelManager : MonoBehaviourPunCallbacks
     {
         base.OnPlayerEnteredRoom(newPlayer);
 
-        if (newPlayer.HasRejoined)
+        CheckForCount();
+    }
+
+    void CheckForCount()
+    {
+        if (PhotonNetwork.CurrentRoom.Players.Count == countToLoad)
         {
-            if (PhotonNetwork.CurrentRoom.Players.Count == 4)
+            championSelectCanvas.SetActive(true);
+            waitingForPlayerText.gameObject.SetActive(false);
+            GameAdministrator.OnServerUpdate += ChampionSelectTimer;
+            timerBackup = (float)PhotonNetwork.Time;
+            
+            if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                championSelectCanvas.SetActive(true);
-                waitingForPlayerText.gameObject.SetActive(false);
-                GameAdministrator.OnServerUpdate += ChampionSelectTimer;
-                timerBackup = (float)PhotonNetwork.Time;
-                if (PhotonNetwork.LocalPlayer.IsMasterClient)
-                {
-                    PhotonNetwork.CurrentRoom.IsOpen = false;
-                }
+                PhotonNetwork.CurrentRoom.IsOpen = false;
             }
         }
     }
 
     public void ChampionSelectTimer()
     {
+        timer.text = Mathf.FloorToInt(timeToStart - waitingTimer).ToString();
+        
         if (waitingTimer >= timeToStart)
         {
             StartGame();

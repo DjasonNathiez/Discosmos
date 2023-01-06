@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class CenterEffects : MonoBehaviour
 {
+    public Vegas_Black_Hole head;
+
     [SerializeField] private float succForce;
     [SerializeField] private float damages;
     [SerializeField] private float tickDamage;
@@ -34,40 +36,44 @@ public class CenterEffects : MonoBehaviour
             foreach (var rb in _rigidbodies)
             {
                 rb.AddForce((transform.position - rb.transform.position).normalized * (succForce * Time.deltaTime));
-                var playerManager = rb.transform.parent.GetComponent<PlayerManager>();
-                if(playerManager !=  null) playerManager.DealDamage(new int[]{playerManager.photonView.ViewID},(int)damages);
-                Debug.DrawLine(transform.position, rb.transform.position, Color.blue);
+                
+                if(hitID.Count != 0) head.sender.DealDamage(hitID.ToArray(),head.damage);
             }
         }
     }
     
     private void OnTriggerEnter(Collider other)
     {
-        if(other.GetComponent<PlayerController>())
+        PlayerController controller = other.GetComponent<PlayerController>();
+        
+        if(controller)
         {
-            _rigidbody = other.GetComponent<PlayerController>().GetComponent<Rigidbody>();
+            _rigidbody = controller.GetComponent<Rigidbody>();
+            
             if (_rigidbody != null)
             {
                 _rigidbodies.Add(_rigidbody);
             }
+            
+            hitID.Add(controller.manager.photonView.ViewID);
         }
     }
     
     private void OnTriggerExit(Collider other)
     {
-        if(other.GetComponent<PlayerController>())
+        
+        PlayerController controller = other.GetComponent<PlayerController>();
+
+        if(controller)
         {
-            _rigidbody = other.GetComponent<PlayerController>().GetComponent<Rigidbody>();
+            _rigidbody = controller.GetComponent<Rigidbody>();
+            
             if (_rigidbody != null)
             {
                 _rigidbodies.Remove(_rigidbody);
             }
+            
+            hitID.Remove(controller.manager.photonView.ViewID);
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, radius);
     }
 }

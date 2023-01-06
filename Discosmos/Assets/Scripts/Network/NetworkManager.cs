@@ -116,8 +116,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          GameObject playerTest = PhotonNetwork.Instantiate(player.name, Vector3.zero, quaternion.identity);
          
          playerTest.GetPhotonView().Controller.NickName = GameAdministrator.instance.username;
-         playerTest.GetComponent<PlayerManager>().championDataSo = testChamp;
-         playerTest.GetComponent<PlayerManager>().Initialize();
+         playerTest.GetComponent<PlayerManager>().currentData = testChamp;
+         playerTest.GetComponent<PlayerManager>().Initialize(Character.MIMI);
          
          PhotonNetwork.LoadLevel(sceneTestName);
       }
@@ -323,7 +323,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          {"RoomPrivacy", currentPlayerRoom.roomPrivacy.ToString()}
       };
 
-      PhotonNetwork.RaiseEvent(1, options, raiseOption, SendOptions.SendReliable);
+      PhotonNetwork.RaiseEvent(200, options, raiseOption, SendOptions.SendReliable);
       
       SwitchRoom(roomName);
    }
@@ -371,7 +371,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
          {"PhotonID", GameAdministrator.instance.localViewID}
       };
 
-      PhotonNetwork.RaiseEvent(2, options, raiseOption, SendOptions.SendReliable);
+      PhotonNetwork.RaiseEvent(201, options, raiseOption, SendOptions.SendReliable);
       
       SwitchRoom(roomName);
    }
@@ -435,6 +435,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
    public void OnEvent(EventData photonEvent)
    {
+      /*
       if (photonEvent.Code == 200)
       {
          Hashtable options = (Hashtable)photonEvent.CustomData;
@@ -448,6 +449,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
          UpdateRoomList((string)options["RoomName"], (string)options["Username"], (int)options["PhotonID"]);
       }
+      */
    }
 
    public void SwitchRoom(string roomName)

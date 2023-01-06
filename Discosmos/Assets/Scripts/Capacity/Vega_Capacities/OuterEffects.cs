@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class OuterEffects : MonoBehaviour
 {
+    public Vegas_Black_Hole head;
+    
     [SerializeField] private float succForce;
     [SerializeField] private float slowForce;
     [SerializeField] private float radius;
@@ -55,11 +57,5 @@ public class OuterEffects : MonoBehaviour
                 _rigidbodies.Remove(_rigidbody);
             }
         }
-    }
-    
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, radius);
     }
 }
