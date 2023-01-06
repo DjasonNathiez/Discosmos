@@ -15,12 +15,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
     [HideInInspector] public Transform canvas;
     [HideInInspector] public GameObject cam;
     [HideInInspector] public IPlayer iplayer;
-    [HideInInspector] public Enums.Teams currentTeam;
+    public Enums.Teams currentTeam;
     public ChampionDataSO championDataSo;
     [HideInInspector] public PlayerAnimationScript playerAnimationScript;
     [HideInInspector] public CameraController cameraController;
     [HideInInspector] public GameObject modelBody;
     public Transform fogOfWarRenderer;
+    public GameObject mimiModel;
+    public GameObject vegaModel;
+    public PlayerAnimationScript mimiAnimScript;
+    public PlayerAnimationScript vegaAnimScript;
+    [HideInInspector] public PlayerAnimationScript currentAnimationScript;
     
     [Header("Stats and UI")]
     private bool overwriteOnline;
@@ -199,10 +204,111 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         PhotonNetwork.RaiseEvent(RaiseEvent.KnockBackTarget, data, raiseEventOptions, SendOptions.SendReliable);
     }
 
+    public void SendPlayerCharacter(int characterID)
+    {
+        Hashtable data = new Hashtable()
+        {
+            { "ID", photonView.ViewID },
+            { "CharacterID", characterID }
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.SetCharacter, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
+    public void SendPlayerTeam(int team)
+    {
+        Hashtable data = new Hashtable()
+        {
+            { "ID", photonView.ViewID },
+            { "TeamID", team }
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.SetTeam, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
+    public void ApplyCharacterChoice(Enums.Character character)
+    {
+        switch (character)
+        {
+            case Enums.Character.Mimi:
+                vegaModel.SetActive(false);
+                mimiModel.SetActive(true);
+                currentAnimationScript = mimiAnimScript;
+                break;
+            
+            case Enums.Character.Vega:
+                mimiModel.SetActive(false);
+                vegaModel.SetActive(true);
+                currentAnimationScript = vegaAnimScript;
+                break;
+        }
+    }
+
+    public void ApplyTeamChoice(Enums.Teams team)
+    {
+        SetTeam(team);
+    }
+    
     public void OnEvent(EventData photonEvent)
     {
         Hashtable data = (Hashtable)photonEvent.CustomData;
         if (data == null) return;
+
+            Debug.Log((int)data["ID"]);
+            
+            if (photonEvent.Code == RaiseEvent.SetCharacter)
+            {
+                int characterID = (int)data["CharacterID"];
+                int playerID = (int)data["ID"];
+
+                Debug.Log(photonView.ViewID + " + " + playerID);
+
+                if(photonView.ViewID != playerID) return;
+                
+                switch (characterID)
+                {
+                    case 0 :
+                        //MIMI
+                        ApplyCharacterChoice(Enums.Character.Mimi);
+                        Debug.Log(photonView.ViewID + " selected Mimi");
+                        break;
+                    
+                    case 1:
+                        //VEGA
+                        ApplyCharacterChoice(Enums.Character.Vega);
+                        Debug.Log(photonView.ViewID + " selected Vega");
+                        break;
+                }
+                return;
+            }
+            
+            if (photonEvent.Code == RaiseEvent.SetTeam)
+            {
+                int teamID = (int)data["TeamID"];
+                int playerID = (int)data["ID"];
+
+                Debug.Log(photonView.ViewID + " + " + playerID);
+
+                if(photonView.ViewID != playerID) return;
+                
+                switch (teamID)
+                {
+                    case 0:
+                        ApplyTeamChoice(Enums.Teams.Green);
+                        Debug.Log(photonView.ViewID + " selected team Green");
+                        break;
+                    case 1:
+                        ApplyTeamChoice(Enums.Teams.Pink);
+                        Debug.Log(photonView.ViewID + " selected team Pink");
+                        break;
+                }
+                return;
+            }
+
         int[] targets = (int[])data["TargetsID"];
         if(targets == null) return;
         
@@ -294,7 +400,26 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
     public void Respawn()
     {
         currentHealth = maxHealth;
-        PlayerController.transform.position = FindObjectOfType<LevelManager>().spawnPoint.position;
+        LevelManager levelManager = FindObjectOfType<LevelManager>();
+
+        if (levelManager.gameStarted)
+        {
+            switch (currentTeam)
+            {
+                case Enums.Teams.Green:
+                    PlayerController.transform.position = levelManager.spawnPointGreenA.position;
+                    break;
+                case Enums.Teams.Pink:
+                    PlayerController.transform.position = levelManager.spawnPointPinkA.position;
+                    break;
+            }
+        }
+        else
+        {
+            PlayerController.transform.position = levelManager.hubSpawnPoint.position;
+
+        }
+        
         PlayerController.agent.ResetPath();
     }
 
