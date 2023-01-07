@@ -10,13 +10,15 @@ using UnityEngine.AI;
 public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeamable
 {
     [HideInInspector] public string username;
-    [HideInInspector] public PlayerController PlayerController;
+    public PlayerController PlayerController;
     [HideInInspector] public GameObject hud;
     [HideInInspector] public Transform canvas;
     [HideInInspector] public GameObject cam;
     [HideInInspector] public IPlayer iplayer;
     public Enums.Teams currentTeam;
-    public ChampionDataSO championDataSo;
+    public ChampionDataSO mimiData;
+    public ChampionDataSO vegaData;
+    [HideInInspector] public ChampionDataSO currentData;
     [HideInInspector] public PlayerAnimationScript playerAnimationScript;
     [HideInInspector] public CameraController cameraController;
     [HideInInspector] public GameObject modelBody;
@@ -92,37 +94,36 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         }
     }
 
-    public void Initialize()
+    public void Initialize(Character character)
     {
         canMove = true;
-
+        
         #region DATA
 
-        if (championDataSo)
+        switch (character)
         {
-            //DATA
+            case Character.MIMI:
+                currentData = mimiData;
+                mimiModel.SetActive(true);
+                vegaModel.SetActive(false);
+                
+                SendPlayerCharacter(0);
+                SendPlayerTeam(0);
+                break;
             
-            //Movement
-            currentSpeed = championDataSo.baseSpeed;
-            baseSpeed = championDataSo.baseSpeed;
-            speedCurve = championDataSo.speedCurve;
-            slowDownCurve = championDataSo.slowDownCurve;
-
-            //Attack
-            baseDamage = championDataSo.baseDamage;
-            damageMultiplier = championDataSo.damageMultiplier;
-            baseAttackSpeed = championDataSo.baseAttackSpeed;
-            attackRange = championDataSo.attackRange;
-
-            //CAPACITIES
-            PlayerController.ActiveCapacity1SO = championDataSo.ActiveCapacity1So;
-            PlayerController.ActiveCapacity2SO = championDataSo.ActiveCapacity2So;
-            PlayerController.UltimateCapacitySO = championDataSo.UltimateCapacitySo;
+            case Character.VEGA:
+                currentData = vegaData;
+                mimiModel.SetActive(false);
+                vegaModel.SetActive(true);
+                
+                SendPlayerCharacter(1);
+                SendPlayerTeam(0);
+                break;
         }
+        
+        SetData();
 
         #endregion
-        
-       
 
         #region PHOTON
 
@@ -140,6 +141,31 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         playerAnimationScript.SetTeamModel(currentTeam);
     }
 
+
+    public void SetData()
+    {
+        if (currentData)
+        {
+            //DATA
+            //Movement
+            currentSpeed = currentData.baseSpeed;
+            baseSpeed = currentData.baseSpeed;
+            speedCurve = currentData.speedCurve;
+            slowDownCurve = currentData.slowDownCurve;
+
+            //Attack
+            baseDamage = currentData.baseDamage;
+            damageMultiplier = currentData.damageMultiplier;
+            baseAttackSpeed = currentData.baseAttackSpeed;
+            attackRange = currentData.attackRange;
+
+            //CAPACITIES
+            PlayerController.ActiveCapacity1SO = currentData.ActiveCapacity1So;
+            PlayerController.ActiveCapacity2SO = currentData.ActiveCapacity2So;
+            PlayerController.UltimateCapacitySO = currentData.UltimateCapacitySo;
+        }
+    }
+    
     public void SetPlayerActiveState(bool isActive)
     {
         playerAnimationScript.SetTeamModel(currentTeam);
@@ -155,11 +181,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
     {
         fogOfWarRenderer.position = PlayerController.transform.position;
         PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
-    }
-
-    private void OnDestroy()
-    {
-        Debug.Log("Have been destroy");
     }
 
     public void DealDamage(int[] targetsID, int damageAmount)
@@ -238,19 +259,25 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                 vegaModel.SetActive(false);
                 mimiModel.SetActive(true);
                 currentAnimationScript = mimiAnimScript;
+                currentAnimationScript.SetTeamModel(currentTeam);
                 break;
             
             case Enums.Character.Vega:
                 mimiModel.SetActive(false);
                 vegaModel.SetActive(true);
                 currentAnimationScript = vegaAnimScript;
+                currentAnimationScript.SetTeamModel(currentTeam);
                 break;
         }
+        
+        SetData();
+        PlayerController.InitCapacities();
     }
 
     public void ApplyTeamChoice(Enums.Teams team)
     {
         SetTeam(team);
+        currentAnimationScript.SetTeamModel(team);
     }
     
     public void OnEvent(EventData photonEvent)
@@ -258,14 +285,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         Hashtable data = (Hashtable)photonEvent.CustomData;
         if (data == null) return;
 
-            Debug.Log((int)data["ID"]);
-            
-            if (photonEvent.Code == RaiseEvent.SetCharacter)
+        if (photonEvent.Code == RaiseEvent.SetCharacter)
             {
                 int characterID = (int)data["CharacterID"];
                 int playerID = (int)data["ID"];
-
-                Debug.Log(photonView.ViewID + " + " + playerID);
 
                 if(photonView.ViewID != playerID) return;
                 
@@ -274,13 +297,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                     case 0 :
                         //MIMI
                         ApplyCharacterChoice(Enums.Character.Mimi);
-                        Debug.Log(photonView.ViewID + " selected Mimi");
                         break;
                     
                     case 1:
                         //VEGA
                         ApplyCharacterChoice(Enums.Character.Vega);
-                        Debug.Log(photonView.ViewID + " selected Vega");
                         break;
                 }
                 return;
@@ -291,19 +312,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                 int teamID = (int)data["TeamID"];
                 int playerID = (int)data["ID"];
 
-                Debug.Log(photonView.ViewID + " + " + playerID);
-
                 if(photonView.ViewID != playerID) return;
                 
                 switch (teamID)
                 {
                     case 0:
                         ApplyTeamChoice(Enums.Teams.Green);
-                        Debug.Log(photonView.ViewID + " selected team Green");
                         break;
                     case 1:
                         ApplyTeamChoice(Enums.Teams.Pink);
-                        Debug.Log(photonView.ViewID + " selected team Pink");
                         break;
                 }
                 return;
@@ -446,4 +463,10 @@ public enum Capacities
     MIMI_Ultimate,
     VEGA_Blackhole,
     VEGA_Ultimate
+}
+
+public enum Character
+{
+    MIMI,
+    VEGA
 }

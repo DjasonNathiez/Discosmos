@@ -52,6 +52,11 @@ public class PlayerAnimationScript : MonoBehaviour
         playerController.OnCapacityPerformed(Capacities.MIMI_Laser, laserHitBox.idOnIt);
     }
 
+    public void CallBlackHoleVFX()
+    {
+        playerController.OnCapacityPerformed(Capacities.VEGA_Blackhole);
+    }
+
     public void CallMimiAttackFX()
     {
         autoAttackFX.Play();

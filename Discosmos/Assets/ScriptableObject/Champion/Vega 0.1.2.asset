@@ -94,6 +94,6 @@ MonoBehaviour:
   baseAttackSpeed: 2
   attackRange: 0.6
   PassiveCapacitySo: {fileID: 0}
-  ActiveCapacity1So: {fileID: 11400000, guid: 5c3aea6a65835584f804ac84114ecffa, type: 2}
-  ActiveCapacity2So: {fileID: 11400000, guid: 5c3aea6a65835584f804ac84114ecffa, type: 2}
-  UltimateCapacitySo: {fileID: 11400000, guid: 5c3aea6a65835584f804ac84114ecffa, type: 2}
+  ActiveCapacity1So: {fileID: 11400000, guid: f103f33dc7283494a9220187d477bb03, type: 2}
+  ActiveCapacity2So: {fileID: 11400000, guid: f103f33dc7283494a9220187d477bb03, type: 2}
+  UltimateCapacitySo: {fileID: 11400000, guid: f103f33dc7283494a9220187d477bb03, type: 2}

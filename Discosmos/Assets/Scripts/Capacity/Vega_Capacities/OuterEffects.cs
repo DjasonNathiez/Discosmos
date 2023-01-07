@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class OuterEffects : MonoBehaviour
 {
+    public Vegas_Black_Hole head;
+    
     [SerializeField] private float succForce;
     [SerializeField] private float slowForce;
     [SerializeField] private float radius;
@@ -35,9 +37,11 @@ public class OuterEffects : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if(other.GetComponent<PlayerController>())
+        PlayerManager manager = other.GetComponent<PlayerManager>();
+        
+        if(manager && manager != head.sender)
         {
-            _rigidbody = other.GetComponent<PlayerController>().GetComponent<Rigidbody>();
+            _rigidbody = manager.PlayerController.GetComponent<Rigidbody>();
             if (_rigidbody != null)
             {
                 _rigidbodies.Add(_rigidbody);
@@ -47,19 +51,16 @@ public class OuterEffects : MonoBehaviour
     
     private void OnTriggerExit(Collider other)
     {
-        if(other.GetComponent<PlayerController>())
+        
+        PlayerManager manager = other.GetComponent<PlayerManager>();
+
+        if(manager && manager != head.sender)
         {
-            _rigidbody = other.GetComponent<PlayerController>().GetComponent<Rigidbody>();
+            _rigidbody = manager.PlayerController.GetComponent<Rigidbody>();
             if (_rigidbody != null)
             {
                 _rigidbodies.Remove(_rigidbody);
             }
         }
-    }
-    
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, radius);
     }
 }
