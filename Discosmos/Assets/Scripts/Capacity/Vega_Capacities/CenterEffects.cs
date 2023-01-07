@@ -18,10 +18,12 @@ public class CenterEffects : MonoBehaviour
     private SphereCollider _collider;
     [SerializeField] private List<Rigidbody> _rigidbodies;
     private Rigidbody _rigidbody;
-    private List<int> hitID = new List<int>();
+    private List<int> hitID;
     
     private void Start()
     {
+        hitID = new List<int>();
+        
         _collider = GetComponent<SphereCollider>();
         _collider.isTrigger = true;
         _rigidbodies = new List<Rigidbody>();

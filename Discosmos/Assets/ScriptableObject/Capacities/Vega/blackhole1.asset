@@ -16,6 +16,6 @@ MonoBehaviour:
   index: 2
   castTime: 0
   cooldownTime: 5
+  durationBase: 3
+  speedBase: 4
   capacitiesHitBox: {fileID: 0}
-  duration: 3
-  speed: 2
