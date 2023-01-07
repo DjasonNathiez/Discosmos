@@ -466,7 +466,7 @@ public class PlayerController : MonoBehaviour
         
         if (Input.GetKeyDown(activeCapacity1) && !ActiveCapacity1.onCooldown)
         {
-            mimiLaserVisualization.SetActive(true);
+            mimiLaserVisualization.SetActive(true); 
         }
         
         if (Input.GetKey(activeCapacity1))
@@ -480,12 +480,29 @@ public class PlayerController : MonoBehaviour
             {
                 OnExitRamp();
             }
+            
             StopMovement();
             
-            mimiLaserVisualization.SetActive(false);
+            //Laser Mimi
             transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
             manager.isCasting = true;
             ActiveCapacity1.Cast();
+
+            if (manager.currentAnimationScript == manager.mimiAnimScript)
+            {
+                Debug.Log("laser performed");
+                mimiLaserVisualization.SetActive(false);
+            }
+            else
+            {
+                Debug.Log("Black hole performed");
+                vegaBlackHoleVisual.SetActive(true);
+                vegaBlackHoleVisual.transform.position = this.transform.position;
+                BlackHoleCapacitySO blackHoleData = (BlackHoleCapacitySO) ActiveCapacity1SO;
+                int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                
+                blackHole.SetBlackHole(this.transform.forward,  blackHoleData.duration, blackHoleData.speed, manager, damage);
+            }
         }
 
         if (Input.GetKeyUp(activeCapacity2))
@@ -508,7 +525,13 @@ public class PlayerController : MonoBehaviour
                 break;
             
             case Capacities.VEGA_Blackhole:
-                OnCapacityPerformed(Capacities.VEGA_Blackhole);
+                vegaBlackHoleVisual.SetActive(true);
+                vegaBlackHoleVisual.transform.position = this.transform.position;
+                BlackHoleCapacitySO blackHoleData = (BlackHoleCapacitySO) ActiveCapacity1SO;
+                int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                
+                transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
+                blackHole.SetBlackHole(transform.forward,  blackHoleData.duration, blackHoleData.speed, manager, damage);
                 break;
         }
     }

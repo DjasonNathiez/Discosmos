@@ -46,7 +46,7 @@ public class CenterEffects : MonoBehaviour
     {
         PlayerController controller = other.GetComponent<PlayerController>();
         
-        if(controller)
+        if(controller  && controller.manager != head.sender)
         {
             _rigidbody = controller.GetComponent<Rigidbody>();
             
@@ -64,7 +64,7 @@ public class CenterEffects : MonoBehaviour
         
         PlayerController controller = other.GetComponent<PlayerController>();
 
-        if(controller)
+        if(controller && controller.manager != head.sender)
         {
             _rigidbody = controller.GetComponent<Rigidbody>();
             
