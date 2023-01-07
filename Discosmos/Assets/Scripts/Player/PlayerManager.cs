@@ -309,6 +309,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         {
             int input = (int) data["Input"];
             int sender = (int) data["Sender"];
+
+            if (input == 1)
+            {
+                PhotonNetwork.GetPhotonView(sender).gameObject.GetComponent<PlayerManager>().PlayerController.LoadBlackHole();
+            }
         }
         
         if (photonEvent.Code == RaiseEvent.SetCharacter)

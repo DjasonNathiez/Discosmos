@@ -495,12 +495,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                Debug.Log("Black hole performed");
-                vegaBlackHoleVisual.SetActive(true);
-                vegaBlackHoleVisual.transform.position = this.transform.position;
-                int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
-                
-                blackHole.SetBlackHole(transform.forward,  ActiveCapacity1SO.durationBase, ActiveCapacity1SO.speedBase, manager, damage);
+                manager.SendInput(manager.photonView.ViewID, 1);
             }
         }
 
@@ -513,6 +508,16 @@ public class PlayerController : MonoBehaviour
         {
             UltimateCapacity.Cast();
         }
+    }
+
+    public void LoadBlackHole()
+    {
+        Debug.Log("Black hole performed");
+        vegaBlackHoleVisual.SetActive(true);
+        vegaBlackHoleVisual.transform.position = this.transform.position;
+        int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                
+        blackHole.SetBlackHole(transform.forward,  ActiveCapacity1SO.durationBase, ActiveCapacity1SO.speedBase, manager, damage);
     }
 
     void OnCapacityActive(Capacities capacity)
