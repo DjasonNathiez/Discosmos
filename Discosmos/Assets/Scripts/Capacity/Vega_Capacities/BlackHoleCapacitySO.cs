@@ -3,9 +3,6 @@ using UnityEngine;
 [CreateAssetMenu(order = 0, menuName = "Capacities/Active/Vega/Black Hole", fileName = "new Black Hole")]
 public class BlackHoleCapacitySO : ActiveCapacitySO
 {
-    public float duration;
-    public float speed;
-    
     public override void GetActiveCapacity()
     {
         activeCapacity = new BlackHoleCapacity(); 

@@ -183,6 +183,19 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         PlayerController.myTargetable.UpdateUI(true,true,currentHealth, maxHealth);
     }
 
+    public void SendInput(int sendID, int inputSend)
+    {
+        Hashtable data = new Hashtable()
+        {
+            {"Sender", sendID},
+            {"Input", inputSend}
+        };
+        
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All, CachingOption = EventCaching.AddToRoomCacheGlobal};
+
+        PhotonNetwork.RaiseEvent(RaiseEvent.Input, data, raiseEventOptions, SendOptions.SendReliable);
+    }
+
     public void DealDamage(int[] targetsID, int damageAmount)
     {
         Hashtable data = new Hashtable
@@ -253,6 +266,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
 
     public void ApplyCharacterChoice(Enums.Character character)
     {
+        
         switch (character)
         {
             case Enums.Character.Mimi:
@@ -260,6 +274,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                 mimiModel.SetActive(true);
                 currentAnimationScript = mimiAnimScript;
                 currentAnimationScript.SetTeamModel(currentTeam);
+                currentData = mimiData;
+                
+                SetData();
+                PlayerController.InitCapacities();
                 break;
             
             case Enums.Character.Vega:
@@ -267,11 +285,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                 vegaModel.SetActive(true);
                 currentAnimationScript = vegaAnimScript;
                 currentAnimationScript.SetTeamModel(currentTeam);
+                currentData = vegaData;
+                
+                SetData();
+                PlayerController.InitCapacities();
                 break;
         }
         
-        SetData();
-        PlayerController.InitCapacities();
     }
 
     public void ApplyTeamChoice(Enums.Teams team)
@@ -285,8 +305,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
         Hashtable data = (Hashtable)photonEvent.CustomData;
         if (data == null) return;
 
+        if (photonEvent.Code == RaiseEvent.Input)
+        {
+            int input = (int) data["Input"];
+            int sender = (int) data["Sender"];
+        }
+        
         if (photonEvent.Code == RaiseEvent.SetCharacter)
-            {
+        {
                 int characterID = (int)data["CharacterID"];
                 int playerID = (int)data["ID"];
 
@@ -305,10 +331,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                         break;
                 }
                 return;
-            }
+        }
             
-            if (photonEvent.Code == RaiseEvent.SetTeam)
-            {
+        if (photonEvent.Code == RaiseEvent.SetTeam)
+        {
                 int teamID = (int)data["TeamID"];
                 int playerID = (int)data["ID"];
 
@@ -324,7 +350,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IOnEventCallback, ITeama
                         break;
                 }
                 return;
-            }
+        }
 
         int[] targets = (int[])data["TargetsID"];
         if(targets == null) return;
