@@ -129,8 +129,8 @@ Material:
     - _Ramp_Smoothness: 0
     - _ReceiveShadows: 1
     - _Rimlight: 1
-    - _Rimlight_Fresnel: 0
-    - _Rimlight_Intensity: 1.99
+    - _Rimlight_Fresnel: 9.71
+    - _Rimlight_Intensity: 1
     - _SampleGI: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
