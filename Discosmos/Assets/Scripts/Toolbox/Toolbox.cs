@@ -2,12 +2,28 @@ namespace Toolbox.Variable
 {
     public static class RaiseEvent
     {
+        //PlayerSetup
+        public static byte SetCharacter = 1;
+        public static byte SetTeam = 2;
+        
+        //Input
+        public static byte Input = 10;
+
+        
         //BEGIN AT 100
         public static byte DamageTarget = 100;
         public static byte HealTarget = 101;
         public static byte Death = 102;
         public static byte HitStopTarget = 103;
         public static byte KnockBackTarget = 104;
+    }
+
+    public static class InputID
+    {
+        public static int Capacity1 = 1;
+        public static int Capacity2 = 2;
+        public static int CapacityUltimate= 3;
+
     }
     
     public static class NetworkDelegate
@@ -36,6 +52,12 @@ namespace Toolbox.Variable
     
     public static class Enums
     {
+        public enum Character
+        {
+            Mimi,
+            Vega
+        }
+        
         public enum RoomPrivacy
         {
             Open,

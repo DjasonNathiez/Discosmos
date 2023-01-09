@@ -97,6 +97,7 @@ MonoBehaviour:
   currentShield: 0
   maxHealth: 100
   currentWaypoint: 0
+  targets: []
   target: {fileID: 0}
   loopMode: 1
   shaking: 0

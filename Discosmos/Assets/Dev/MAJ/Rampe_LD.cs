@@ -25,10 +25,13 @@ public class Rampe_LD : MonoBehaviour
 
     [Header("Tool")] 
     [SerializeField] private bool generateRail;
+    [SerializeField] private bool generateRessources;
     public bool addNewPoint;
     public bool removeLastPoint;
     [SerializeField] private GameObject railPoint;
     [SerializeField] private bool visualizeExitDirections;
+    [SerializeField] private bool exitDirectionAuto = true;
+    [SerializeField] private float exitDirectionSize = 5;
 
     [Header("Gameplay")] 
     [SerializeField] private bool playerOnRamp;
@@ -45,6 +48,11 @@ public class Rampe_LD : MonoBehaviour
     [SerializeField] private float transitionDelay;
     [SerializeField] public Vector3 exitDirectionFirstNode = Vector3.right;
     [SerializeField] public Vector3 exitDirectionLastNode = Vector3.left;
+
+    [Header("Ressources")] 
+    [SerializeField] private GameObject ressource;
+    [SerializeField] private int ressourcesNb;
+    private List<GameObject> ressources;
 
     [Header("Graphics")] 
     [SerializeField] private Material material;
@@ -166,11 +174,23 @@ public class Rampe_LD : MonoBehaviour
             RemoveLastPoint();
             removeLastPoint = false;
         }
+        
+        if (generateRessources)
+        {
+            GenerateRessources();
+            generateRessources = false;
+        }
 
         if (visualizeExitDirections)
         {
-            Gizmos.DrawLine(distancedNodes[0],distancedNodes[0]+exitDirectionFirstNode);
-            Gizmos.DrawLine(distancedNodes[distancedNodes.Count-1],distancedNodes[distancedNodes.Count-1]+exitDirectionLastNode);
+            Gizmos.DrawRay(distancedNodes[0],exitDirectionFirstNode.normalized*exitDirectionSize);
+            Gizmos.DrawRay(distancedNodes[distancedNodes.Count-1],exitDirectionLastNode.normalized*exitDirectionSize);
+        }
+
+        if (exitDirectionAuto)
+        {
+            exitDirectionFirstNode = (distancedNodes[0] - distancedNodes[1]).normalized*exitDirectionSize;
+            exitDirectionLastNode = (distancedNodes[distancedNodes.Count - 1] - distancedNodes[distancedNodes.Count - 2]).normalized*exitDirectionSize;
         }
     }
 
@@ -190,6 +210,15 @@ public class Rampe_LD : MonoBehaviour
         DestroyImmediate(railPoints[railPoints.Count - 1].point.gameObject);
         railPoints.RemoveAt(railPoints.Count - 1);
     }
+    
+    void GenerateRessources()
+    {
+        for (int i = 0; i < ressourcesNb; i++)
+        {
+            
+        }
+    }
+
 
     Mesh GenerateRail()
     {

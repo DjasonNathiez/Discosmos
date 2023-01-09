@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -28,7 +27,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback, IT
     private bool isMoving = false;
     private bool isAttacking = false;
         
-    private List<GameObject> entitiesInRange = new List<GameObject>();
+    public List<Targetable> targets = new List<Targetable>();
     public GameObject target;
     private Vector3 targetPosition;
     
@@ -130,28 +129,32 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback, IT
             { 
                 ApplyKnockBack();
             }
-            
-            //while there are no GameObjects with the team != this.team in the entitiesInRange list and the currentWaypoint is not the last waypoint move to the next waypoint else move In Range and attack
-            if (entitiesInRange.Count == 0 && currentWaypoint < _waypoints.Length)
+
+            FindTargets();
+
+            if (targets.Count == 0)
             {
-                MoveToWaypoint();
-            }
-            else if (entitiesInRange.Count == 0 && currentWaypoint == _waypoints.Length)
-            {
-                if (loopMode)
+                if (currentWaypoint < _waypoints.Length)
                 {
-                    currentWaypoint = 0;
                     MoveToWaypoint();
                 }
-                else
+                else if (currentWaypoint == _waypoints.Length)
                 {
-                    agent.isStopped = true;
+                    if (loopMode)
+                    {
+                        currentWaypoint = 0;
+                        MoveToWaypoint();
+                    }
+                    else
+                    {
+                        agent.isStopped = true;
+                    }
                 }
             }
             else
             {
-                MoveInRange();
-            }   
+                AttackTarget();
+            }
         }
     }
 
@@ -163,6 +166,7 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback, IT
     private void MoveToWaypoint()
     {
         agent.SetDestination(_waypoints[currentWaypoint].position);
+        agent.isStopped = false;
         if (Vector3.SqrMagnitude(new Vector3(transform.position.x,0,transform.position.z) - new Vector3(_waypoints[currentWaypoint].position.x,0,_waypoints[currentWaypoint].position.z)) < 1f)
         {
             currentWaypoint++;
@@ -170,25 +174,39 @@ public class MinionsController : MonoBehaviourPunCallbacks, IOnEventCallback, IT
 
     }
     
-    private void MoveInRange()
+    private void AttackTarget()
+    {
+        agent.isStopped = true;
+        transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(new Vector3((targets[0].targetableBody.position - transform.position).x,0,(targets[0].targetableBody.position - transform.position).z)),5*Time.deltaTime);
+    }
+
+    public void FindTargets()
     {
         colliders = Physics.OverlapSphere(transform.position, range);
         foreach (var collider in colliders)
         {
-            if (collider.gameObject.GetComponent<Team>() != null)
+            Targetable targetable = collider.GetComponent<Targetable>();
+
+            if (targetable && !targets.Contains(targetable))
             {
-                if (collider.gameObject.GetComponent<Team>().TeamID != 0)
+                ITeamable teamable = targetable.masterPhotonView.GetComponent<ITeamable>();
+                if (teamable != null && teamable.CurrentTeam() != CurrentTeam())
                 {
-                    target = collider.gameObject;
-                    targetPosition = target.transform.position;
-                    agent.SetDestination(targetPosition);
-                    if (Vector3.Distance(transform.position, targetPosition) < 1f)
-                    {
-                        Attack();
-                    }
-                }
+                    targets.Add(targetable);
+                }    
             }
         }
+
+        
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (Vector3.SqrMagnitude(targets[i].targetableBody.position - transform.position) > range * range)
+            {
+                targets.RemoveAt(i);
+                break;
+            }
+        }
+        
     }
     
     public void InitializeHitStop(float time,float force)

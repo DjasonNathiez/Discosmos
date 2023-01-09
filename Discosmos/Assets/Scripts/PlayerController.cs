@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
@@ -22,12 +23,12 @@ public class PlayerController : MonoBehaviour
     [Header("Capacities")]
     
     [HideInInspector]public PassiveCapacitySO PassiveCapacitySO;
-    [HideInInspector]public ActiveCapacitySO ActiveCapacity1SO;
+    public ActiveCapacitySO ActiveCapacity1SO;
     [HideInInspector]public ActiveCapacitySO ActiveCapacity2SO;
     [HideInInspector]public ActiveCapacitySO UltimateCapacitySO;
     
     private PassiveCapacity PassiveCapacity;
-    private ActiveCapacity ActiveCapacity1;
+    public ActiveCapacity ActiveCapacity1;
     private ActiveCapacity ActiveCapacity2;
     private ActiveCapacity UltimateCapacity;
 
@@ -35,6 +36,8 @@ public class PlayerController : MonoBehaviour
     public CastEnded OnCastEnded;
 
     public GameObject mimiLaserVisualization;
+    public GameObject vegaBlackHoleVisual;
+    public Vegas_Black_Hole blackHole;
 
     [Header("Auto Attack")] 
     
@@ -78,15 +81,22 @@ public class PlayerController : MonoBehaviour
    private float speedPadLerp = 1;
 
     [Header("Animation")] 
-    [HideInInspector] public Animator animator;
+    public Animator animatorMimi;
+    public Animator animatorVega;
     [SerializeField] private GameObject sparkles;
 
     [Header("UI")] 
     private Image speedJauge;
 
+
     #region INITIALIZATION
 
     private void OnEnable()
+    {
+        InitCapacities();
+    }
+
+    public void InitCapacities()
     {
         OnCastEnded += OnCapacityActive;
         
@@ -157,8 +167,14 @@ public class PlayerController : MonoBehaviour
             myTargetable.UpdateUI(false,false,0,0,true,Mathf.Lerp(myTargetable.healthBar.speedFill.fillAmount,manager.force,Time.deltaTime * 5f));
             manager.currentSpeed = manager.speedCurve.Evaluate(manager.force) + manager.baseSpeed;
             agent.speed = manager.currentSpeed;
-            animator.SetFloat("Speed",manager.force*1.5f+1);
-
+            if (manager.currentData == manager.mimiData)
+            {
+                animatorMimi.SetFloat("Speed",manager.force*1.5f+1);
+            }
+            else
+            {
+                animatorVega.SetFloat("Speed",manager.force*1.5f+1);   
+            }
             SpeedPadFunction();
         }
     }
@@ -297,9 +313,14 @@ public class PlayerController : MonoBehaviour
             {
                 if (manager.CurrentTeam() == teamable.CurrentTeam()) return null;
             }
-            Debug.Log("OUI OK " + targetable.bodyPhotonID);
-            animator.SetInteger("Target",targetable.bodyPhotonID);
-            Debug.Log("OUI OK DACC " + animator.GetInteger("Target"));
+            if (manager.currentData == manager.mimiData)
+            {
+                animatorMimi.SetInteger("Target",targetable.bodyPhotonID);   
+            }
+            else
+            {
+                animatorVega.SetInteger("Target",targetable.bodyPhotonID);   
+            }
             return targetable;
         }
         return null;
@@ -367,7 +388,11 @@ public class PlayerController : MonoBehaviour
             
             if(!manager.isCasting) transform.rotation = Quaternion.LookRotation(cible.targetableBody.position - transform.position);
 
-            if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            if (manager.currentData == manager.mimiData && animatorMimi.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            {
+                isAttacking = false;
+            }
+            else if (manager.currentData == manager.vegaData && animatorVega.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
             {
                 isAttacking = false;
             }
@@ -441,7 +466,7 @@ public class PlayerController : MonoBehaviour
         
         if (Input.GetKeyDown(activeCapacity1) && !ActiveCapacity1.onCooldown)
         {
-            mimiLaserVisualization.SetActive(true);
+            mimiLaserVisualization.SetActive(true); 
         }
         
         if (Input.GetKey(activeCapacity1))
@@ -455,12 +480,23 @@ public class PlayerController : MonoBehaviour
             {
                 OnExitRamp();
             }
+            
             StopMovement();
             
-            mimiLaserVisualization.SetActive(false);
+            //Laser Mimi
             transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
             manager.isCasting = true;
             ActiveCapacity1.Cast();
+
+            if (manager.currentAnimationScript == manager.mimiAnimScript)
+            {
+                Debug.Log("laser performed");
+                mimiLaserVisualization.SetActive(false);
+            }
+            else
+            {
+                manager.SendInput(manager.photonView.ViewID, 1);
+            }
         }
 
         if (Input.GetKeyUp(activeCapacity2))
@@ -474,32 +510,53 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void LoadBlackHole()
+    {
+        Debug.Log("Black hole performed");
+        vegaBlackHoleVisual.SetActive(true);
+        vegaBlackHoleVisual.transform.position = this.transform.position;
+        int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                
+        blackHole.SetBlackHole(transform.forward,  ActiveCapacity1SO.durationBase, ActiveCapacity1SO.speedBase, manager, damage);
+    }
+
     void OnCapacityActive(Capacities capacity)
     {
         switch (capacity)
         {
             case Capacities.MIMI_Laser:
-                Debug.Log("Animate");
                 ChangeAnimation(6);
+                break;
+            
+            case Capacities.VEGA_Blackhole:
+                vegaBlackHoleVisual.SetActive(true);
+                vegaBlackHoleVisual.transform.position = this.transform.position;
+                int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                
+                transform.rotation = Quaternion.Euler(0,Quaternion.LookRotation(MouseWorldPosition()- transform.position).eulerAngles.y,0);
+                blackHole.SetBlackHole(transform.forward,  ActiveCapacity1SO.durationBase, ActiveCapacity1SO.speedBase, manager, damage);
                 break;
         }
     }
     
-    public void OnCapacityPerformed(Capacities capacity, List<int> targets)
+    public void OnCapacityPerformed(Capacities capacity, List<int> targets = null)
     {
         manager.isCasting = false;
         
         List<int> enemies = new List<int>();
-        
-        for (int i = 0; i < targets.Count; i++)
-        {
-            ITeamable teamable = PhotonView.Find(targets[i]).GetComponent<ITeamable>();
 
-            if (teamable != null)
+        if (targets != null)
+        {
+            for (int i = 0; i < targets.Count; i++)
             {
-                if (manager.CurrentTeam() != teamable.CurrentTeam())
+                ITeamable teamable = PhotonView.Find(targets[i]).GetComponent<ITeamable>();
+
+                if (teamable != null)
                 {
-                    enemies.Add(targets[i]);
+                    if (manager.CurrentTeam() != teamable.CurrentTeam())
+                    {
+                        enemies.Add(targets[i]);
+                    }
                 }
             }
         }
@@ -514,6 +571,14 @@ public class PlayerController : MonoBehaviour
                 manager.KnockBack(enemies.ToArray(), manager.force > 0 ? 0.6f * manager.force : 0,manager.force > 0 ? 11f * manager.force : 0,kbDirection.normalized);
                 EnableMovement();
                 break;
+            
+            case Capacities.VEGA_Blackhole:
+                vegaBlackHoleVisual.SetActive(true);
+                vegaBlackHoleVisual.transform.position = this.transform.position;
+                BlackHoleCapacitySO blackHoleData = (BlackHoleCapacitySO) ActiveCapacity1SO;
+                int damage = Mathf.RoundToInt(ActiveCapacity1SO.amount * manager.damageMultiplier.Evaluate(manager.force));
+                blackHole.SetBlackHole(transform.forward,  ActiveCapacity1SO.durationBase, ActiveCapacity1SO.speedBase, manager, damage);
+                break;
         }
     }
 
@@ -524,7 +589,14 @@ public class PlayerController : MonoBehaviour
     
     public void ChangeAnimation(int index)
     {
-        animator.SetInteger("Animation",index);
+        if (manager.currentData == manager.mimiData)
+        {
+            animatorMimi.SetInteger("Animation",index);
+        }
+        else
+        {
+            animatorVega.SetInteger("Animation",index);
+        }
     }
 
     #endregion
@@ -737,22 +809,21 @@ public class PlayerController : MonoBehaviour
         {
             agent.ResetPath();
             moving = false;
-            animator.Play("Idle");
+            
         }
         else if (movementType == MovementType.FollowCible)
         {
             agent.ResetPath();
             moving = false;
-            animator.Play("Idle");
+           
         }
         else if (movementType == MovementType.Attack)
         {
             isAttacking = false;
-            animator.Play("Idle");
         }
         else if (movementType == MovementType.KeepDirectionWithoutNavMesh)
         {
-            animator.Play("Idle");
+            
         }
         else if (movementType == MovementType.Slide)
         {
