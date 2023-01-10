@@ -54,6 +54,6 @@ Material:
     - _Scale_noise: 5
     - _Treshold_size: 0.89
     m_Colors:
-    - _Color: {r: 30.494114, g: 7.1479826, b: 0.47896427, a: 0}
+    - _Color: {r: 15.247057, g: 3.5922387, b: 0.23948257, a: 0}
     - _Color_1: {r: 0.32091716, g: 0.03137255, b: 0.7647059, a: 0}
   m_BuildTextureStacks: []

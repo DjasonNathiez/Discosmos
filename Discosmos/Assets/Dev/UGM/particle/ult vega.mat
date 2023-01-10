@@ -49,11 +49,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _Nombre_de_carr_horizontal: 8
-    - _Nombre_de_carr_vertical: 1
+    - _Nombre_de_carr_vertical: 2
     - _Opacity: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Speed: 8.12
+    - _Speed: 5.26
     - _rose_ou_vert: 0
     m_Colors: []
   m_BuildTextureStacks: []

@@ -52,7 +52,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Scale_noise: 4.63
-    - _Treshold_size: 0.36
+    - _Treshold_size: 8.39
     m_Colors:
     - _Color: {r: 0, g: 0.7169812, b: 0.66848963, a: 0}
     - _Color_1: {r: 0.32091716, g: 0.03137255, b: 0.7647059, a: 0}
