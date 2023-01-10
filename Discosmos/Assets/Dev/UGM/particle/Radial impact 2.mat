@@ -64,5 +64,5 @@ Material:
     - _Speed_scroolling: -0.94
     - _Texture: 0
     m_Colors:
-    - _Color: {r: 2, g: 2, b: 2, a: 0}
+    - _Color: {r: 3.9999995, g: 3.9999995, b: 3.9999995, a: 0}
   m_BuildTextureStacks: []

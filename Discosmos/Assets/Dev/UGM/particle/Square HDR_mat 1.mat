@@ -50,7 +50,7 @@ Material:
     - _Taille_noise: 15
     - _Transparent: 1
     m_Colors:
-    - _Color: {r: 9.178426, g: 9.178426, b: 9.178426, a: 0}
+    - _Color: {r: 4.5892124, g: 4.5892124, b: 4.5892124, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &3017723563517958477
 MonoBehaviour:
